@@ -1,4 +1,5 @@
 
+/etc/init.d/postgresql restart
    
 ## Script to create spatially enabled database for effdis database project ### 
 
