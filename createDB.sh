@@ -1,6 +1,7 @@
 
    
-## Script to create spatially enabled databases for effdis database project ### 
+## Script to create spatially enabled database for effdis database project ### 
+
 sudo -i -u postgres
 createdb effdis
 psql -d effdis
