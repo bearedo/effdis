@@ -5,23 +5,11 @@
 
 sudo -i -u postgres
 createdb effdis
-psql -d effdis
-CREATE EXTENSION postgis;
-CREATE EXTENSION postgis_topology;
+createlang plpgsql effdis
+psql -d effdis -c "CREATE EXTENSION postgis;"
+psql -d effdis -c "CREATE EXTENSION postgis_topology;"
+#psql -d effdis -c "CREATE EXTENSION postgis_tiger_geocoder;"
 
-psql -U postgres -d effdis -f /usr/share/postgresql/9.1/contrib/postgis-2.0/postgis.sql
-psql -U postgres -d effdis -f /usr/share/postgresql/9.1/contrib/postgis-2.0/spatial_ref_sys.sql
-psql -U postgres -d effdis -f /usr/share/postgresql/9.1/contrib/postgis-2.0/postgis_comments.sql
-
-# with raster support:
-
-psql -U postgres -d effdis -f /usr/share/postgresql/9.1/contrib/postgis-2.0/rtpostgis.sql
-psql -U postgres -d effdis -f /usr/share/postgresql/9.1/contrib/postgis-2.0/raster_comments.sql
-
-# with topology support:
-
-psql -U postgres -d effdis -f /usr/share/postgresql/9.1/contrib/postgis-2.0/topology.sql
-psql -U postgres -d effdis -f /usr/share/postgresql/9.1/contrib/postgis-2.0/topology_comments.sql
 
 
     
