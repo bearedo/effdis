@@ -2,28 +2,39 @@
 
 # Script to install postgres and postgis
 
-# Prerequisites #
+sudo su -
 
-sudo apt-get install build-essential postgresql-9.3 postgresql-server-dev-9.3 libgeos-c1 libgdal-dev 
-libproj-dev libjson0-dev libxml2-dev libxml2-utils xsltproc docbook-xsl docbook-mathml
+sudo apt-get update
 
-# Install postgis from source #
+sudo apt-get install postgresql-9.3-postgis-2.1
 
-wget http://download.osgeo.org/postgis/source/postgis-2.1.7.tar.gz
-tar xfz postgis-2.1.7.tar.gz
-cd postgis-2.1.7
+# Import the Boundless GPG key:
 
-# A basic configuration for PostGIS 2.1, with raster and topology support #
+wget -qO- https://apt.boundlessgeo.com/gpg.key | apt-key add -
 
-./configure
-make
-sudo make install
-sudo ldconfig
-sudo make comments-install
+# Add the OpenGeo Suite repository:
 
-# Enable the command-line tools to work from your shell: 
+echo "deb https://apt.boundlessgeo.com/suite/v45/ubuntu/ trusty main" > /etc/apt/sources.list.d/opengeo.list
 
+apt-get update
 
-sudo ln -sf /usr/share/postgresql-common/pg_wrapper /usr/local/bin/shp2pgsql
-sudo ln -sf /usr/share/postgresql-common/pg_wrapper /usr/local/bin/pgsql2shp
-sudo ln -sf /usr/share/postgresql-common/pg_wrapper /usr/local/bin/raster2pgsql
+# Search for OpenGeo Suite packages to verify that the repository list is correct. If the command does not return any results, examine the output of the apt command for any errors or warnings.
+
+apt-cache search opengeo
+
+# To install typical server components:
+
+    apt-get install opengeo-server
+
+# To install typical client components:
+
+    apt-get install opengeo-client
+
+# To install typical client and server components:
+
+    apt-get install opengeo
+
+# Controlling the postgres server
+
+sudo service postgresql start|stop|restart
+
