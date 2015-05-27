@@ -259,11 +259,13 @@ grd         <- createGrid(spatBound$x,spatBound$y,resx,resy,type="SpatialGridDat
 
 grd@proj4string <- geogWGS84
 
+
+
 cutbreaksval  <- list(ALL = c(-1,0,10,25,50,100,200,400))
 legval        <- list(ALL = c("0","0 <= 10","10 <= 25", "25 <= 50","50 <= 100","100 <= 200","200 <= 400"))
 #- Potentially, divide your data by a certain constant and add this constant to the legend title
-valdiv        <- 1000 * 60 #combination of converting from minutes to hours and getting a legend value per 1000 hours
-unitval       <- c('x 1000 hours per year')
+valdiv        <- 1000000 #combination of converting from minutes to hours and getting a legend value per 1000 hours
+unitval       <- c('x million hooks per year')
 
 
 #- Reset values

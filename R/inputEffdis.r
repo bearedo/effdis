@@ -8,13 +8,20 @@ library(sp)
 library(doBy)
 library(rgdal)
 library(RODBC)
+library(RColorBrewer)
 library(ggplot2)
+library(vmstools)
+
 
 #### Read in data for 2011 ###
 
 # Set working directory #
 
 setwd('/home/doug/Dropbox/Globefish-Consultancy-Services-2015/ICCAT-Effdis-Contract-2015/Data/effdis_2011/input')
+
+source("/home/doug/Dropbox/Globefish-Consultancy-Services-2015/ICCAT-Effdis-Contract-2015/Scripts/utilityDB.R")
+source("/home/doug/effdis/R/utilityDB.R")
+source("/home/doug/effdis/R/trend.r")
 
 # List files in directory #
 
@@ -117,18 +124,12 @@ t2ceLL$trend <- trend.f(year=t2ceLL$YearC,month=t2ceLL$TimePeriodID,start.year=1
 
 # Note: apparently even though it says 1x1 in the original data they have actually been converted to 5x5.
 
-
-source("/home/doug/Dropbox/Globefish-Consultancy-Services-2015/ICCAT-Effdis-Contract-2015/Scripts/utilityDB.R")
-source("/home/doug/effdis/R/utilityDB.R")
-source("/home/doug/effdis/R/trend.r")
-
 table(t2ceLL$SquareTypeCode)
 
 #1x1   5x5 
 # 11874 89640 
 
 df <- data.frame(quad=t2ceLL$QuadID,lat=t2ceLL$Lat5,lon=t2ceLL$Lon5,square=ac(t2ceLL$SquareTypeCode))
-
 
 df1<- data.frame(quad=rep(NA,length(df[,1])),lat=rep(NA,length(df[,1])),lon=rep(NA,length(df[,1])),square=rep(NA,length(df[,1])))
 
@@ -225,8 +226,7 @@ xl <- seq(min(ct$YearC),max(ct$Year),by=5)
 axis(1,at=seq(min(ct$trend),max(ct$trend),by=60),labels=as.character(xl))
 abline(v=seq(min(ct$trend),max(ct$trend),by=60),lty=2,col='blue')
 
-
-#Have a look at the relationship between n hooks and specie weights caught
+#Have a look at the relationship between n hooks and species weights caught
 
 cor(cbind(ct$Eff1,ct$ALB,ct$BFT,ct$BET,ct$SKJ,ct$YFT,ct$SWO,ct$BUM,ct$SAI,ct$WHM))
 
@@ -243,31 +243,90 @@ plot(ct$WHM,sqrt(ct$Eff1),pch='.')
 plot(ct$Total,sqrt(ct$Eff1),pch='.')
 plot(log(ct$Total),log(ct$Eff1),pch='.')
 
-
-
-
-
-
-
 #### Plotting in spatial dimension ###
 
+nct <- ct[ct$YearC == 1990,]
+
+coords      <- SpatialPointsDataFrame(cbind(x=an(ac(nct$lon)),y=an(ac(nct$lat))),data=nct)
+
+geogWGS84 <- CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs") # Make sure proj is what we think it is.
+
+coords@proj4string <- geogWGS84
+
+plot(coords,type='p',pch='.')
+map('worldHires',add=T,fill=T,col='green')
+
+#### Useful global spatial data from here ###
+
+#http://www.vdstech.com/world-data.aspx
+
+#Shapefiles for oceans
+
+oceans <- readOGR(dsn="/home/doug/Dropbox/Globefish-Consultancy-Services-2015/ICCAT-Effdis-Contract-2015/Data", layer="OceanSeas") # World seas and oceans
+
+geogWGS84 <- CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs") # Make sure proj is what we think it is.
+oceans@proj4string <- geogWGS84
+
+class(oceans)
+
+head(oceans@data)
+
+table(oceans@data$NAME)
+
+wo <- grep('ATLANTIC',oceans@data$NAME)
+
+ocean.polys <- as.character(sort(unique(oceans@data$NAME)))
+ocean.polys[1:10]
+
+atlantic <- oceans[oceans@data$NAME %in% ocean.polys[c(97,117)],]
+
+#Shapefile for countries
+
+world <- readOGR(dsn="/home/doug/Dropbox/Globefish-Consultancy-Services-2015/ICCAT-Effdis-Contract-2015/Data", layer="world") # World seas and oceans
+
+geogWGS84 <- CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs") # Make sure proj is what we think it is.
+
+world@proj4string <- geogWGS84
+
+class(world)
+
+head(world@data)
+
+table(world@data$NAME)
+
+world.polys <- as.character(sort(unique(world@data$NAME)))
+world.polys
+
+atl.countries <- world[world@data$NAME %in% world.polys[c(3,6,7,9,23,25,27,29,35,
+                                                          37,39,41,43,47,49,53,55,59,61,63,65,67,69,
+                                                          75,79,81,83,85,87,89,91,93,101,105,107,111,123,
+                                                          133,137,147,153,159,171,175,181,183,185,187,189,191,
+                                                          197,199,201,203,209,211,213,215,217,219,223,237,239,2,
+                                                          10,12,14,16,20,24,28,30,34,38,4,42,46,50,52,54,56,
+                                                          58,60,64,66,68,70,74,78,80,82,84,86,88,90,92,94,96,
+                                                          102,104,110,120,122,124,126,128,130,134,136,138,140,144,
+                                                          146,148,150,154,158,168,170,174,178,180,182,184,186,188,
+                                                          196,198,202,204,206,216,220,222,224,228,230,234,236,238
+                                                          )],]
 
 
+plot(coords,col='red',pch='.',axes=T)
+plot(world,fill=T,col='green',add=T,axes=T)
+plot(atlantic,add=T)
 
+# Get rid of EFFDIS observations on land #
 
+idx <- over(coords,atl.countries)
+land      <- rep(NA,length(nct[,1]))
 
+land[which(is.na(idx[,1])==FALSE)] <- 1
+land[which(is.na(idx[,1])==TRUE)] <- 0
 
+nct$land <- land
 
+nct<- nct[nct$land ==0,] # Chuck out data on land.
 
-
-
-
-
-
-
-plot(t2ceLL$lon,t2ceLL$lat,pch='.')
-
-coords      <- SpatialPointsDataFrame(cbind(x=as.numeric(as.character(t2ceLL$lon)),y=as.numeric(as.character(t2ceLL$lat))),data=t2ceLL)
+coords      <- SpatialPointsDataFrame(cbind(x=an(ac(nct$lon)),y=an(ac(nct$lat))),data=nct)
 
 geogWGS84 <- CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs") # Make sure proj is what we think it is.
 
@@ -275,6 +334,86 @@ coords@proj4string <- geogWGS84
 
 plot(coords)
 
+#######Plotting routines#############
+#- Define grid cell area
+resx        <- 5
+resy        <- 5
+
+
+cl          <- 1.1  #cex.lab
+ca          <- 1    #cex.axis
+fonts       <- 2    #font
+xl          <- list(label="Longitude",font=fonts,cex=cl) #x-label
+yl          <- list(label="Latitude",font=fonts,cex=cl)  #y-label
+zl          <- list(font=fonts,cex=cl) #z-label (if any)
+colintens   <- brewer.pal(6,"YlOrRd")  #colour for fishing intensity
+colland     <- brewer.pal(9,"PiYG")[8] #colour of land
+colgrey     <- brewer.pal(9,"Greys")   #colour of grey shades
+figtype     <- "tiff"                  #figure extension type
+parmar      <- rep(2,4)                #panel settings
+paroma      <- (c(6,6,2,2)+0.1)        #panel settings
+reso        <- 1                       #dpi setting (1=100dpi)
+
+#-Obtain outer region of my areas and VMS positions. This helps to create maps later on with the same dimensions.
+bbox        <- bbox(coords)
+spatBound   <- list(xrange = c(floor(range(bbox["x",])[1]),ceiling(range(bbox["x",])[2])),
+                    yrange = c(floor(range(bbox["y",])[1]),ceiling(range(bbox["y",])[2])))
+grd         <- createGrid(spatBound$x,spatBound$y,resx,resy,type="SpatialGridDataFrame",exactBorder=T)
+
+grd@proj4string <- geogWGS84
+
+#- Reset values
+grd@data[] <- 0
+
+
+#-Create column to aggregate over (most often, this column already exists and is output from your previous analyses)
+#tacsat                        <- intervalTacsat(tacsat,level="vessel",fill.na=T)
+
+idx                           <- over(as(coords,"SpatialPoints"),as(grd,"SpatialGrid"))
+nct$gridID                 <- idx
+
+
+#- Here we aggregate data to the grid cell. You can aggregate any column you like, we use INTV as an example here.
+grd@data[names(table(idx)),1] <- aggregate(nct$Eff1,by=list(nct$gridID),FUN=sum,na.rm=T)$x
+
+#Look at value ranges:
+rr <- range(grd@data[an(names(table(idx))),1])
+
+cutbreaksval  <- list(ALL = c(-1,0,10,25,50,100,150,200))
+legval        <- list(ALL = c("0","0 <= 10","10 <= 25", "25 <= 50","50 <= 100","100 <= 200","200 <= 400"))
+#- Potentially, divide your data by a certain constant and add this constant to the legend title
+valdiv        <- 1000000 #combination of converting from minutes to hours and getting a legend value per 1000 hours
+unitval       <- c('x 1000000 million hooks')
+
+
+plot(1,1,col="white",xlim=spatBound$xrange,ylim=spatBound$yrange,xlab="",ylab="",
+     xaxt="n",yaxt="n",las=1,cex.lab=xl$cex,font=xl$font,
+     asp=1/lonLatRatio(mean(spatBound$xrange),mean(spatBound$yrange)))
+coordGrd  <- coordinates(grd)[an(names(table(idx))),]
+
+#-Here we turn each of the grid cells into a polygon. All polygons together make the picture
+
+grdPols <- 
+  lonLat2SpatialPolygons(lst=lapply(as.list(1:nrow(coordGrd)),function(x){data.frame(SI_LONG=c(coordGrd[x,"s1"]-resx/2,rep(coordGrd[x,"s1"]+resx/2,2),coordGrd[x,"s1"]-resx/2),
+                                                                                     SI_LATI=c(rep(coordGrd[x,"s2"]-resy/2,2),rep(coordGrd[x,"s2"]+resy/2,2)))}))
+
+cols<- c("white",colintens)[cut(grd@data[an(names(table(idx))),1]/valdiv,breaks=cutbreaksval$ALL)]
+plot(grdPols,col=cols,add=T,border='transparent')
+#plot(atl.countries,add=T,col=colland)
+map("worldHires",resolution=1,add=T,fill=TRUE,col=colland);map.axes();#box()
+#axis(1);axis(2,las=1); box()
+
+
+
+
+#-Add a legend
+legend(x='topright',fill=c('white',colintens),legend=legval$ALL,bg='white',title=unitval,box.lty=1)
+
+
+#- Add axis and title
+title(main="Fishing intensity",outer=F,cex=cl)
+mtext(xl$label,side=1,outer=T,line=-3,at=0.5,font=xl$font,cex=xl$cex)
+mtext(yl$label,side=2,outer=T,line=-1.5,at=0.5,font=yl$font,cex=yl$cex)                                                                                       
 
 
 
