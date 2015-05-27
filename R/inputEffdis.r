@@ -6,6 +6,9 @@ library(rio)
 library(spatial)
 library(sp)
 library(doBy)
+library(rgdal)
+library(RODBC)
+library(ggplot2)
 
 #### Read in data for 2011 ###
 
