@@ -100,8 +100,6 @@ table(t2ceLL$DSetType,t2ceLL$FlagName)
 # -w                        874                  60      65      0       53       0      1797
 # 
 
-
-
 # Year month coverage in the Atlantic##
 
 ymc <- table(t2ceLL$YearC[t2ceLL$Region=='AT'],t2ceLL$TimePeriodID[t2ceLL$Region=='AT'])
@@ -155,6 +153,7 @@ table(t1det9sp$GearGrp)
 table(t1det9sp$Flag)
 t1ct <- t1det9sp[t1det9sp$Flag == 'Chinese Taipei' & t1det9sp$Region == 'AT',]
 table(t1ct$Species)
+
 #Just long-lines
 
 t1ct <- t1ct[t1ct$GearGrp == 'LL',]
@@ -164,7 +163,6 @@ t1ct1 <- aggregate(Qty_t ~ YearC+Species,data=t1ct,sum)
 library(lattice)
 
 xyplot(Qty_t~YearC|Species,data=t1ct1)
-
 
 
 ## Task2: Total number of hooks observed ##
@@ -207,6 +205,36 @@ aggregate(Eff1~FlagName,FUN=sum,data=t2ceLL)
 
 ct <- t2ceLL[t2ceLL$FlagName == 'Chinese Taipei'& t2ceLL$Region == 'AT',]
 
+## Sampling in space ##
+
+#By year 
+par(mfrow=c(5,9),mar=c(0,0,2,0))
+ys <- sort(unique(ct$YearC))
+ly <- length(ys) # 43 years
+for (i in min(ys):max(ys))
+  {
+dat <- ct[ct$YearC == i,]
+plot(ct$lon,ct$lat,type='n',xaxt='n',yaxt='n')
+points(dat$lon,dat$lat,pch='.')
+map('world',add=T,col='green')
+title(i)
+}
+
+#By month
+par(mfrow=c(3,4),mar=c(0,0,2,0))
+ms <- sort(unique(ct$TimePeriodID))
+lm <- length(ms) # 43 years
+for (i in min(ms):max(ms))
+{
+  dat <- ct[ct$TimePeriodID == i,]
+  plot(ct$lon,ct$lat,type='n',xaxt='n',yaxt='n')
+  points(dat$lon,dat$lat,pch='.')
+  map('world',add=T,col='green',fill=T)
+  title(month.abb[i])
+}
+
+
+
 plot(ct$trend,log(ct$Eff1),pch='.',xaxt='n',ylab='Number of hooks',xlab="year")
 lines(supsmu(ct$trend,log(ct$Eff1)          ),col='green')
 xl <- seq(min(ct$YearC),max(ct$Year),by=5)
@@ -228,20 +256,29 @@ abline(v=seq(min(ct$trend),max(ct$trend),by=60),lty=2,col='blue')
 
 #Have a look at the relationship between n hooks and species weights caught
 
-cor(cbind(ct$Eff1,ct$ALB,ct$BFT,ct$BET,ct$SKJ,ct$YFT,ct$SWO,ct$BUM,ct$SAI,ct$WHM))
+cc <- cor(cbind(ct$Eff1,ct$ALB,ct$BFT,ct$BET,ct$SKJ,ct$YFT,ct$SWO,ct$BUM,ct$SAI,ct$WHM))
+round(cc,2)
 
-par(mfrow=c(1,1))
-plot(ct$ALB,sqrt(ct$Eff1),pch='.')
-plot(ct$BFT,sqrt(ct$Eff1),pch='.')
-plot(ct$BET,sqrt(ct$Eff1),pch='.')
-plot(ct$SKJ,sqrt(ct$Eff1),pch='.')
-plot(ct$YFT,sqrt(ct$Eff1),pch='.')
-plot(ct$SWO,sqrt(ct$Eff1),pch='.')
-plot(ct$BUM,sqrt(ct$Eff1),pch='.')
-plot(ct$SAI,sqrt(ct$Eff1),pch='.')
-plot(ct$WHM,sqrt(ct$Eff1),pch='.')
-plot(ct$Total,sqrt(ct$Eff1),pch='.')
+
+par(mfrow=c(3,4),mar=c(1,1,3,1))
+for(i in 19:27){
+plot(ct[,i],sqrt(ct$Eff1),pch='.')
+title(colnames(ct)[i])
+}
 plot(log(ct$Total),log(ct$Eff1),pch='.')
+title('Total')
+
+# Multivariate relationships in the Taiwanese data #
+
+ct2 <- cbind(Yearct$YearC,ct$TimePeriodID,ct$lon,ct$lat,ct$Eff1,ct$ALB,ct$BFT,
+             ct$BET,ct$SKJ,ct$YFT,ct$SWO,ct$BUM,ct$SAI,ct$WHM,ct$Total)
+
+pairs(ct2,pch='.')
+
+round(cor(ct2),2)
+
+
+
 
 #### Plotting in spatial dimension ###
 
