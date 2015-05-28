@@ -139,8 +139,8 @@ for(i in 1:length(df[,1]))
 t2ceLL$lon <- df1$lon
 t2ceLL$lat <- df1$lat
 
-
-#Task 1: 
+#####################################
+#Task 1 #############################
 
 head(t1det9sp)
 
@@ -162,7 +162,7 @@ t1ct1 <- aggregate(Qty_t ~ YearC+Species,data=t1ct,sum)
 
 library(lattice)
 
-xyplot(Qty_t~YearC|Species,data=t1ct1)
+xyplot(log(Qty_t)~YearC|Species,data=t1ct1)
 
 
 ## Task2: Total number of hooks observed ##
@@ -256,8 +256,6 @@ abline(v=seq(min(ct$trend),max(ct$trend),by=60),lty=2,col='blue')
 
 #Have a look at the relationship between n hooks and species weights caught
 
-cc <- cor(cbind(ct$Eff1,ct$ALB,ct$BFT,ct$BET,ct$SKJ,ct$YFT,ct$SWO,ct$BUM,ct$SAI,ct$WHM))
-round(cc,2)
 
 
 par(mfrow=c(3,4),mar=c(1,1,3,1))
@@ -270,8 +268,9 @@ title('Total')
 
 # Multivariate relationships in the Taiwanese data #
 
-ct2 <- cbind(Yearct$YearC,ct$TimePeriodID,ct$lon,ct$lat,ct$Eff1,ct$ALB,ct$BFT,
-             ct$BET,ct$SKJ,ct$YFT,ct$SWO,ct$BUM,ct$SAI,ct$WHM,ct$Total)
+ct2 <- data.frame(year=ct$YearC,monthk=ct$TimePeriodID,lon=ct$lon,lat=ct$lat,hooks=ct$Eff1,
+                  ALB=ct$ALB,BFT=ct$BFT,
+             BET=ct$BET,SKJ=ct$SKJ,YFT=ct$YFT,SWO=ct$SWO,BUM=ct$BUM,SAI=ct$SAI,WHM=ct$WHM,Total=ct$Total)
 
 pairs(ct2,pch='.')
 
