@@ -6,7 +6,7 @@ output: ioslides_presentation
 ---
 
 ## SHORT-TERM CONTRACT 
-### A MODELING APPROACH TO ESTIMATE OVERALL ATLANTIC EFFORT BY TIME-AREA STRATA (EFFDIS)
+### A MODELING APPROACH TO ESTIMATE OVERALL ATLANTIC FISHING EFFORT BY TIME-AREA STRATA (EFFDIS)
 
 ## Objectives
 
@@ -16,20 +16,30 @@ Update the current EFFDIS estimations for longline gear (1950 to 2014) using the
 
 ## Outline
 
-The SGECO Working group rmade a series of recommendations for improving EFFDIS i.e.
+The SGECO Working group made a series of recommendations for improving EFFDIS, ie.
 
-+ Seasonality and Spatial 
-+ Species composition 
-+ Bait boat and purse-seine 
-+ uncertainty/variance 
-+ cross-validate using other relevant information where available, e.g. VMS data.
++ Considering seasonal and spatial patterns and their interactions 
++ Understanding how information from pecies composition can best be used in this context
++ Combining bait boat and purse-seine estimates with the long-line
++ Estimating uncertainty/variance 
++ Cross-validating using other relevant information where available, e.g. VMS data
 
 ## Workplan
 
-+ Obtain all the relevant data and review the methods for EFFDIS estimation 
++ Obtain all the relevant data and review the current methods for EFFDIS estimation 
 + Write documented R code to mimic the current procedure. 
-+ Develop  ‘strawman’ methodologies for estimating fishing effort for one fleet/flag country
++ Develop  ‘strawman’ methodologies for estimating fishing effort for a single fleet/flag country
 + Once a method is approved for one fleet the Contractor will then adapt it to other fleets to produce global estimates.  
 + Use an online SQL relational database linked to R-scripts
 
 ## Tasks
+
+
+
+
+
+
+
+
+
+
