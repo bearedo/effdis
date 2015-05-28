@@ -11,6 +11,7 @@ library(RODBC)
 library(RColorBrewer)
 library(ggplot2)
 library(vmstools)
+library(gam)
 
 
 #### Read in data for 2011 ###
@@ -138,6 +139,10 @@ for(i in 1:length(df[,1]))
 
 t2ceLL$lon <- df1$lon
 t2ceLL$lat <- df1$lat
+
+write.table(t2ceLL,'t2ceLL.csv',sep=',')
+
+
 
 #####################################
 #Task 1 #############################
@@ -268,13 +273,65 @@ title('Total')
 
 # Multivariate relationships in the Taiwanese data #
 
-ct2 <- data.frame(year=ct$YearC,monthk=ct$TimePeriodID,lon=ct$lon,lat=ct$lat,hooks=ct$Eff1,
+ct2 <- data.frame(year=ct$YearC,month=ct$TimePeriodID,lon=ct$lon,lat=ct$lat,hooks=ct$Eff1,
                   ALB=ct$ALB,BFT=ct$BFT,
              BET=ct$BET,SKJ=ct$SKJ,YFT=ct$YFT,SWO=ct$SWO,BUM=ct$BUM,SAI=ct$SAI,WHM=ct$WHM,Total=ct$Total)
 
-pairs(ct2,pch='.')
+#pairs(ct2,pch='.')
 
-round(cor(ct2),2)
+cc <- round(cor(ct2),2)
+
+par(mfrow=c(1,1))
+image(cc)
+
+# Merge Task1 and Task2
+
+# Simplify t1ct
+
+t1ct2 <- data.frame(year=t1ct$YearC,area=t1ct$Area,species=t1ct$Species,total_catch_kgs=t1ct$Qty_t*1000)
+
+# Produce sum for NORT and SOUT
+
+t1ct2 <- aggregate(total_catch_kgs~year+species,data=t1ct2,sum)
+
+# Convert ct2 to long-format
+
+library(reshape2)
+
+ct3 <- melt(ct2[,-15],id=c('year','month','lon','lat','hooks'))
+dimnames(ct3)[[2]][6:7] <- c('species','measured_catch_kgs')
+
+dim(ct3)
+
+
+# Now merge task 1 and 2
+
+ct3$total_catch_kgs <- t1ct2$total_catch_kgs[match(paste(ct3$year,ct3$species),paste(t1ct2$year,t1ct2$species))]
+ct3 <- ct3[!is.na(ct3$total_catch_kgs),]
+
+
+mc <- aggregate(measured_catch_kgs~year+species,data=ct3,sum)
+mc1 <-merge(mc,t1ct2,all.x=T)
+par(mar=c(3,3,3,3))
+plot(mc1$measured_catch_kgs,mc1$total_catch_kgs)
+abline(0,1)
+
+
+ct3$trend <- trend.f(year=ct3$year,month=ct3$month,start.year=1967)
+
+z0<-gam(hooks~1,family=poisson,data=ct3)
+z1<-gam(hooks~lo(trend)+lo(month)+lo(lon)+lo(lat),family=poisson,data=ct3)
+summary(z1)
+
+z2 <- glm(hooks~1,family=quasipoisson,data=ct3)
+z3 <- glm(hooks~measured_catch_kgs,family=quasipoisson,data=ct3)
+z4 <- glm(hooks~measured_catch_kgs+total_catch_kgs,family=quasipoisson,data=ct3)
+
+z2 <- glm.nb(hooks~1,data=ct3)
+z3 <- glm.nb(hooks~measured_catch_kgs,data=ct3)
+z4 <- glm.nb(hooks~measured_catch_kgs+total_catch_kgs,data=ct3)
+anova(z2,z3,z4,test="Chi")
+
 
 
 
