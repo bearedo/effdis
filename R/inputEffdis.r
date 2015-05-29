@@ -141,7 +141,7 @@ t2ceLL$lon <- df1$lon
 t2ceLL$lat <- df1$lat
 
 write.table(t2ceLL,'t2ceLL.csv',sep=',')
-
+t2ceLL <- read.table('t2ceLL.csv',sep=',')
 
 
 #####################################

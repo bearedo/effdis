@@ -24,15 +24,22 @@ The SGECO Working group made a series of recommendations for improving EFFDIS, i
 + Estimating uncertainty/variance 
 + Cross-validating using other relevant information where available, e.g. VMS data
 
-## Workplan
+## Overall workplan
 
 + Obtain all the relevant data and review the current methods for EFFDIS estimation 
-+ Write documented R code to mimic the current procedure. 
++ Write documented R code to mimic the current procedure
 + Develop  ‘strawman’ methodologies for estimating fishing effort for a single fleet/flag country
 + Once a method is approved for one fleet the Contractor will then adapt it to other fleets to produce global estimates.  
 + Use an online SQL relational database linked to R-scripts
 
-## Tasks
+## Detailed workplan
+
++ Explore data for confounding (data catalogue)
++ Investigate the relationship between Task 1 and Task 2 data (Sum of products) for fleet combinations
++ Develop most appropriate multi-variate models (e.g. GLMs, GAMs) to interpolate data voids
++ Estimate variance/bias with jackknife
++ Test predictions using cross-validation methodology
+
 
 
 
