@@ -293,6 +293,15 @@ for (i in min(ms):max(ms))
 }
 }
 
+spatial.coverage.by.month.task2.f()
+spatial.coverage.by.month.task2.f(which.flag='Belize')
+spatial.coverage.by.month.task2.f(which.flag='China P.R.')
+spatial.coverage.by.month.task2.f(which.flag='Chinese Taipei')
+spatial.coverage.by.month.task2.f(which.flag='Japan')
+spatial.coverage.by.month.task2.f(which.flag='U.S.A.')
+
+
+
 
 plot(ct$trend,log(ct$Eff1),pch='.',xaxt='n',ylab='Number of hooks',xlab="year")
 lines(supsmu(ct$trend,log(ct$Eff1)          ),col='green')
