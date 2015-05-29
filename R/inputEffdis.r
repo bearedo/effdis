@@ -101,18 +101,45 @@ table(t2ceLL$DSetType,t2ceLL$FlagName)
 # -w                        874                  60      65      0       53       0      1797
 # 
 
-# Year month coverage in the Atlantic##
 
-ymc <- table(t2ceLL$YearC[t2ceLL$Region=='AT'],t2ceLL$TimePeriodID[t2ceLL$Region=='AT'])
-dimnames(ymc)[[1]] <- c(min(t2ceLL$YearC):max(t2ceLL$YearC)) 
+######################################################
+##### Year month coverage in the Atlantic ############
+######################################################
+
+yr.month.coverage.task2.f<-function(tdata=t2ceLL,which.region = 'AT',which.flag='EU.Portugal'){
+
+#3D plot to explore temporal confounding
+ #tdata <- t2ceLL
+ #which.region <- 'AT'
+ #which.flag   <- 'EU.Portugal'
+ fdata <- tdata[tdata$Region == which.region & tdata$FlagName == which.flag,]
+
+ymc <- table(fdata$YearC,fdata$TimePeriodID) # Number of observations by year and month
+dimnames(ymc)[[1]] <- c(min(fdata$YearC):max(fdata$YearC)) 
 dimnames(ymc)[[2]] <- month.abb
 
-image(min(t2ceLL$YearC):max(t2ceLL$YearC),1:12,ymc,xaxt='n',yaxt='n',xlab="",ylab="",col=terrain.colors(100))
-contour(min(t2ceLL$YearC):max(t2ceLL$YearC),1:12,ymc,add=T)
-axis(side=1,at=min(t2ceLL$YearC):max(t2ceLL$YearC),label=row.names(ymc))
-axis(side=2,at=1:12,label=month.abb[1:12])
+image(min(fdata$YearC):max(fdata$YearC),1:12,ymc,xaxt='n',yaxt='n',xlab="",ylab="",col=terrain.colors(100),
+      xlim=range(tdata$YearC),ylim=range(tdata$TimePeriodID))
+contour(min(fdata$YearC):max(fdata$YearC),1:12,ymc,add=T)
 
-# Note - data coverage has increased markely with what appear to be steps in around 1974 and 1997.
+axis(side=1,at=min(tdata$YearC):max(tdata$YearC),label=sort(unique(tdata$YearC)))
+ms <- range(fdata$TimePeriodID)
+axis(side=2,at=ms[1]:ms[2],label=month.abb[ms[1]:ms[2]])
+title(which.flag)
+
+}
+
+#######################################################
+
+yr.month.coverage.task2.f()
+yr.month.coverage.task2.f(which.flag='Belize')
+yr.month.coverage.task2.f(which.flag='China P.R.')
+yr.month.coverage.task2.f(which.flag='Chinese Taipei')
+yr.month.coverage.task2.f(which.flag='Japan')
+yr.month.coverage.task2.f(which.flag='U.S.A.')
+
+
+# Note - data coverage for Chinese Taipei has increased markely with what appear to be steps in around 1974 and 1997.
 
 # Add trend column (useful for time-series analysis)
 
@@ -141,11 +168,14 @@ t2ceLL$lon <- df1$lon
 t2ceLL$lat <- df1$lat
 
 write.table(t2ceLL,'t2ceLL.csv',sep=',')
+
+
 t2ceLL <- read.table('t2ceLL.csv',sep=',')
 
 
 #####################################
 #Task 1 #############################
+######################################
 
 head(t1det9sp)
 
@@ -206,38 +236,62 @@ aggregate(Eff1~FlagName,FUN=sum,data=t2ceLL)
 # 25                    Vanuatu   21941130
 # 26                  Venezuela   34653748
 
-# Chinese Taipei in Atlantic #
+# Chinese Taipei in Atlantic Task 2#
 
 ct <- t2ceLL[t2ceLL$FlagName == 'Chinese Taipei'& t2ceLL$Region == 'AT',]
 
 ## Sampling in space ##
 
-#By year 
-par(mfrow=c(5,9),mar=c(0,0,2,0))
-ys <- sort(unique(ct$YearC))
+## By year ##
+
+spatial.coverage.by.year.task2.f <- function(tdata=t2ceLL,which.region = 'AT',which.flag='EU.Portugal'){
+  #tdata <- t2ceLL
+  #which.region <- 'AT'
+  #which.flag   <- 'EU.Portugal'
+  fdata <- tdata[tdata$FlagName == which.flag & tdata$Region == which.region,]
+  
+  par(mfrow=c(6,10),mar=c(0,0,2,0)) # 50 years
+ys <- sort(unique(tdata$YearC))
 ly <- length(ys) # 43 years
+
 for (i in min(ys):max(ys))
-  {
-dat <- ct[ct$YearC == i,]
-plot(ct$lon,ct$lat,type='n',xaxt='n',yaxt='n')
+{
+dat <- fdata[fdata$YearC == i,]
+if(length(dat[,1])==0){frame()}
+else{
+plot(dat$lon,dat$lat,type='n',xaxt='n',yaxt='n',ylim=range(tdata$lat),xlim=range(tdata$lon))
 points(dat$lon,dat$lat,pch='.')
 map('world',add=T,col='green')
 title(i)
 }
+}
+}
+
+spatial.coverage.by.year.task2.f()
+spatial.coverage.by.year.task2.f(which.flag='Belize')
+spatial.coverage.by.year.task2.f(which.flag='China P.R.')
+spatial.coverage.by.year.task2.f(which.flag='Chinese Taipei')
+spatial.coverage.by.year.task2.f(which.flag='Japan')
+spatial.coverage.by.year.task2.f(which.flag='U.S.A.')
 
 #By month
+spatial.coverage.by.month.task2.f <- function(tdata=t2ceLL,which.region = 'AT',which.flag='EU.Portugal')
+{
+  
+  fdata <- tdata[tdata$FlagName == which.flag & tdata$Region == which.region,]
 par(mfrow=c(3,4),mar=c(0,0,2,0))
-ms <- sort(unique(ct$TimePeriodID))
+ms <- sort(unique(fdata$TimePeriodID))
 lm <- length(ms) # 43 years
 for (i in min(ms):max(ms))
 {
-  dat <- ct[ct$TimePeriodID == i,]
-  plot(ct$lon,ct$lat,type='n',xaxt='n',yaxt='n')
+  dat <- fdata[fdata$TimePeriodID == i,]
+  plot(tdata$lon,tdata$lat,type='n',xaxt='n',yaxt='n')
   points(dat$lon,dat$lat,pch='.')
   map('world',add=T,col='green',fill=T)
   title(month.abb[i])
 }
-
+}
+}
 
 
 plot(ct$trend,log(ct$Eff1),pch='.',xaxt='n',ylab='Number of hooks',xlab="year")
