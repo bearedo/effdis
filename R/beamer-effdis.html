@@ -36,7 +36,7 @@
       // Author information
       presenters: [
             {
-        name:  'Doug &amp; Laurie' ,
+        name:  'Doug Beare &amp; Laurie Kell' ,
         company: '',
         gplus: '',
         twitter: '',
@@ -95,7 +95,7 @@
 
 <slide class=''><hgroup><h2>SHORT-TERM CONTRACT</h2></hgroup><article  id="short-term-contract">
 
-<h3>A MODELING APPROACH TO ESTIMATE OVERALL ATLANTIC EFFORT BY TIME-AREA STRATA (EFFDIS)</h3>
+<h3>A MODELING APPROACH TO ESTIMATE OVERALL ATLANTIC FISHING EFFORT BY TIME-AREA STRATA (EFFDIS)</h3>
 
 </article></slide><slide class=''><hgroup><h2>Objectives</h2></hgroup><article  id="objectives">
 
@@ -105,27 +105,35 @@
 
 </article></slide><slide class=''><hgroup><h2>Outline</h2></hgroup><article  id="outline">
 
-<p>The SGECO Working group rmade a series of recommendations for improving EFFDIS i.e.</p>
+<p>The SGECO Working group made a series of recommendations for improving EFFDIS, ie.</p>
 
 <ul>
-<li>Seasonality and Spatial</li>
-<li>Species composition</li>
-<li>Bait boat and purse-seine</li>
-<li>uncertainty/variance</li>
-<li>cross-validate using other relevant information where available, e.g. VMS data.</li>
+<li>Considering seasonal and spatial patterns and their interactions</li>
+<li>Understanding how information from pecies composition can best be used in this context</li>
+<li>Combining bait boat and purse-seine estimates with the long-line</li>
+<li>Estimating uncertainty/variance</li>
+<li>Cross-validating using other relevant information where available, e.g. VMS data</li>
 </ul>
 
-</article></slide><slide class=''><hgroup><h2>Workplan</h2></hgroup><article  id="workplan">
+</article></slide><slide class=''><hgroup><h2>Overall workplan</h2></hgroup><article  id="overall-workplan">
 
 <ul>
-<li>Obtain all the relevant data and review the methods for EFFDIS estimation</li>
-<li>Write documented R code to mimic the current procedure.</li>
-<li>Develop ‘strawman’ methodologies for estimating fishing effort for one fleet/flag country</li>
+<li>Obtain all the relevant data and review the current methods for EFFDIS estimation</li>
+<li>Write documented R code to mimic the current procedure</li>
+<li>Develop ‘strawman’ methodologies for estimating fishing effort for a single fleet/flag country</li>
 <li>Once a method is approved for one fleet the Contractor will then adapt it to other fleets to produce global estimates.<br/></li>
 <li>Use an online SQL relational database linked to R-scripts</li>
 </ul>
 
-</article></slide><slide class=''><hgroup><h2>Tasks</h2></hgroup><article  id="tasks"></article></slide>
+</article></slide><slide class=''><hgroup><h2>Detailed workplan</h2></hgroup><article  id="detailed-workplan">
+
+<ul>
+<li>Explore data for confounding (data catalogue)</li>
+<li>Investigate the relationship between Task 1 and Task 2 data (Sum of products) for fleet combinations</li>
+<li>Develop most appropriate multi-variate models (e.g. GLMs, GAMs) to interpolate data voids</li>
+<li>Estimate variance/bias with jackknife</li>
+<li>Test predictions using cross-validation methodology</li>
+</ul></article></slide>
 
 
   <slide class="backdrop"></slide>
