@@ -17,7 +17,7 @@ spatial.coverage.by.year.task2.f <- function(tdata=t2ceLL,which.region = 'AT',wh
       title(i,cex.main=.75)}
     else{
       plot(dat$lon,dat$lat,type='n',xaxt='n',yaxt='n',ylim=range(tdata$lat),xlim=range(tdata$lon))
-      points(dat$lon,dat$lat,pch='.',col='red')
+      points(dat$lon,dat$lat,pch=16,col='red')
       map('world',add=T,col='green',fill=T)
       title(i,cex.main=.75)
     }
