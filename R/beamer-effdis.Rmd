@@ -2,7 +2,7 @@
 title: ' Effort Estimation'
 author: "Doug Beare & Laurie Kell"
 date: "25/05/2015"
-output: ioslides_presentation
+output: slidy_presentation
 ---
 
 ## SHORT-TERM CONTRACT 
@@ -41,11 +41,48 @@ The SGECO Working group made a series of recommendations for improving EFFDIS, i
 + Test predictions using cross-validation methodology
 
 
+## Confounding
+```{r,include=FALSE}
+library(rio)
+library(maps)
+library(mapdata)
+source("/home/doug/effdis/R/yr.month.coverage.task2.f")
+source("/home/doug/effdis/R/spatial.coverage.by.year.task2.f")
+t2ceLL <- read.table("/home/doug/effdis/data/t2ceLL.csv",sep=",")
+t1det9sp <- import("/home/doug/effdis/data/t1det_9sp.xlsx")
+```
+```{r temporal confounding Chinese Taipei,include=TRUE,echo=FALSE}
+yr.month.coverage.task2.f(tdata=t2ceLL,which.flag='Chinese Taipei')
+```
 
+## 
 
+```{r temporal confounding Japan,include=TRUE,echo=FALSE}
+yr.month.coverage.task2.f(tdata=t2ceLL,which.flag='Japan')
+```
 
+## 
 
+```{r spatial confounding China,include=TRUE,echo=FALSE}
+library(maps)
+spatial.coverage.by.year.task2.f(tdata=t2ceLL,which.flag='Chinese Taipei')
+```
 
+##
+
+```{r spatial confounding by month Portugal, fig.width=8,include=TRUE,echo=FALSE}
+source("/home/doug/effdis/R/spatial.coverage.by.month.task2.f")
+spatial.coverage.by.month.task2.f()
+```
+
+##
+
+```{r no of hooks reported by Taipei and Japan in task 2, fig.width=8,include=TRUE,echo=FALSE,message = FALSE, error=FALSE, warnings=FALSE}
+source("/home/doug/effdis/R/effort.by.year.task2.f")
+par(mfrow=c(2,1))
+effort.by.year.task2.f(which.flag='Chinese Taipei')
+effort.by.year.task2.f(which.flag='Japan')
+```
 
 
 
