@@ -12,6 +12,8 @@ library(RColorBrewer)
 library(ggplot2)
 library(vmstools)
 library(gam)
+library(maps)
+library(mapdata)
 
 
 #### Read in data for 2011 ###
@@ -20,7 +22,7 @@ library(gam)
 
 setwd('/home/doug/Dropbox/Globefish-Consultancy-Services-2015/ICCAT-Effdis-Contract-2015/Data/effdis_2011/input')
 
-source("/home/doug/Dropbox/Globefish-Consultancy-Services-2015/ICCAT-Effdis-Contract-2015/Scripts/utilityDB.R")
+#source("/home/doug/Dropbox/Globefish-Consultancy-Services-2015/ICCAT-Effdis-Contract-2015/Scripts/utilityDB.R")
 source("/home/doug/effdis/R/utilityDB.R")
 source("/home/doug/effdis/R/trend.r")
 
@@ -28,10 +30,10 @@ source("/home/doug/effdis/R/trend.r")
 
 list.files()
 
-mw <- import("MeanWeights2011.xlsx")
-fr <- import("revisedFleetRanks.xlsx")
-t1det9sp <- import("t1det_9sp.xlsx")
-t2ceLL <- import("t2ce_LL_raw5x5.xlsx")
+mw <- import("/home/doug/Dropbox/Globefish-Consultancy-Services-2015/ICCAT-Effdis-Contract-2015/Data/effdis_2011/input/MeanWeights2011.xlsx")
+fr <- import("/home/doug/Dropbox/Globefish-Consultancy-Services-2015/ICCAT-Effdis-Contract-2015/Data/effdis_2011/input/revisedFleetRanks.xlsx")
+t1det9sp <- import("/home/doug/Dropbox/Globefish-Consultancy-Services-2015/ICCAT-Effdis-Contract-2015/Data/effdis_2011/input/t1det_9sp.xlsx")
+t2ceLL <- import("/home/doug/Dropbox/Globefish-Consultancy-Services-2015/ICCAT-Effdis-Contract-2015/Data/effdis_2011/input/t2ce_LL_raw5x5.xlsx")
 
 # First five rows of Task 2 data
 
@@ -132,7 +134,7 @@ title(which.flag)
 #######################################################
 
 yr.month.coverage.task2.f()
-yr.month.coverage.task2.f(which.flag='Belize')
+yr.month.coverage.task2.f(tdata=t2ceLL,which.flag='Belize')
 yr.month.coverage.task2.f(which.flag='China P.R.')
 yr.month.coverage.task2.f(which.flag='Chinese Taipei')
 yr.month.coverage.task2.f(which.flag='Japan')
@@ -167,10 +169,10 @@ for(i in 1:length(df[,1]))
 t2ceLL$lon <- df1$lon
 t2ceLL$lat <- df1$lat
 
-write.table(t2ceLL,'t2ceLL.csv',sep=',')
+write.table(t2ceLL,'/home/doug/effdis/data/t2ceLL.csv',sep=',')
 
 
-t2ceLL <- read.table('t2ceLL.csv',sep=',')
+t2ceLL <- read.table('/home/doug/effdis/data/t2ceLL.csv',sep=',')
 
 
 #####################################
@@ -244,28 +246,10 @@ ct <- t2ceLL[t2ceLL$FlagName == 'Chinese Taipei'& t2ceLL$Region == 'AT',]
 
 ## By year ##
 
-spatial.coverage.by.year.task2.f <- function(tdata=t2ceLL,which.region = 'AT',which.flag='EU.Portugal'){
-  #tdata <- t2ceLL
-  #which.region <- 'AT'
-  #which.flag   <- 'EU.Portugal'
-  fdata <- tdata[tdata$FlagName == which.flag & tdata$Region == which.region,]
-  
-  par(mfrow=c(6,10),mar=c(0,0,2,0)) # 50 years
-ys <- sort(unique(tdata$YearC))
-ly <- length(ys) # 43 years
+source("/home/doug/effdis/R/spatial.coverage.by.year.task2.f")
 
-for (i in min(ys):max(ys))
-{
-dat <- fdata[fdata$YearC == i,]
-if(length(dat[,1])==0){frame()}
-else{
-plot(dat$lon,dat$lat,type='n',xaxt='n',yaxt='n',ylim=range(tdata$lat),xlim=range(tdata$lon))
-points(dat$lon,dat$lat,pch='.')
-map('world',add=T,col='green')
-title(i)
-}
-}
-}
+
+
 
 spatial.coverage.by.year.task2.f()
 spatial.coverage.by.year.task2.f(which.flag='Belize')
@@ -275,23 +259,9 @@ spatial.coverage.by.year.task2.f(which.flag='Japan')
 spatial.coverage.by.year.task2.f(which.flag='U.S.A.')
 
 #By month
-spatial.coverage.by.month.task2.f <- function(tdata=t2ceLL,which.region = 'AT',which.flag='EU.Portugal')
-{
-  
-  fdata <- tdata[tdata$FlagName == which.flag & tdata$Region == which.region,]
-par(mfrow=c(3,4),mar=c(0,0,2,0))
-ms <- sort(unique(fdata$TimePeriodID))
-lm <- length(ms) # 43 years
-for (i in min(ms):max(ms))
-{
-  dat <- fdata[fdata$TimePeriodID == i,]
-  plot(tdata$lon,tdata$lat,type='n',xaxt='n',yaxt='n')
-  points(dat$lon,dat$lat,pch='.')
-  map('world',add=T,col='green',fill=T)
-  title(month.abb[i])
-}
-}
-}
+
+source("/home/doug/effdis/R/spatial.coverage.by.month.task2.f")
+
 
 spatial.coverage.by.month.task2.f()
 spatial.coverage.by.month.task2.f(which.flag='Belize')
@@ -301,13 +271,11 @@ spatial.coverage.by.month.task2.f(which.flag='Japan')
 spatial.coverage.by.month.task2.f(which.flag='U.S.A.')
 
 
+source("/home/doug/effdis/R/effort.by.year.task2.f")
 
-
-plot(ct$trend,log(ct$Eff1),pch='.',xaxt='n',ylab='Number of hooks',xlab="year")
-lines(supsmu(ct$trend,log(ct$Eff1)          ),col='green')
-xl <- seq(min(ct$YearC),max(ct$Year),by=5)
-axis(1,at=seq(min(ct$trend),max(ct$trend),by=60),labels=as.character(xl))
-abline(v=seq(min(ct$trend),max(ct$trend),by=60))
+par(mfrow=c(2,1))
+effort.by.year.task2.f(which.flag='Chinese Taipei')
+effort.by.year.task2.f(which.flag='Japan')
 
 
 #Sum by year and month
