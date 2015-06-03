@@ -1,6 +1,6 @@
 ---
 title: ' EFFDIS Effort Estimation'
-author: "Doug Beare, Laurie Kell & Carlos Palma"
+author: "Doug Beare with assistance from the ICCAT Secretariat"
 date: "03/06/2015"
 output: slidy_presentation
 ---
@@ -29,10 +29,10 @@ output: slidy_presentation
 + Once a method is approved for one fleet the Contractor will then adapt it to other fleets to produce global estimates  
 + Use an online SQL relational database linked to R-scripts
 
-## Detailed workplan
+## Detailed short-term workplan
 
 + Explore data for non-random, non-representative sampling (data catalogue)
-+ Investigate the relationship between Task 1 and Task 2 data (Sum of products) for fleet combinations
++ Investigate the relationship (sum of products) between Task 1, which focuses on the total catches of 9 major tuna & tuna-like species (Albacore, Bluefin, Yellowfin, Bigeye, Skipjack, Swordfish, Blue Marlin, White Marlin, Sailfish), and Task 2 data which is more detailed containing more detailed information on location, season, etc.
 + Develop most appropriate multi-variate models (e.g. GLMs, GAMs) for interpoplation
 + Estimate variance/bias with jack-knife
 + Test predictions using cross-validation methodology
@@ -85,7 +85,7 @@ effort.by.year.task2.r(which.flag='Japan')
 ```
 
 
-## Relationship between Task 1 and Task 2 data (Sum of products) for all fleet combinations
+## Relationship (sum of products) between Task 1 (the total catches of 9 major tuna & tuna-like species) and Task 2 (much more detailed) data for all fleet combinations
 
 
 ```{r relationship between task 1 and task 2 data, include=TRUE,echo=FALSE,message = FALSE, error=FALSE, warnings=FALSE}
