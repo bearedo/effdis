@@ -1,6 +1,6 @@
 
 
-spatial.coverage.by.month.task2.f <- function(tdata=t2ceLL,which.region = 'AT',which.flag='EU.Portugal')
+spatial.coverage.by.month.task2.r <- function(tdata=t2ceLL,which.region = 'AT',which.flag='EU.Portugal')
 {
   
   fdata <- tdata[tdata$FlagName == which.flag & tdata$Region == which.region,]

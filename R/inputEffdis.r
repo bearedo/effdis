@@ -85,6 +85,11 @@ table(t2ceLL$DSetType)
 # n-    nw    -w 
 # 44290 21437 35787 
 
+table(t2ceLL$CatchUnit)
+#kg    nr 
+#57224 44290
+
+
 table(t2ceLL$DSetType,t2ceLL$FlagName)
 
 # Belize Brasil China P.R. Chinese Taipei  Cuba EU.Cyprus EU.España EU.Greece EU.Italy
@@ -102,50 +107,45 @@ table(t2ceLL$DSetType,t2ceLL$FlagName)
 # nw                          0                   0     831      0        0     201         0
 # -w                        874                  60      65      0       53       0      1797
 # 
+table(t2ceLL$CatchUnit,t2ceLL$FlagName)
 
+# Belize Brasil China P.R. Chinese Taipei  Cuba EU.Cyprus EU.España EU.Greece EU.Italy EU.Malta EU.Portugal Japan Korea Rep. Maroc
+# kg    238   8081       1067          21908    41       157      9210       262       77       44         600     0       6499    65
+# nr      0    813          0              0  2247         0         0         0        0        0           0 34298        194     0
+# 
+# Mexico Namibia Panama Philippines South Africa St. Vincent and Grenadines Trinidad and Tobago Uruguay U.S.A. U.S.S.R. Vanuatu
+# kg    442     727   2763         338          824                        874                  60     896      0       53     201
+# nr      0       0      0           0            0                          0                   0       0   6550        0       0
+# 
+# Venezuela
+# kg      1797
+# nr       188
 
 ######################################################
 ##### Year month coverage in the Atlantic ############
 ######################################################
 
-yr.month.coverage.task2.f<-function(tdata=t2ceLL,which.region = 'AT',which.flag='EU.Portugal'){
 
-#3D plot to explore temporal confounding
- #tdata <- t2ceLL
- #which.region <- 'AT'
- #which.flag   <- 'EU.Portugal'
- fdata <- tdata[tdata$Region == which.region & tdata$FlagName == which.flag,]
-
-ymc <- table(fdata$YearC,fdata$TimePeriodID) # Number of observations by year and month
-dimnames(ymc)[[1]] <- c(min(fdata$YearC):max(fdata$YearC)) 
-dimnames(ymc)[[2]] <- month.abb
-
-image(min(fdata$YearC):max(fdata$YearC),1:12,ymc,xaxt='n',yaxt='n',xlab="",ylab="",col=terrain.colors(100),
-      xlim=range(tdata$YearC),ylim=range(tdata$TimePeriodID))
-contour(min(fdata$YearC):max(fdata$YearC),1:12,ymc,add=T)
-
-axis(side=1,at=min(tdata$YearC):max(tdata$YearC),label=sort(unique(tdata$YearC)))
-ms <- range(fdata$TimePeriodID)
-axis(side=2,at=ms[1]:ms[2],label=month.abb[ms[1]:ms[2]])
-title(which.flag)
-
-}
 
 #######################################################
 
-yr.month.coverage.task2.f()
-yr.month.coverage.task2.f(tdata=t2ceLL,which.flag='Belize')
-yr.month.coverage.task2.f(which.flag='China P.R.')
-yr.month.coverage.task2.f(which.flag='Chinese Taipei')
-yr.month.coverage.task2.f(which.flag='Japan')
-yr.month.coverage.task2.f(which.flag='U.S.A.')
+source("/home/doug/effdis/R/yr.month.coverage.task2.r")
+
+
+
+yr.month.coverage.task2.r()
+yr.month.coverage.task2.r(tdata=t2ceLL,which.flag='Belize')
+yr.month.coverage.task2.r(which.flag='China P.R.')
+yr.month.coverage.task2.r(which.flag='Chinese Taipei')
+yr.month.coverage.task2.r(which.flag='Japan')
+yr.month.coverage.task2.r(which.flag='U.S.A.')
 
 
 # Note - data coverage for Chinese Taipei has increased markely with what appear to be steps in around 1974 and 1997.
 
 # Add trend column (useful for time-series analysis)
 
-t2ceLL$trend <- trend.f(year=t2ceLL$YearC,month=t2ceLL$TimePeriodID,start.year=1956)
+t2ceLL$trend <- trend.r(year=t2ceLL$YearC,month=t2ceLL$TimePeriodID,start.year=1956)
 
 
 ### convert spatial information to grid centroids with Laurie's code ##
@@ -246,36 +246,32 @@ ct <- t2ceLL[t2ceLL$FlagName == 'Chinese Taipei'& t2ceLL$Region == 'AT',]
 
 ## By year ##
 
-source("/home/doug/effdis/R/spatial.coverage.by.year.task2.f")
+source("/home/doug/effdis/R/spatial.coverage.by.year.task2.r")
 
-
-
-
-spatial.coverage.by.year.task2.f()
-spatial.coverage.by.year.task2.f(which.flag='Belize')
-spatial.coverage.by.year.task2.f(which.flag='China P.R.')
-spatial.coverage.by.year.task2.f(which.flag='Chinese Taipei')
-spatial.coverage.by.year.task2.f(which.flag='Japan')
-spatial.coverage.by.year.task2.f(which.flag='U.S.A.')
+spatial.coverage.by.year.task2.r()
+spatial.coverage.by.year.task2.r(which.flag='Belize')
+spatial.coverage.by.year.task2.r(which.flag='China P.R.')
+spatial.coverage.by.year.task2.r(which.flag='Chinese Taipei')
+spatial.coverage.by.year.task2.r(which.flag='Japan')
+spatial.coverage.by.year.task2.r(which.flag='U.S.A.')
 
 #By month
 
-source("/home/doug/effdis/R/spatial.coverage.by.month.task2.f")
+source("/home/doug/effdis/R/spatial.coverage.by.month.task2.r")
 
 
-spatial.coverage.by.month.task2.f()
-spatial.coverage.by.month.task2.f(which.flag='Belize')
-spatial.coverage.by.month.task2.f(which.flag='China P.R.')
-spatial.coverage.by.month.task2.f(which.flag='Chinese Taipei')
-spatial.coverage.by.month.task2.f(which.flag='Japan')
-spatial.coverage.by.month.task2.f(which.flag='U.S.A.')
+spatial.coverage.by.month.task2.r()
+spatial.coverage.by.month.task2.r(which.flag='Belize')
+spatial.coverage.by.month.task2.r(which.flag='China P.R.')
+spatial.coverage.by.month.task2.r(which.flag='Chinese Taipei')
+spatial.coverage.by.month.task2.r(which.flag='Japan')
+spatial.coverage.by.month.task2.r(which.flag='U.S.A.')
 
 
-source("/home/doug/effdis/R/effort.by.year.task2.f")
-
+source("/home/doug/effdis/R/effort.by.year.task2.r")
 par(mfrow=c(2,1))
-effort.by.year.task2.f(which.flag='Chinese Taipei')
-effort.by.year.task2.f(which.flag='Japan')
+effort.by.year.task2.r(which.flag='Chinese Taipei')
+effort.by.year.task2.r(which.flag='Japan')
 
 
 #Sum by year and month
@@ -290,27 +286,33 @@ xl <- seq(min(ct$YearC),max(ct$Year),by=5)
 axis(1,at=seq(min(ct$trend),max(ct$trend),by=60),labels=as.character(xl))
 abline(v=seq(min(ct$trend),max(ct$trend),by=60),lty=2,col='blue')
 
+
 #Have a look at the relationship between n hooks and species weights caught
-
-
 
 par(mfrow=c(3,4),mar=c(1,1,3,1))
 for(i in 19:27){
-plot(ct[,i],sqrt(ct$Eff1),pch='.')
+plot(log(ct[,i]),log(ct$Eff1),pch='.')
 title(colnames(ct)[i])
 }
 plot(log(ct$Total),log(ct$Eff1),pch='.')
 title('Total')
 
-# Multivariate relationships in the Taiwanese data #
+# Multivariate relationships in the Task 2 data #
 
-ct2 <- data.frame(year=ct$YearC,month=ct$TimePeriodID,lon=ct$lon,lat=ct$lat,hooks=ct$Eff1,
-                  ALB=ct$ALB,BFT=ct$BFT,
-             BET=ct$BET,SKJ=ct$SKJ,YFT=ct$YFT,SWO=ct$SWO,BUM=ct$BUM,SAI=ct$SAI,WHM=ct$WHM,Total=ct$Total)
+tdata <- t2ceLL
+
+task2.simple <- data.frame(year=tdata$YearC,trend=tdata$trend,month=tdata$TimePeriodID,region = tdata$Region, flagname=tdata$FlagName, 
+                  fleetcode=tdata$FleetCode,lon=tdata$lon,lat=tdata$lat,hooks=tdata$Eff1,dsettype=tdata$DSetType,catchunit=tdata$CatchUnit,
+                  ALB=tdata$ALB,BFT=tdata$BFT,
+             BET=tdata$BET,SKJ=tdata$SKJ,YFT=tdata$YFT,SWO=tdata$SWO,BUM=tdata$BUM,SAI=tdata$SAI,WHM=tdata$WHM,Total=tdata$Total)
 
 #pairs(ct2,pch='.')
 
-cc <- round(cor(ct2),2)
+dim(task2.simple)
+
+task2.simple[task2.simple$flagname == 'Chinese Taipei' & task2.simple$year == 1990 & task2.simple$month == 1,]
+
+cc <- round(cor(task2.simple[,-c(4,5,6,9,10,11)]),2)
 
 par(mfrow=c(1,1))
 image(cc)
@@ -318,41 +320,296 @@ image(cc)
 # Merge Task1 and Task2
 
 # Simplify t1ct
+# Take out longlines
 
-t1ct2 <- data.frame(year=t1ct$YearC,area=t1ct$Area,species=t1ct$Species,total_catch_kgs=t1ct$Qty_t*1000)
+task1 <- t1det9sp[t1det9sp$GearGrp == 'LL',]
+task1.simple <- data.frame(year=task1$YearC,region=task1$Region,area=task1$Area,flagname=task1$Flag,fleetcode=task1$Fleet,
+                    species=task1$Species,total_catch_kgs=task1$Qty_t*1000)
 
-# Produce sum for NORT and SOUT
+# Sum over region, year, species fleetand flag
 
-t1ct2 <- aggregate(total_catch_kgs~year+species,data=t1ct2,sum)
+task1.sum <- aggregate(total_catch_kgs~region+year+flagname+fleetcode+species,data=task1.simple,sum)
 
-# Convert ct2 to long-format
+# Convert task2 to long-format
 
 library(reshape2)
 
-ct3 <- melt(ct2[,-15],id=c('year','month','lon','lat','hooks'))
-dimnames(ct3)[[2]][6:7] <- c('species','measured_catch_kgs')
+task2.lf <- melt(task2.simple[,-21],id=c('year','trend','month','region','flagname','fleetcode','lon','lat','hooks','dsettype','catchunit'))
+dimnames(task2.lf)[[2]][12:13] <- c('species','measured_catch')
 
-dim(ct3)
+dim(task2.lf) #= 913626
+
+task2.lf [task2.lf$species == 'ALB' & task2.lf$flagname == 'Chinese Taipei' & task2.lf$year == 1990 & task2.lf$month == 1,]
+task2.lf [task2.lf$flagname == 'EU.Greece' & task2.lf$month ==2 & task2.lf$year == 2000,]
+
 
 
 # Now merge task 1 and 2
+#long format
+task2.lf$total_catch_kgs <- 
+  task1.sum$total_catch_kgs[match(paste(task2.lf$year,task2.lf$region,task2.lf$flagname,
+                                        task2.lf$fleetcode,task2.lf$species),
+                                        paste(task1.sum$year,task1.sum$region,task1.sum$flagname,
+                                              task1.sum$fleetcode,task1.sum$species))]
 
-ct3$total_catch_kgs <- t1ct2$total_catch_kgs[match(paste(ct3$year,ct3$species),paste(t1ct2$year,t1ct2$species))]
-ct3 <- ct3[!is.na(ct3$total_catch_kgs),]
 
+task1.2.lf <- task2.lf
 
-mc <- aggregate(measured_catch_kgs~year+species,data=ct3,sum)
-mc1 <-merge(mc,t1ct2,all.x=T)
-par(mar=c(3,3,3,3))
-plot(mc1$measured_catch_kgs,mc1$total_catch_kgs)
+sum(is.na(task1.2.lf$total_catch_kgs)) # 148966
+
+nas <- rep(0,length(task1.2.lf[,1]))
+nas[!is.na(task1.2.lf$total_catch_kgs)]<- 1
+table(nas)
+task1.2.lf <- task1.2.lf[!is.na(task1.2.lf$total_catch_kgs),]
+#task1.2.lf$trend <- trend.r(year=task1.2.lf$year,month=task1.2.lf$month,start.year=1956)
+task1.2.lf <- orderBy(~trend+species+flagname,data=task1.2.lf)
+task1.2.lf$bin <- ifelse(task1.2.lf$measured_catch==0,0,1)
+
+task2.sum <- aggregate(cbind(measured_catch,hooks)~year+species+region+flagname+fleetcode+catchunit,
+                        data=task2.lf,sum,na.rm=T)
+
+head(task2.sum)
+dim(task2.sum) # = 6822
+task2.sum <- orderBy(~year+species+flagname+catchunit,data=task2.sum)
+
+task1.2 <-merge(task2.sum,task1.sum,all.x=T)
+
+write.table(task1.2,'/home/doug/effdis/data/task1.2.csv',sep=',')
+
+ctaipei <- task1.2.lf[task1.2.lf$flagname == 'Chinese Taipei' & task1.2.lf$region == 'AT',]
+#ctaipei <- task1.2[task1.2$flagname == 'Chinese Taipei' & task1.2$region == 'AT',]
+
+ctaipei <- ctaipei[ctaipei$catchunit== 'kg',]
+par(mar=c(4,4,4,4))
+plot(log(ctaipei$measured_catch),log(ctaipei$total_catch_kgs),xlab='task2',ylab='task1',ylim=c(0,24),xlim=c(0,24))
+plot(ctaipei$measured_catch,ctaipei$total_catch_kgs,pch='.')
 abline(0,1)
 
+xyplot(total_catch_kgs ~ measured_catch|catchunit,data=ctaipei)
+xyplot(log(total_catch_kgs) ~ log(measured_catch)|flagname,groups=catchunit,data=task1.2)
 
-ct3$trend <- trend.f(year=ct3$year,month=ct3$month,start.year=1967)
+xyplot(log(total_catch_kgs) ~ log(measured_catch)|flagname,groups=catchunit,data=task1.2[task1.2$region == 'AT' ,]
+       ,xlab='task2',ylab='task1',auto.key = T)
 
-z0<-gam(hooks~1,family=poisson,data=ct3)
-z1<-gam(hooks~lo(trend)+lo(month)+lo(lon)+lo(lat),family=poisson,data=ct3)
-summary(z1)
+```{r relationship between task 1 and task 2 data, include=TRUE,echo=FALSE,message = FALSE, error=FALSE, warnings=FALSE}
+task1.2 <- read.table("/home/doug/effdis/data/task1.2.csv",header=T)
+library(lattice)
+xyplot(log(total_catch_kgs) ~ log(measured_catch)|flagname,groups=catchunit,data=task1.2[task1.2$region == 'AT' ,]
+       ,xlab='task2',ylab='task1',auto.key = T)
+```
+## Investigating the relationship between Task 1 and Task 2 data (Sum of products) for fleet combinations
+task1.2 <- read.table("/home/doug/effdis/data/task1.2.csv",header=T,sep=',')
+
+## Developing the most appropriate multi-variate models (e.g. GLMs, GAMs) for interpolation
+
+
+xyplot(log(total_catch_kgs) ~ log(measured_catch)|flagname,groups=catchunit,data=task1.2[task1.2$region == 'AT' ,])
+xyplot(log(total_catch_kgs) ~ log(measured_catch)|flagname,groups=catchunit,data=task1.2[task1.2$region == 'AT' ,])
+
+xyplot(log(hooks) ~ log(measured_catch)|flagname,groups=catchunit,data=task1.2[task1.2$region == 'AT' ,])
+xyplot(log(hooks) ~ log(measured_catch)|flagname,groups=catchunit,data=task1.2[task1.2$region == 'AT' ,])
+xyplot(log(hooks) ~ log(measured_catch)|flagname,groups=catchunit,data=task1.2[task1.2$region == 'AT' ,])
+
+
+
+xyplot(log(hooks) ~ log(measured_catch)|flagname,groups=species,data=task2.lf[task2.lf$region == 'AT' ,])
+xyplot(log(hooks) ~ log(measured_catch)|flagname,groups=species,data=task2.lf[task2.lf$region == 'AT' ,])
+xyplot(log(hooks) ~ log(measured_catch)|flagname,groups=species,data=task2.lf[task2.lf$region == 'AT' ,])
+
+
+
+
+
+xyplot(log(hooks) ~ log(total_catch_kgs)|flagname,groups=species,data=task2.sum[task2.sum$region == 'AT' & task2.sum$dsettype == '-w',])
+
+
+
+
+###Experiment with GAMs#####
+
+library(gam)
+
+## Taipei ##
+
+write.table(task1.2.lf,"/home/doug/effdis/data/task1.2.lf.csv",sep=',')
+
+task1.2.lf.tai <- task1.2.lf[task1.2.lf$flagname == 'Chinese Taipei' & task1.2.lf$catchunit == 'kg',]
+summary(task1.2.lf.tai)
+task1.2.lf.tai$cpue <- task1.2.lf.tai$measured_catch/task1.2.lf.tai$hooks
+
+min.lat <- min(task1.2.lf.tai$lat)
+max.lat <- max(task1.2.lf.tai$lat)
+min.lon <- min(task1.2.lf.tai$lon)
+max.lon <- max(task1.2.lf.tai$lon)
+grid.res <- 5
+t1 <- min(task1.2.lf.tai$trend)
+t2 <- max(task1.2.lf.tai$trend)
+lonnie <- seq(min.lon,max.lon,by=grid.res)
+lattie <- seq(min.lat,max.lat,by=grid.res)
+lo <- length(lonnie)
+la <- length(lattie)
+
+#z0<-gam(hooks~offset(measured_catch)+1,family=quasipoisson,data=task2.lf.tai)
+#z1<-gam(hooks~offset(measured_catch)+lo(trend)+lo(month)+lo(lon)+lo(lat),family=quasipoisson,data=task2.lf.tai)
+#summary(z1)
+
+alb <- task1.2.lf.tai[task1.2.lf.tai$species == 'SWO',]
+
+#Binomial model for probability of catch
+b0 <- gam(bin~1,family=quasibinomial(link="logit"),data=alb)
+b1 <- gam(bin~lo(trend)+lo(month)+lo(lon)+lo(lat),family=quasibinomial(link="logit"),data=alb)
+#b2 <- gam(bin~lo(trend)+lo(month)+lo(lon)+lo(lat)*species,family=quasibinomial(link="logit"),data=alb)
+
+grd <-expand.grid(lon=lonnie,lat=lattie)
+grd$month <- 6
+grd$trend <- 648
+grd$species <- as.factor('ALB')
+prob <- predict(b1,grd,type="response")
+grd$prob <- as.vector(prob)
+image(lonnie,lattie,matrix(grd$prob,length(lonnie),length(lattie)))
+contour(lonnie,lattie,matrix(grd$prob,length(lonnie),length(lattie)),add=T)
+
+
+#Gamma model to be used together with above. Given you caught something then how much?
+zz0 <- gam(measured_catch~1,family=Gamma(link="log"),data=alb[alb$bin==1,])
+zz1 <- gam(measured_catch~lo(trend)+lo(month)+lo(lon)+lo(lat),family=Gamma(link="log"),data=alb[alb$bin==1,])
+#zz2 <- gam(measured_catch~lo(trend)+lo(month)+lo(lon)+lo(lat)*species,family=Gamma(link="log"),data=alb[alb$bin==1,])
+#zz3 <- gam(measured_catch~lo(trend,month,lon,lat)*species,family=Gamma(link="log"),data=task2.lf.tai[task2.lf.tai$bin==1,])
+
+plot(alb$trend,log(alb$measured_catch),pch='.')
+lines(alb$trend[alb$bin==1],log(fitted(zz1)),col='red')
+
+
+pcatch <- predict(zz1,grd,type="response")
+grd$pcatch <- as.vector(pcatch)
+image(lonnie,lattie,matrix(grd$pcatch,length(lonnie),length(lattie)))
+contour(lonnie,lattie,matrix(grd$pcatch,length(lonnie),length(lattie)),add=T)
+
+
+#Poisson model for nhooks
+h0 <- gam(hooks~1,family=quasipoisson(link="log"),data=alb[alb$species == 'ALB',])
+h1 <- gam(hooks~lo(trend)+lo(month)+lo(lon)+lo(lat),family=quasipoisson(link="log"),data=alb[alb$species == 'ALB',])
+
+anova(h0,h1,test='Chi')
+
+hks <- predict(h1,grd,type="response")
+grd$hks<- as.vector(hks)
+image(lonnie,lattie,matrix(grd$hks,lo,la))
+contour(lonnie,lattie,matrix(grd$hks,lo,la),add=T)
+
+grd$catch <- grd$prob*grd$pcatch
+image(lonnie,lattie,matrix(grd$catch,lo,la))
+contour(lonnie,lattie,matrix(grd$catch,lo,la),add=T)
+
+grd$cpue <- grd$catch/grd$hks
+
+image(lonnie,lattie,matrix(grd$cpue,lo,la))
+contour(lonnie,lattie,matrix(grd$cpue,la,la),add=T)
+
+# Task 1 ALB catches by Taipei December 2009
+
+task1.sum[task1.sum$flagname == "Chinese Taipei" & task1.sum$species == 'ALB' & task1.sum$year == 2009,]
+task2.sum[task2.sum$flagname == "Chinese Taipei" & task2.sum$species == 'ALB' & task2.sum$year == 2009,]
+
+# Get rid of observations on land etc. #
+
+grd.spdf      <- SpatialPointsDataFrame(cbind(x=an(ac(grd$lon)),y=an(ac(grd$lat))),data=grd)
+data.spdf     <- SpatialPointsDataFrame(cbind(x=an(ac(alb$lon)),y=an(ac(alb$lat))),data=alb)
+
+geogWGS84 <- CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs") # Make sure proj is what we think it is.
+
+grd.spdf@proj4string <- geogWGS84
+data.spdf@proj4string <- geogWGS84
+
+plot(grd.spdf,pch='.')
+plot(data.spdf,add=T,col='red')
+map('worldHires',add=T,fill=T,col='green')
+
+#seas <- readOGR(dsn="/home/doug/effdis/data", layer="World_Seas") # World seas and oceans
+
+geogWGS84 <- CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs") # Make sure proj is what we think it is.
+seas@proj4string <- geogWGS84
+
+class(seas)
+
+seas.polys <- as.character(sort(unique(seas@data$NAME)))
+seas.polys[1:10]
+
+wo <- grep('Atl',seas.polys)
+wi <- grep('Med',seas.polys)
+
+seas.polys[wi]
+
+atlantic <- seas[seas@data$NAME %in% seas.polys[wo],]
+med <-      seas[seas@data$NAME %in% seas.polys[wi],]
+
+plot(atlantic)
+plot(med)
+
+idx <- over(grd.spdf,atlantic)
+at.sea      <- rep(NA,length(grd[,1]))
+
+
+at.sea[which(is.na(idx[,1])==TRUE)] <- 'land'
+at.sea[which(is.na(idx[,1])==FALSE)] <- 'sea'
+
+grd$at.sea <- at.sea
+
+grd$cpue[grd$at.sea == 'land'] <- NA
+grd$prob[grd$at.sea == 'land'] <- NA
+grd$catch[grd$at.sea == 'land'] <- NA
+grd$hks[grd$at.sea == 'land'] <- NA
+grd$pcatch[grd$at.sea == 'land'] <- NA
+
+write.table(grd,file='/home/doug/effdis/R/grd')
+grd <- read.table(file='/home/doug/effdis/R/grd')
+
+par(mfrow=c(2,2))
+
+image(lonnie,lattie,matrix(grd$hks,lo,la),col=topo.colors(100),xlab='',ylab='')
+contour(lonnie,lattie,matrix(grd$hks,lo,la),col=topo.colors(100),add=T)
+map('worldHires',add=T,fill=T);title('Number of hooks')
+
+
+image(lonnie,lattie,matrix(grd$prob,lo,la),col=topo.colors(100),xlab='',ylab='')
+contour(lonnie,lattie,matrix(grd$prob,lo,la),col=topo.colors(100),add=T)
+map('worldHires',add=T,fill=T);title('Probability of catch (P)')
+
+
+image(lonnie,lattie,matrix(grd$pcatch,lo,la),col=topo.colors(100),xlab='',ylab='')
+contour(lonnie,lattie,matrix(grd$catch,lo,la),col=topo.colors(100),add=T)
+map('worldHires',add=T,fill=T);title('Catch without zeros (C1)')
+
+
+image(lonnie,lattie,matrix(grd$catch,lo,la),col=topo.colors(100),xlab='',ylab='')
+contour(lonnie,lattie,matrix(grd$catch,lo,la),col=topo.colors(100),add=T)
+map('worldHires',add=T,fill=T);title('Catch - P x C1')
+
+
+
+image(lonnie,lattie,matrix(grd$catch,lo,la),col=topo.colors(100),xlab='',ylab='')
+contour(lonnie,lattie,matrix(grd$catch,lo,la),col=topo.colors(100),add=T)
+map('worldHires',add=T,fill=T)
+
+
+
+
+sum(grd$catch,na.rm=T)
+
+
+9541000/sum(grd$catch,na.rm=T)
+
+# Albacore task1 in 2009
+task1.sum[task1.sum$region == 'AT' & task1.sum$flagname == "Chinese Taipei" & task1.sum$species == 'SWO' & task1.sum$year == 2009,]
+# Albacore task2 in 2009
+task2.sum[task2.sum$region == 'AT' & task2.sum$flagname == "Chinese Taipei" & task2.sum$species == 'SWO' & task2.sum$year == 2009,]
+# Albacore task2 December 2009
+t2 <- task2.lf[task2.lf$flagname == "Chinese Taipei" & task2.lf$species == 'SWO' & task2.lf$year == 2009 & task2.lf$trend == 648,]
+sum(t2$measured_catch)/1000
+sum(grd$catch,na.rm=T)/1000
+
+
+summary(h2)
 
 z2 <- glm(hooks~1,family=quasipoisson,data=ct3)
 z3 <- glm(hooks~measured_catch_kgs,family=quasipoisson,data=ct3)
@@ -362,6 +619,7 @@ z2 <- glm.nb(hooks~1,data=ct3)
 z3 <- glm.nb(hooks~measured_catch_kgs,data=ct3)
 z4 <- glm.nb(hooks~measured_catch_kgs+total_catch_kgs,data=ct3)
 anova(z2,z3,z4,test="Chi")
+
 
 
 
@@ -397,12 +655,17 @@ head(oceans@data)
 
 table(oceans@data$NAME)
 
-wo <- grep('ATLANTIC',oceans@data$NAME)
 
 ocean.polys <- as.character(sort(unique(oceans@data$NAME)))
 ocean.polys[1:10]
 
+wo <- grep('ATLANTIC',ocean.polys)
+w1 <- grep('MED',ocean.polys)
+
+ocean.polys[w1]
+
 atlantic <- oceans[oceans@data$NAME %in% ocean.polys[c(97,117)],]
+med <- oceans[oceans@data$NAME %in% ocean.polys[c(92,93)],]
 
 #Shapefile for countries
 

@@ -1,4 +1,4 @@
-spatial.coverage.by.year.task2.f <- function(tdata=t2ceLL,which.region = 'AT',which.flag='EU.Portugal'){
+spatial.coverage.by.year.task2.r <- function(tdata=t2ceLL,which.region = 'AT',which.flag='EU.Portugal'){
   #tdata <- t2ceLL
   #which.region <- 'AT'
   #which.flag   <- 'EU.Portugal'

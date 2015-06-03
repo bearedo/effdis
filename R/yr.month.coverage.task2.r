@@ -1,4 +1,4 @@
-yr.month.coverage.task2.f<-function(tdata=t2ceLL,which.region = 'AT',which.flag='EU.Portugal'){
+yr.month.coverage.task2.r<-function(tdata=t2ceLL,which.region = 'AT',which.flag='EU.Portugal'){
 
 #3D plot to explore temporal confounding
  #tdata <- t2ceLL
