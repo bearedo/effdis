@@ -1,13 +1,147 @@
-Version: 1.0
+---
+title: ' EFFDIS Effort Estimation'
+author: "Doug Beare with assistance from the ICCAT Secretariat"
+date: "03/06/2015"
+output: slidy_presentation
+---
 
-RestoreWorkspace: Default
-SaveWorkspace: Default
-AlwaysSaveHistory: Default
+## SHORT-TERM CONTRACT: A MODELING APPROACH TO ESTIMATE OVERALL ATLANTIC FISHING EFFORT BY TIME-AREA STRATA (EFFDIS)
 
-EnableCodeIndexing: Yes
-UseSpacesForTab: Yes
-NumSpacesForTab: 2
-Encoding: UTF-8
+### Objectives
 
-RnwWeave: Sweave
-LaTeX: pdfLaTeX
+* Develop a robust statistical modeling approach to estimate overall Atlantic fishing effort stratified by flag/fleet, gear, area (5ºx5º degree square grid), year and month (starting in 1950).
+
+* Update the current EFFDIS estimations for longline gear (1950 to 2014) using the new approach, and then develop estimation procedures for baitboat and purse-seine with the appropriate effort units.  
+
+## The SGECO Working group made a series of recommendations for improving EFFDIS, ie.to:
+
++ Consider seasonal and spatial patterns and their interactions 
++ Understand how information from species composition can best be used in this context
++ Combine bait boat and purse-seine estimates with long-line
++ Estimate uncertainty/variance 
++ Exploit other relevant information where available, e.g. VMS data
+
+## Overall workplan
+
++ Obtain all the relevant data and review the current methods for EFFDIS estimation 
++ Write documented R code to mimic the current procedure
++ Develop  ‘strawman’ methodologies for estimating fishing effort for a single fleet/flag country
++ Once a method is approved for one fleet the Contractor will then adapt it to other fleets to produce global estimates  
++ Use an online SQL relational database linked to R-scripts
+
+## Detailed short-term workplan
+
++ Explore data for non-random, non-representative sampling (data catalogue)
++ Investigate the relationship (sum of products) between Task 1, which focuses on the total catches of 9 major tuna & tuna-like species (Albacore, Bluefin, Yellowfin, Bigeye, Skipjack, Swordfish, Blue Marlin, White Marlin, Sailfish), and Task 2 data which is more detailed containing more detailed information on location, season, etc.
++ Develop most appropriate multi-variate models (e.g. GLMs, GAMs) for interpoplation
++ Estimate variance/bias with jack-knife
++ Test predictions using cross-validation methodology
+
+## Exploring data for non-random, non-representative sampling (data catalogue)
+
+### Sampling by year and month - Chinese Taipei
+
+```{r code,include=FALSE}
+library(rio)
+library(maps)
+library(mapdata)
+library(lattice)
+source("/home/doug/effdis/R/yr.month.coverage.task2.r")
+source("/home/doug/effdis/R/spatial.coverage.by.year.task2.r")
+t2ceLL <- read.table("/home/doug/effdis/data/t2ceLL.csv",sep=",")
+t1det9sp <- import("/home/doug/effdis/data/t1det_9sp.xlsx")
+```
+```{r temporal confounding Chinese Taipei,include=TRUE,echo=FALSE}
+yr.month.coverage.task2.r(tdata=t2ceLL,which.flag='Chinese Taipei')
+```
+
+## Sampling by year and month - Japan
+
+```{r temporal confounding Japan,include=TRUE,echo=FALSE}
+yr.month.coverage.task2.r(tdata=t2ceLL,which.flag='Japan')
+```
+
+## Sampling in space by year - Chinese Taipei 
+
+```{r spatial confounding China,include=TRUE,echo=FALSE}
+library(maps)
+spatial.coverage.by.year.task2.r(tdata=t2ceLL,which.flag='Chinese Taipei')
+```
+
+## Sampling in space by year - Portugal
+
+```{r spatial confounding by month Portugal,include=TRUE,echo=FALSE}
+source("/home/doug/effdis/R/spatial.coverage.by.month.task2.r")
+spatial.coverage.by.month.task2.r()
+```
+
+## No of hooks by time - Chinese Taipei and Japan
+
+```{r no of hooks reported by Taipei and Japan in task 2,include=TRUE,echo=FALSE,message = FALSE, error=FALSE, warnings=FALSE}
+source("/home/doug/effdis/R/effort.by.year.task2.r")
+par(mfrow=c(2,1))
+effort.by.year.task2.r(which.flag='Chinese Taipei')
+effort.by.year.task2.r(which.flag='Japan')
+```
+
+
+## Relationship (sum of products) between Task 1 (the total catches of 9 major tuna & tuna-like species) and Task 2 (much more detailed) data for all fleet combinations
+
+
+```{r relationship between task 1 and task 2 data, include=TRUE,echo=FALSE,message = FALSE, error=FALSE, warnings=FALSE}
+task1.2 <- read.table("/home/doug/effdis/data/task1.2.csv",header=T,sep=',')
+xyplot(log(total_catch_kgs) ~ log(measured_catch)|flagname,groups=catchunit,data=task1.2[task1.2$region == 'AT' ,]
+       ,xlab='task2',ylab='task1',auto.key = T)
+```
+
+## Developing multivariate models. Swordfish modeled (GAM) as function of space and time - Chinese Taipei for June 2009
+
+
+```{r regression modeling, include=TRUE,echo=FALSE,message = FALSE, error=FALSE, warnings=FALSE}
+grd <- read.table(file='/home/doug/effdis/R/grd')
+lonnie <- seq(-87.5,22.5,by=5)
+lattie <- seq(-57.5,52.5,by=5)
+lo<- length(lonnie)
+la<- length(lattie)
+
+par(mfrow=c(2,2),mar=c(1,1,3,1))
+
+image(lonnie,lattie,matrix(grd$hks,lo,la),col=topo.colors(100),xlab='',ylab='')
+contour(lonnie,lattie,matrix(grd$hks,lo,la),col=topo.colors(100),add=T)
+map('worldHires',add=T,fill=T);title('Number of hooks')
+
+
+image(lonnie,lattie,matrix(grd$prob,lo,la),col=topo.colors(100),xlab='',ylab='')
+contour(lonnie,lattie,matrix(grd$prob,lo,la),col=topo.colors(100),add=T)
+map('worldHires',add=T,fill=T);title('Probability of catch (P)')
+
+
+image(lonnie,lattie,matrix(grd$pcatch,lo,la),col=topo.colors(100),xlab='',ylab='')
+contour(lonnie,lattie,matrix(grd$catch,lo,la),col=topo.colors(100),add=T)
+map('worldHires',add=T,fill=T);title('Catch without zeros (C1)')
+
+
+image(lonnie,lattie,matrix(grd$catch,lo,la),col=topo.colors(100),xlab='',ylab='')
+contour(lonnie,lattie,matrix(grd$catch,lo,la),col=topo.colors(100),add=T)
+map('worldHires',add=T,fill=T);title('Catch - P x C1')
+
+```
+
+## Conclusions
++ The project only recently started and the data are complex and the Contractor is working to understand the nuances
++ There is non-random, non-representative sampling
++ There is a strong positive correlation between Task 1 and Task 2 data for most countries which is useful information
++ Provision of numbers for Task 2 (instead of weights) by e.g. USA creates problems
++ Regression modeling is a promising approach
++ A series of models can be fitted to the data and used for interpolation and variance estimation 
+
+
+
+
+
+
+
+
+
+
+

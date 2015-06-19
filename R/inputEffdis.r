@@ -19,7 +19,7 @@ library(RODBC)
 # postgres server running locally (in gedt /etc/odbc.ini)
 chan <- odbcConnect("effdis-local", case="postgresql", believeNRows=FALSE)
 sqlTables(chan)  #List all tables in the DB
-mydata <- sqlFetch(chan, "some_table") # Return a table as a dataframe
+#mydata <- sqlFetch(chan, "some_table") # Return a table as a dataframe
 odbcClose(chan)
 
 #postgres server at tuna-cc1
