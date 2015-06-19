@@ -15,7 +15,24 @@ library(gam)
 library(maps)
 library(mapdata)
 
+library(RODBC)
+# postgres server running locally (in gedt /etc/odbc.ini)
+chan <- odbcConnect("effdis-local", case="postgresql", believeNRows=FALSE)
+sqlTables(chan)  #List all tables in the DB
+mydata <- sqlFetch(chan, "some_table") # Return a table as a dataframe
+odbcClose(chan)
 
+#postgres server at tuna-cc1
+chan <- odbcConnect("effdis-tuna-cc1", case="postgresql", believeNRows=FALSE)
+sqlTables(chan)  #List all tables in the DB
+mydata <- sqlFetch(chan, "t2ce") # Return a table as a dataframe
+
+dimnames(t2ce)[[2]][55:56] <- c('longitude','latitude')
+
+sqlSave(chan,t2ce[1:100,],tablename='t2ce')
+
+
+odbcClose(chan)
 #### Read in data for 2011 ###
 
 # Set working directory #
@@ -31,9 +48,22 @@ source("/home/doug/effdis/R/trend.r")
 list.files()
 
 mw <- import("/home/doug/Dropbox/Globefish-Consultancy-Services-2015/ICCAT-Effdis-Contract-2015/Data/effdis_2011/input/MeanWeights2011.xlsx")
+
 fr <- import("/home/doug/Dropbox/Globefish-Consultancy-Services-2015/ICCAT-Effdis-Contract-2015/Data/effdis_2011/input/revisedFleetRanks.xlsx")
+
 t1det9sp <- import("/home/doug/Dropbox/Globefish-Consultancy-Services-2015/ICCAT-Effdis-Contract-2015/Data/effdis_2011/input/t1det_9sp.xlsx")
+
 t2ceLL <- import("/home/doug/Dropbox/Globefish-Consultancy-Services-2015/ICCAT-Effdis-Contract-2015/Data/effdis_2011/input/t2ce_LL_raw5x5.xlsx")
+
+t2ce  <- import("/home/doug/Dropbox/Globefish-Consultancy-Services-2015/ICCAT-Effdis-Contract-2015/Data/effdis_2011/input/t2ce.csv")
+
+flags <- import("/home/doug/Dropbox/Globefish-Consultancy-Services-2015/ICCAT-Effdis-Contract-2015/Data/effdis_2011/input/flags.csv")
+
+cffs <- import("/home/doug/Dropbox/Globefish-Consultancy-Services-2015/ICCAT-Effdis-Contract-2015/Data/CODES_Flags-Fleets.xls"
+               
+t2ce$FleetCode <- flags$FleetCode[match(t2ce$FleetID,flags$FleetID)]
+
+dim(t2ce[t2ce$GearGrpCode == 'LL',])
 
 # First five rows of Task 2 data
 
@@ -145,7 +175,8 @@ yr.month.coverage.task2.r(which.flag='U.S.A.')
 
 # Add trend column (useful for time-series analysis)
 
-t2ceLL$trend <- trend.r(year=t2ceLL$YearC,month=t2ceLL$TimePeriodID,start.year=1956)
+t2ceLL$trend <- trend.r(year=t2ceLL$YearC,month=t2ceLL$TimePeriodID,start.year=1950)
+t2ce$trend <- trend.r(year=t2ce$YearC,month=t2ce$TimePeriodID,start.year=1950)
 
 
 ### convert spatial information to grid centroids with Laurie's code ##
@@ -158,21 +189,31 @@ table(t2ceLL$SquareTypeCode)
 # 11874 89640 
 
 df <- data.frame(quad=t2ceLL$QuadID,lat=t2ceLL$Lat5,lon=t2ceLL$Lon5,square=ac(t2ceLL$SquareTypeCode))
-
 df1<- data.frame(quad=rep(NA,length(df[,1])),lat=rep(NA,length(df[,1])),lon=rep(NA,length(df[,1])),square=rep(NA,length(df[,1])))
-
 for(i in 1:length(df[,1]))
 {
   df1[i,] <- latLon(x=df[i,])
 }
-
 t2ceLL$lon <- df1$lon
 t2ceLL$lat <- df1$lat
-
 write.table(t2ceLL,'/home/doug/effdis/data/t2ceLL.csv',sep=',')
-
-
 t2ceLL <- read.table('/home/doug/effdis/data/t2ceLL.csv',sep=',')
+
+
+# df <- data.frame(quad=t2ce$QuadID,lat=t2ce$Lat,lon=t2ce$Lon,square=ac(t2ce$SquareTypeCode))
+# df1<- data.frame(quad=rep(NA,length(df[,1])),lat=rep(NA,length(df[,1])),lon=rep(NA,length(df[,1])),square=rep(NA,length(df[,1])))
+# for(i in 1:length(df[,1]))
+# {
+#   df1[i,] <- latLon(x=df[i,])
+# }
+# t2ce$lon <- df1$lon
+# t2ce$lat <- df1$lat
+
+# write.table(t2ce,'/home/doug/effdis/data/t2ce.csv',sep=',')
+
+t2ce <- read.table('/home/doug/effdis/data/t2ce.csv',sep=',')
+
+
 
 
 #####################################
@@ -801,7 +842,6 @@ legend(x='topright',fill=c('white',colintens),legend=legval$ALL,bg='white',title
 title(main="Fishing intensity",outer=F,cex=cl)
 mtext(xl$label,side=1,outer=T,line=-3,at=0.5,font=xl$font,cex=xl$cex)
 mtext(yl$label,side=2,outer=T,line=-1.5,at=0.5,font=yl$font,cex=yl$cex)                                                                                       
-
 
 
 
