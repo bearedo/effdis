@@ -1,9 +1,9 @@
 yr.month.coverage.task2.r<-function(tdata=t2ceLL,which.region = 'AT',which.flag='EU.Portugal'){
 
 #3D plot to explore temporal confounding
- tdata <- t2ceLL
- which.region <- 'AT'
- which.flag   <- 'EU.Portugal'
+ #tdata <- t2ceLL
+ #which.region <- 'AT'
+ #which.flag   <- 'EU.Portugal'
  fdata <- tdata[tdata$Region == which.region & tdata$FlagName == which.flag,]
 
 ymc <- table(fdata$YearC,fdata$TimePeriodID) # Number of observations by year and month
