@@ -59,15 +59,17 @@ t2ce  <- import("/home/doug/Dropbox/Globefish-Consultancy-Services-2015/ICCAT-Ef
 
 flags <- import("/home/doug/Dropbox/Globefish-Consultancy-Services-2015/ICCAT-Effdis-Contract-2015/Data/effdis_2011/input/flags.csv")
 
-cffs <- import("/home/doug/Dropbox/Globefish-Consultancy-Services-2015/ICCAT-Effdis-Contract-2015/Data/CODES_Flags-Fleets.xls"
+cffs <- import("/home/doug/Dropbox/Globefish-Consultancy-Services-2015/ICCAT-Effdis-Contract-2015/Data/CODES_Flags-Fleets.xls")
                
 t2ce$FleetCode <- flags$FleetCode[match(t2ce$FleetID,flags$FleetID)]
 
-dim(t2ce[t2ce$GearGrpCode == 'LL',])
+dim(t2ce[t2ce$GearGrpCode == 'LL' & t2ce$SquareTypeCode %in% c('5x5'),])
+dim(t2ceLL)
 
 # First five rows of Task 2 data
 
 head(t2ceLL)
+head(t2ce)
 
 #How many regions
 
@@ -76,17 +78,24 @@ table(t2ceLL$Region)
 #AT    MD 
 #99488  2026 
 
-# How many years
+table(t2ce$Region) # no region in the database
+
+# How many years ?
 
 ys <- table(t2ceLL$YearC)
 
 summary(t2ceLL$YearC)
 
+ys <- table(t2ce$YearC)
+
+summary(t2ce$YearC)
+
 #Remove the missing value
 
 t2ceLL <- t2ceLL[!is.na(t2ceLL$YearC),]
 
-#How many Flag states 
+
+#How many Flag states ?
 
 table(t2ceLL$FlagName)
 
@@ -109,34 +118,39 @@ table(t2ceLL$FlagName)
 # Vanuatu                  Venezuela 
 # 201                       1985 
 
+t2<-sort(table(t2ce$FleetCode)) # not available in the Access Db.
+
+t1<-sort(table(t1det9sp$Fleet))
+
+
+u2<-unique(t2ce$FleetCode) # NB. Not available in the Access Db.
+
+u1<-unique(t1det9sp$Fleet) 
+
+
+match(u1,u2) # Match fleet codes ? 
+
 # Some countries report numbers, some weights and some both
 
 table(t2ceLL$DSetType)
 # n-    nw    -w 
 # 44290 21437 35787 
 
+table(t2ce$DSetType)
+
+#--     n-     nw     -w 
+#     24 136211  85256 346010 
+
+
 table(t2ceLL$CatchUnit)
 #kg    nr 
 #57224 44290
 
+table(t2ce$CatchUnit)
+ #grd     kg     nr 
+ #122206 270693 174602 
 
-table(t2ceLL$DSetType,t2ceLL$FlagName)
 
-# Belize Brasil China P.R. Chinese Taipei  Cuba EU.Cyprus EU.España EU.Greece EU.Italy
-# n-      0    813          0              0  2247         0         0         0        0
-# nw      0      0         79          11152     0         0      8881        44        0
-# -w    238   8081        988          10756    41       157       329       218       77
-# 
-# EU.Malta EU.Portugal Japan Korea Rep. Maroc Mexico Namibia Panama Philippines South Africa
-# n-        0           0 34298        194     0      0       0      0           0            0
-# nw       18           0     0        212     0     19       0      0           0            0
-# -w       26         600     0       6287    65    423     727   2763         338          824
-# 
-# St. Vincent and Grenadines Trinidad and Tobago Uruguay U.S.A. U.S.S.R. Vanuatu Venezuela
-# n-                          0                   0       0   6550        0       0       188
-# nw                          0                   0     831      0        0     201         0
-# -w                        874                  60      65      0       53       0      1797
-# 
 table(t2ceLL$CatchUnit,t2ceLL$FlagName)
 
 # Belize Brasil China P.R. Chinese Taipei  Cuba EU.Cyprus EU.España EU.Greece EU.Italy EU.Malta EU.Portugal Japan Korea Rep. Maroc
@@ -171,6 +185,10 @@ yr.month.coverage.task2.r(which.flag='Japan')
 yr.month.coverage.task2.r(which.flag='U.S.A.')
 
 
+
+
+
+
 # Note - data coverage for Chinese Taipei has increased markely with what appear to be steps in around 1974 and 1997.
 
 # Add trend column (useful for time-series analysis)
@@ -187,6 +205,11 @@ table(t2ceLL$SquareTypeCode)
 
 #1x1   5x5 
 # 11874 89640 
+
+table(t2ce$SquareTypeCode)
+
+#0x10  10x20    1x1  20x20   5x10    5x5   none 
+#1235     39 403016    250    753 161986    222 
 
 df <- data.frame(quad=t2ceLL$QuadID,lat=t2ceLL$Lat5,lon=t2ceLL$Lon5,square=ac(t2ceLL$SquareTypeCode))
 df1<- data.frame(quad=rep(NA,length(df[,1])),lat=rep(NA,length(df[,1])),lon=rep(NA,length(df[,1])),square=rep(NA,length(df[,1])))
