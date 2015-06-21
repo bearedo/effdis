@@ -8,15 +8,15 @@ spatial.coverage.by.year.task2.r <- function(tdata=t2ceLL,which.region = 'AT',wh
   ys <- sort(unique(tdata$YearC))
   ly <- length(ys) # 43 years
   
-  for (i in min(ys):max(ys))
+  for (i in min(ys,na.rm=T):max(ys,na.rm=T))
   {
     dat <- fdata[fdata$YearC == i,]
     if(length(dat[,1])==0){
-      plot(dat$lon,dat$lat,type='n',xaxt='n',yaxt='n',ylim=range(tdata$lat),xlim=range(tdata$lon))
+      plot(dat$lon,dat$lat,type='n',xaxt='n',yaxt='n',ylim=range(tdata$lat,na.rm=T),xlim=range(tdata$lon,na.rm=T))
       map('world',col='green',fill=T,add=T)
       title(i,cex.main=.75)}
     else{
-      plot(dat$lon,dat$lat,type='n',xaxt='n',yaxt='n',ylim=range(tdata$lat),xlim=range(tdata$lon))
+      plot(dat$lon,dat$lat,type='n',xaxt='n',yaxt='n',ylim=range(tdata$lat,na.rm=T),xlim=range(tdata$lon,na.rm=T))
       points(dat$lon,dat$lat,pch=16,col='red')
       map('world',add=T,col='green',fill=T)
       title(i,cex.main=.75)

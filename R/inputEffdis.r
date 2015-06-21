@@ -220,7 +220,7 @@ for(i in 1:length(df[,1]))
 t2ceLL$lon <- df1$lon
 t2ceLL$lat <- df1$lat
 write.table(t2ceLL,'/home/doug/effdis/data/t2ceLL.csv',sep=',')
-t2ceLL <- read.table('/home/doug/effdis/data/t2ceLL.csv',sep=',')
+t2ceLL <- read.table('/home/doug/Dropbox/Globefish-Consultancy-Services-2015/ICCAT-Effdis-Contract-2015/Data/t2ceLL.csv',sep=',')
 
 
 # df <- data.frame(quad=t2ce$QuadID,lat=t2ce$Lat,lon=t2ce$Lon,square=ac(t2ce$SquareTypeCode))
@@ -234,9 +234,7 @@ t2ceLL <- read.table('/home/doug/effdis/data/t2ceLL.csv',sep=',')
 
 # write.table(t2ce,'/home/doug/effdis/data/t2ce.csv',sep=',')
 
-t2ce <- read.table('/home/doug/effdis/data/t2ce.csv',sep=',')
-
-
+t2ce <- read.table('/home/doug/Dropbox/Globefish-Consultancy-Services-2015/ICCAT-Effdis-Contract-2015/Data/t2ce.csv',sep=',')
 
 
 #####################################
