@@ -56,15 +56,20 @@ t1det9sp <- import("/home/doug/Dropbox/Globefish-Consultancy-Services-2015/ICCAT
 t2ceLL <- import("/home/doug/Dropbox/Globefish-Consultancy-Services-2015/ICCAT-Effdis-Contract-2015/Data/effdis_2011/input/t2ce_LL_raw5x5.xlsx")
 
 t2ce  <- import("/home/doug/Dropbox/Globefish-Consultancy-Services-2015/ICCAT-Effdis-Contract-2015/Data/effdis_2011/input/t2ce.csv")
+table.csv  <- read.table("/home/doug/Dropbox/Globefish-Consultancy-Services-2015/ICCAT-Effdis-Contract-2015/Data/effdis_2011/input/table.csv",sep=",",header=T)
+
 
 flags <- import("/home/doug/Dropbox/Globefish-Consultancy-Services-2015/ICCAT-Effdis-Contract-2015/Data/effdis_2011/input/flags.csv")
 
 cffs <- import("/home/doug/Dropbox/Globefish-Consultancy-Services-2015/ICCAT-Effdis-Contract-2015/Data/CODES_Flags-Fleets.xls")
                
 t2ce$FleetCode <- flags$FleetCode[match(t2ce$FleetID,flags$FleetID)]
+t2ce$FlagName <- flags$FlagName[match(t2ce$FleetCode,flags$FleetCode)]
+
 
 dim(t2ce[t2ce$GearGrpCode == 'LL' & t2ce$SquareTypeCode %in% c('5x5'),])
-dim(t2ceLL)
+
+dim(t2ce)
 
 # First five rows of Task 2 data
 
@@ -184,11 +189,6 @@ yr.month.coverage.task2.r(which.flag='Chinese Taipei')
 yr.month.coverage.task2.r(which.flag='Japan')
 yr.month.coverage.task2.r(which.flag='U.S.A.')
 
-
-
-
-
-
 # Note - data coverage for Chinese Taipei has increased markely with what appear to be steps in around 1974 and 1997.
 
 # Add trend column (useful for time-series analysis)
@@ -223,18 +223,33 @@ write.table(t2ceLL,'/home/doug/effdis/data/t2ceLL.csv',sep=',')
 t2ceLL <- read.table('/home/doug/Dropbox/Globefish-Consultancy-Services-2015/ICCAT-Effdis-Contract-2015/Data/t2ceLL.csv',sep=',')
 
 
-# df <- data.frame(quad=t2ce$QuadID,lat=t2ce$Lat,lon=t2ce$Lon,square=ac(t2ce$SquareTypeCode))
-# df1<- data.frame(quad=rep(NA,length(df[,1])),lat=rep(NA,length(df[,1])),lon=rep(NA,length(df[,1])),square=rep(NA,length(df[,1])))
-# for(i in 1:length(df[,1]))
-# {
-#   df1[i,] <- latLon(x=df[i,])
-# }
-# t2ce$lon <- df1$lon
-# t2ce$lat <- df1$lat
+df <- data.frame(quad=t2ce$QuadID,lat=t2ce$Lat,lon=t2ce$Lon,square=t2ce$SquareTypeCode)
+df$square <- as.character(df$square)
 
-# write.table(t2ce,'/home/doug/effdis/data/t2ce.csv',sep=',')
+#Checking
 
-t2ce <- read.table('/home/doug/Dropbox/Globefish-Consultancy-Services-2015/ICCAT-Effdis-Contract-2015/Data/t2ce.csv',sep=',')
+# 
+str(df)
+hl <- length(df[,1])
+ndf <- data.frame(quad=rep(NA,hl),lat=rep(NA,hl),lon=rep(NA,hl),square=rep(NA,hl))
+for(i in 1:hl){
+ndf[i,] <- latLon(df[i,])
+}
+
+plot(ndf$lon,ndf$lat,pch='.')
+map('world',add=T)
+#   
+
+t2ce$lon <- ndf$lon
+t2ce$lat <- ndf$lat
+
+dim(t2ce)
+
+#write.table(t2ce,'/home/doug/effdis/data/t2ce.csv',sep=',')
+write.table(t2ce,'/home/doug/Dropbox/Globefish-Consultancy-Services-2015/ICCAT-Effdis-Contract-2015/Data/effdis_2011/input/t2ce.csv',sep=',')
+
+
+t2ce <- read.table('/home/doug/Dropbox/Globefish-Consultancy-Services-2015/ICCAT-Effdis-Contract-2015/Data/effdis_2011/input/t2ce.csv',sep=',')
 
 
 #####################################
