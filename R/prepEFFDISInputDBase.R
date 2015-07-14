@@ -37,8 +37,6 @@ codes_square_types<- import("/home/doug/Dropbox/Globefish-Consultancy-Services-2
 t2ce$FleetCode <- flags$FleetCode[match(t2ce$FleetID,flags$FleetID)]
 t2ce$FlagName <- flags$FlagName[match(t2ce$FleetCode,flags$FleetCode)] 
 
-
-
 # Create center point of each grid using Laurie's code lonLat #
 
 df <- data.frame(quad=t2ce$QuadID,lat=t2ce$Lat,lon=t2ce$Lon,square=t2ce$SquareTypeCode) # simplify data.frame
@@ -85,6 +83,7 @@ sqlSave(chan,codes_time_periods,tablename='codes_time_periods')
 # Get the data from the database to check #
 
 t2ce <- sqlQuery(chan, "SELECT * FROM t2ce LIMIT 5;") # Extract first five rows
+t2ce$trend <- trend.r(year=t2ce$yearc,month=t2ce$timeperiodid,start.year=1950)
 
 
 # Add comments #
