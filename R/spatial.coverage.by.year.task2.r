@@ -7,7 +7,7 @@ spatial.coverage.by.year.task2.r <- function(tdata=t2ce,which.gear='LL',which.fl
   
   ys <- sort(unique(tdata$yearc))
   ly <- length(ys) # 43 years
-  par(mfrow=c(7*9),mar=c(0,0,1,0))
+  par(mfrow=c(7,9),mar=c(0,0,1,0))
   for (i in min(ys,na.rm=T):max(ys,na.rm=T))
   {
     dat <- fdata[fdata$yearc == i,]
@@ -21,7 +21,7 @@ spatial.coverage.by.year.task2.r <- function(tdata=t2ce,which.gear='LL',which.fl
       map('world',add=T,col='green',fill=T)
       title(i,cex.main=.75)
     }
-    mtext(side=3,outer=T,which.flag)  
+    mtext(side=3,outer=T,paste(which.flag,which.gear))  
 
   }
 }
