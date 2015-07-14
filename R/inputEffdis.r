@@ -14,6 +14,7 @@ library(vmstools)
 library(gam)
 library(maps)
 library(mapdata)
+library(COZIGAM)
 
 library(RODBC)
 # postgres server running locally (in gedt /etc/odbc.ini)
@@ -22,17 +23,40 @@ sqlTables(chan)  #List all tables in the DB
 #mydata <- sqlFetch(chan, "some_table") # Return a table as a dataframe
 odbcClose(chan)
 
-#postgres server at tuna-cc1
+
+#Connect to postgres server at tuna-cc1. NB. you must edit etc/odbc.ini file.
 chan <- odbcConnect("effdis-tuna-cc1", case="postgresql", believeNRows=FALSE)
 sqlTables(chan)  #List all tables in the DB
-mydata <- sqlFetch(chan, "t2ce") # Return a table as a dataframe
+t2ce <- sqlFetch(chan, "t2ce") # Return a table as a dataframe
+#dimnames(t2ce)[[2]][55:56] <- c('longitude','latitude')
+#sqlQuery(chan,'drop table t2ce')
+#sqlSave(chan,t2ce,tablename='t2ce')
 
-dimnames(t2ce)[[2]][55:56] <- c('longitude','latitude')
 
-sqlSave(chan,t2ce[1:100,],tablename='t2ce')
+
+sqlQuery(chan, "COMMENT ON TABLE t2ce IS 'These are ICCAT task 2 effort data supplied by Carlos Palma carlos.palma@iccat.int';");
+sqlQuery (chan,"COMMENT ON COLUMN t2ce.yearc IS 'Year';\n");
+sqlQuery(chan,"COMMENT ON COLUMN t2ce.lon IS 'Old longitude';\n");
+sqlQuery(chan,"COMMENT ON COLUMN t2ce.lat IS 'Old latitude';\n");
+sqlQuery(chan,"COMMENT ON COLUMN t2ce.longitude IS 'Center longitude of grid cell calculated according to latLon function of Kell';\n");
+sqlQuery(chan,"COMMENT ON COLUMN t2ce.latitude  IS 'Center latitude of grid cell calculated according to latLon function of Kell';\n");
+sqlQuery(chan,"COMMENT ON COLUMN t2ce.timeperiodid IS '1-12 is month, 13-16 is quarter, 17 is year, 18-19 are first and second semester';\n");
+sqlQuery(chan,"COMMENT ON COLUMN t2ce.catchtypeid IS '0 is Landings, 1 is Discards, 2 is Catches';\n");
+sqlQuery(chan,"COMMENT ON COLUMN t2ce.catchtypecode IS 'L is Landings, D is Discards, C is Catches';\n");
+
+
+
+
+
+sqlQuery(chan,"ALTER TABLE public.t2ce ADD COLUMN the_point geometry(Point,4326);\n");
+sqlQuery(chan,"UPDATE public.t2ce SET the_point = ST_SETSRID(ST_MAKEPOINT(longitude,latitude),4326);\n"); 
+
+sqlQuery (chan,"CREATE INDEX t2ce_the_point ON t2ce USING GIST (the_point);\n");
+
 
 
 odbcClose(chan)
+
 #### Read in data for 2011 ###
 
 # Set working directory #
@@ -55,16 +79,16 @@ t1det9sp <- import("/home/doug/Dropbox/Globefish-Consultancy-Services-2015/ICCAT
 
 t2ceLL <- import("/home/doug/Dropbox/Globefish-Consultancy-Services-2015/ICCAT-Effdis-Contract-2015/Data/effdis_2011/input/t2ce_LL_raw5x5.xlsx")
 
-t2ce  <- import("/home/doug/Dropbox/Globefish-Consultancy-Services-2015/ICCAT-Effdis-Contract-2015/Data/effdis_2011/input/t2ce.csv")
-table.csv  <- read.table("/home/doug/Dropbox/Globefish-Consultancy-Services-2015/ICCAT-Effdis-Contract-2015/Data/effdis_2011/input/table.csv",sep=",",header=T)
+t2ce  <- read.table("/home/doug/Dropbox/Globefish-Consultancy-Services-2015/ICCAT-Effdis-Contract-2015/Data/effdis_2011/input/t2ce.csv",sep=",",header=T)
 
+#table.csv  <- read.table("/home/doug/Dropbox/Globefish-Consultancy-Services-2015/ICCAT-Effdis-Contract-2015/Data/effdis_2011/input/table.csv",sep=",",header=T)
 
-flags <- import("/home/doug/Dropbox/Globefish-Consultancy-Services-2015/ICCAT-Effdis-Contract-2015/Data/effdis_2011/input/flags.csv")
+#flags <- import("/home/doug/Dropbox/Globefish-Consultancy-Services-2015/ICCAT-Effdis-Contract-2015/Data/effdis_2011/input/flags.csv")
 
-cffs <- import("/home/doug/Dropbox/Globefish-Consultancy-Services-2015/ICCAT-Effdis-Contract-2015/Data/CODES_Flags-Fleets.xls")
+#cffs <- import("/home/doug/Dropbox/Globefish-Consultancy-Services-2015/ICCAT-Effdis-Contract-2015/Data/CODES_Flags-Fleets.xls")
                
-t2ce$FleetCode <- flags$FleetCode[match(t2ce$FleetID,flags$FleetID)]
-t2ce$FlagName <- flags$FlagName[match(t2ce$FleetCode,flags$FleetCode)]
+#t2ce$FleetCode <- flags$FleetCode[match(t2ce$FleetID,flags$FleetID)]
+#t2ce$FlagName <- flags$FlagName[match(t2ce$FleetCode,flags$FleetCode)]
 
 
 dim(t2ce[t2ce$GearGrpCode == 'LL' & t2ce$SquareTypeCode %in% c('5x5'),])
