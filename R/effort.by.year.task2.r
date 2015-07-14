@@ -4,7 +4,7 @@ effort.by.year.task2.r <- function(tdata = t2ce, which.gear = 'LL', which.flag =
   #tdata <- t2ce
   #which.region <- 'AT'
   #which.flag   <- 'EU.Portugal'
-  fdata <- tdata[tdata$geargrpcode == which.gear & tdata$flagname == which.flag & tdata$timeperiodid < 13,,]
+  fdata <- tdata[tdata$geargrpcode == which.gear & tdata$flagname == which.flag & tdata$timeperiodid < 13,]
   fdata$trend <- trend.r(year=fdata$yearc,month=fdata$timeperiodid,start.year=1950)
   
   
@@ -17,3 +17,4 @@ abline(v=seq(min(tdata$trend),max(tdata$trend),by=60),lty=2,col='cyan')
 title(paste(which.flag, which.gear))
 
 }
+
