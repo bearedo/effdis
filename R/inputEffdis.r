@@ -1,4 +1,4 @@
-### R-script to import effdis data ###
+### R-script to process effdis data and export ###
 
 #install.packages('rio')
 
@@ -33,28 +33,23 @@ t2ce <- sqlFetch(chan, "t2ce") # Return a table as a dataframe
 #sqlSave(chan,t2ce,tablename='t2ce')
 
 
-
+#Add comments
 sqlQuery(chan, "COMMENT ON TABLE t2ce IS 'These are ICCAT task 2 effort data supplied by Carlos Palma carlos.palma@iccat.int';");
 sqlQuery (chan,"COMMENT ON COLUMN t2ce.yearc IS 'Year';\n");
-sqlQuery(chan,"COMMENT ON COLUMN t2ce.lon IS 'Old longitude';\n");
-sqlQuery(chan,"COMMENT ON COLUMN t2ce.lat IS 'Old latitude';\n");
+sqlQuery(chan,"COMMENT ON COLUMN t2ce.lon IS 'see table codes_square_types ';\n");
+sqlQuery(chan,"COMMENT ON COLUMN t2ce.lat IS 'see table codes_square_types';\n");
 sqlQuery(chan,"COMMENT ON COLUMN t2ce.longitude IS 'Center longitude of grid cell calculated according to latLon function of Kell';\n");
 sqlQuery(chan,"COMMENT ON COLUMN t2ce.latitude  IS 'Center latitude of grid cell calculated according to latLon function of Kell';\n");
 sqlQuery(chan,"COMMENT ON COLUMN t2ce.timeperiodid IS '1-12 is month, 13-16 is quarter, 17 is year, 18-19 are first and second semester';\n");
-sqlQuery(chan,"COMMENT ON COLUMN t2ce.catchtypeid IS '0 is Landings, 1 is Discards, 2 is Catches';\n");
-sqlQuery(chan,"COMMENT ON COLUMN t2ce.catchtypecode IS 'L is Landings, D is Discards, C is Catches';\n");
 
-
-
-
+#Add geo point
 
 sqlQuery(chan,"ALTER TABLE public.t2ce ADD COLUMN the_point geometry(Point,4326);\n");
 sqlQuery(chan,"UPDATE public.t2ce SET the_point = ST_SETSRID(ST_MAKEPOINT(longitude,latitude),4326);\n"); 
 
+#Add index for geopoint
+
 sqlQuery (chan,"CREATE INDEX t2ce_the_point ON t2ce USING GIST (the_point);\n");
-
-
-
 odbcClose(chan)
 
 #### Read in data for 2011 ###
@@ -71,9 +66,9 @@ source("/home/doug/effdis/R/trend.r")
 
 list.files()
 
-mw <- import("/home/doug/Dropbox/Globefish-Consultancy-Services-2015/ICCAT-Effdis-Contract-2015/Data/effdis_2011/input/MeanWeights2011.xlsx")
+mean_weights <- import("/home/doug/Dropbox/Globefish-Consultancy-Services-2015/ICCAT-Effdis-Contract-2015/Data/effdis_2011/input/MeanWeights2011.xlsx")
 
-fr <- import("/home/doug/Dropbox/Globefish-Consultancy-Services-2015/ICCAT-Effdis-Contract-2015/Data/effdis_2011/input/revisedFleetRanks.xlsx")
+#fleet_ranks <- import("/home/doug/Dropbox/Globefish-Consultancy-Services-2015/ICCAT-Effdis-Contract-2015/Data/effdis_2011/input/revisedFleetRanks.xlsx")
 
 t1det9sp <- import("/home/doug/Dropbox/Globefish-Consultancy-Services-2015/ICCAT-Effdis-Contract-2015/Data/effdis_2011/input/t1det_9sp.xlsx")
 
@@ -83,12 +78,26 @@ t2ce  <- read.table("/home/doug/Dropbox/Globefish-Consultancy-Services-2015/ICCA
 
 #table.csv  <- read.table("/home/doug/Dropbox/Globefish-Consultancy-Services-2015/ICCAT-Effdis-Contract-2015/Data/effdis_2011/input/table.csv",sep=",",header=T)
 
-#flags <- import("/home/doug/Dropbox/Globefish-Consultancy-Services-2015/ICCAT-Effdis-Contract-2015/Data/effdis_2011/input/flags.csv")
+flags <- import("/home/doug/Dropbox/Globefish-Consultancy-Services-2015/ICCAT-Effdis-Contract-2015/Data/effdis_2011/input/flags.csv")
 
-#cffs <- import("/home/doug/Dropbox/Globefish-Consultancy-Services-2015/ICCAT-Effdis-Contract-2015/Data/CODES_Flags-Fleets.xls")
-               
-#t2ce$FleetCode <- flags$FleetCode[match(t2ce$FleetID,flags$FleetID)]
-#t2ce$FlagName <- flags$FlagName[match(t2ce$FleetCode,flags$FleetCode)]
+#codes_flag_fleets <- import("/home/doug/Dropbox/Globefish-Consultancy-Services-2015/ICCAT-Effdis-Contract-2015/Data/CODES_Flags-Fleets.xls")
+
+
+codes_effort_types <- import("/home/doug/Dropbox/Globefish-Consultancy-Services-2015/ICCAT-Effdis-Contract-2015/Data/CODES_EffortTypes.xls")
+codes_effort_types <- codes_effort_types[-c(1,2),]
+dimnames(codes_effort_types)[[2]]<-c('EffortTypeID','EffortTypeCode','EffortTypeName')
+
+codes_species <- import("/home/doug/Dropbox/Globefish-Consultancy-Services-2015/ICCAT-Effdis-Contract-2015/Data/CODES_Species.xlsx")
+codes_sampling_areas <- import("/home/doug/Dropbox/Globefish-Consultancy-Services-2015/ICCAT-Effdis-Contract-2015/Data/CODES_SamplingAreas.xls")
+codes_square_types <- import("/home/doug/Dropbox/Globefish-Consultancy-Services-2015/ICCAT-Effdis-Contract-2015/Data/CODES_SquareTypes.xls")
+codes_time_periods <- import("/home/doug/Dropbox/Globefish-Consultancy-Services-2015/ICCAT-Effdis-Contract-2015/Data/CODES_TimePeriods.xls")
+
+
+
+
+              
+t2ce$FleetCode <- flags$FleetCode[match(t2ce$FleetID,flags$FleetID)]
+t2ce$FlagName <- flags$FlagName[match(t2ce$FleetCode,flags$FleetCode)] 
 
 
 dim(t2ce[t2ce$GearGrpCode == 'LL' & t2ce$SquareTypeCode %in% c('5x5'),])
