@@ -28,7 +28,7 @@ odbcClose(chan)
 chan <- odbcConnect("effdis-tuna-cc1", case="postgresql", believeNRows=FALSE)
 sqlTables(chan)  #List all tables in the DB
 t2ce <- sqlFetch(chan, "t2ce") # Return a table as a dataframe
-#dimnames(t2ce)[[2]][55:56] <- c('longitude','latitude')
+dimnames(t2ce)[[2]][55:56] <- c('longitude','latitude')
 #sqlQuery(chan,'drop table t2ce')
 #sqlSave(chan,t2ce,tablename='t2ce')
 
@@ -71,10 +71,13 @@ mean_weights <- import("/home/doug/Dropbox/Globefish-Consultancy-Services-2015/I
 #fleet_ranks <- import("/home/doug/Dropbox/Globefish-Consultancy-Services-2015/ICCAT-Effdis-Contract-2015/Data/effdis_2011/input/revisedFleetRanks.xlsx")
 
 t1det9sp <- import("/home/doug/Dropbox/Globefish-Consultancy-Services-2015/ICCAT-Effdis-Contract-2015/Data/effdis_2011/input/t1det_9sp.xlsx")
+colnames(t1det9sp) <- tolower(colnames(t1det9sp))
 
 t2ceLL <- import("/home/doug/Dropbox/Globefish-Consultancy-Services-2015/ICCAT-Effdis-Contract-2015/Data/effdis_2011/input/t2ce_LL_raw5x5.xlsx")
 
 t2ce  <- read.table("/home/doug/Dropbox/Globefish-Consultancy-Services-2015/ICCAT-Effdis-Contract-2015/Data/effdis_2011/input/t2ce.csv",sep=",",header=T)
+colnames(t2ce) <- tolower(colnames(t2ce))
+
 
 #table.csv  <- read.table("/home/doug/Dropbox/Globefish-Consultancy-Services-2015/ICCAT-Effdis-Contract-2015/Data/effdis_2011/input/table.csv",sep=",",header=T)
 
@@ -91,8 +94,6 @@ codes_species <- import("/home/doug/Dropbox/Globefish-Consultancy-Services-2015/
 codes_sampling_areas <- import("/home/doug/Dropbox/Globefish-Consultancy-Services-2015/ICCAT-Effdis-Contract-2015/Data/CODES_SamplingAreas.xls")
 codes_square_types <- import("/home/doug/Dropbox/Globefish-Consultancy-Services-2015/ICCAT-Effdis-Contract-2015/Data/CODES_SquareTypes.xls")
 codes_time_periods <- import("/home/doug/Dropbox/Globefish-Consultancy-Services-2015/ICCAT-Effdis-Contract-2015/Data/CODES_TimePeriods.xls")
-
-
 
 
               
