@@ -104,6 +104,12 @@ sqlQuery(chan,"UPDATE public.t2ce SET the_point = ST_SETSRID(ST_MAKEPOINT(longit
 # Add index for geopoint
 
 sqlQuery (chan,"CREATE INDEX t2ce_the_point ON t2ce USING GIST (the_point);\n");
+
+# Create separate smaller table with unique locations to add depths to. #
+
+sqlQuery (chan, "SELECT DISTINCT longitude,latitude, the_point INTO t2ce_distinct_locations from t2ce;")
+sqlQuery(chan, "COMMENT ON TABLE t2ce_distinct_locations IS 'These are unique or distinct ICCAT task 2 effort data locations derived from table t2ce. It was made to facilitate easier matching to other potentially useful covariates such as';");
+
 odbcClose(chan)
 
 
