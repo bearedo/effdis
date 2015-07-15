@@ -1,11 +1,11 @@
    
 
-yr.month.coverage.task2.r<-function(tdata=t2ce,start.year=1950,end.year=2010,which.gear='LL',which.flag='EU.Portugal'){
+yr.month.coverage.task2.r<-function(tdata=t2ce,start.year=1950,end.year=2010,which.gear='LL',which.region ='AT', which.flag='EU.Portugal'){
   
   #3D plot to explore temporal confounding
   #tdata <- t2ce; which.flag   <- 'U.S.A.'; which.gear <- 'LL'
   tdata1 <- tdata[tdata$timeperiodid < 13,]
-  fdata <- tdata1[tdata1$flagname == which.flag & tdata1$geargrpcode == which.gear,]
+  fdata <- tdata1[tdata1$flagname == which.flag & tdata1$geargrpcode == which.gear & tdata1$region == which.region,]
   
   dd <- dim(fdata)
   print(dd)
