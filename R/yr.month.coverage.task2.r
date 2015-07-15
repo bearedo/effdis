@@ -1,6 +1,6 @@
    
 
-yr.month.coverage.task2.r<-function(tdata=t2ce,start.year=1950,end.year=2015,which.gear='LL',which.flag='EU.Portugal'){
+yr.month.coverage.task2.r<-function(tdata=t2ce,start.year=1950,end.year=2010,which.gear='LL',which.flag='EU.Portugal'){
   
   #3D plot to explore temporal confounding
   #tdata <- t2ce; which.flag   <- 'U.S.A.'; which.gear <- 'LL'
@@ -16,7 +16,7 @@ yr.month.coverage.task2.r<-function(tdata=t2ce,start.year=1950,end.year=2015,whi
   
   else{
   
-  par(mfrow=c(1,1))
+  par(mfrow=c(1,1),mar=c(3,3,3,3))
   
     fmat <- matrix(NA, length(start.year:end.year),12)
     dimnames(fmat) <- list(c(start.year:end.year),1:12)
