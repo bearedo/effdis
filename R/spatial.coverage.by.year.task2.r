@@ -1,10 +1,10 @@
 
-spatial.coverage.by.year.task2.r <- function(tdata=t2ce,start.year=1950, end.year=2010, which.gear='LL',which.flag='EU.Portugal'){
- # tdata <- t2ce
- # which.gear <- 'LL'
- # which.flag   <- 'Chinese Taipei'
+spatial.coverage.by.year.task2.r <- function(tdata=t2ce,start.year=1950, end.year=2010, which.region = 'AT', which.gear='LL',which.flag='EU.Portugal'){
+  #tdata <- t2ce
+  #which.gear <- 'LL'
+  #which.flag   <- 'Chinese Taipei'
   
-  fdata <- tdata[tdata$flagname == which.flag & tdata$geargrpcode == which.gear,]
+  fdata <- tdata[tdata$flagname == which.flag & tdata$geargrpcode == which.gear & tdata$region == which.region,]
   
   ys <- start.year:end.year
   ly <- length(ys) # 43 years
@@ -12,6 +12,7 @@ spatial.coverage.by.year.task2.r <- function(tdata=t2ce,start.year=1950, end.yea
   for (i in min(ys,na.rm=T):max(ys,na.rm=T))
   {
     dat <- fdata[fdata$yearc == i,]
+    print(dim(dat))
     if(length(dat[,1])==0){
       plot(fdata$longitude,fdata$latitude,type='n',xaxt='n',yaxt='n',ylim=range(tdata$latitude,na.rm=T),xlim=range(tdata$longitude,na.rm=T))
       map('world',col='green',fill=T,add=T)
