@@ -1,5 +1,5 @@
 
-spatial.coverage.by.year.task2.r <- function(tdata=t2ce,start.year=1950, end.year=2015, which.gear='LL',which.flag='EU.Portugal'){
+spatial.coverage.by.year.task2.r <- function(tdata=t2ce,start.year=1950, end.year=2010, which.gear='LL',which.flag='EU.Portugal'){
  # tdata <- t2ce
  # which.gear <- 'LL'
  # which.flag   <- 'Chinese Taipei'
@@ -8,7 +8,7 @@ spatial.coverage.by.year.task2.r <- function(tdata=t2ce,start.year=1950, end.yea
   
   ys <- start.year:end.year
   ly <- length(ys) # 43 years
-  par(mfrow=c(6,11),mar=c(0,0,1,0))
+  par(mfrow=c(6,10),mar=c(0,0,1,0))
   for (i in min(ys,na.rm=T):max(ys,na.rm=T))
   {
     dat <- fdata[fdata$yearc == i,]

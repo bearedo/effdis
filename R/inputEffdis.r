@@ -77,7 +77,7 @@ t2ceLL <- import("/home/doug/Dropbox/Globefish-Consultancy-Services-2015/ICCAT-E
 
 t2ce  <- read.table("/home/doug/Dropbox/Globefish-Consultancy-Services-2015/ICCAT-Effdis-Contract-2015/Data/effdis_2011/input/t2ce.csv",sep=",",header=T)
 colnames(t2ce) <- tolower(colnames(t2ce))
-
+t2ce$trend <- trend.r(year=t2ce$yearc,month=t2ce$timeperiodid,start.year=1950)
 
 #table.csv  <- read.table("/home/doug/Dropbox/Globefish-Consultancy-Services-2015/ICCAT-Effdis-Contract-2015/Data/effdis_2011/input/table.csv",sep=",",header=T)
 
@@ -217,8 +217,8 @@ source("/home/doug/effdis/R/yr.month.coverage.task2.r")
 
 
 yr.month.coverage.task2.r()
-yr.month.coverage.task2.r(tdata=t2ceLL,which.flag='Belize')
-yr.month.coverage.task2.r(which.flag='China P.R.')
+yr.month.coverage.task2.r(tdata=t2ce,which.flag='Belize')
+yr.month.coverage.task2.r(tdata=t2ce,which.gear='LL',which.flag='China P.R.')
 yr.month.coverage.task2.r(which.flag='Chinese Taipei')
 yr.month.coverage.task2.r(which.flag='Japan')
 yr.month.coverage.task2.r(which.flag='U.S.A.')
@@ -284,6 +284,7 @@ write.table(t2ce,'/home/doug/Dropbox/Globefish-Consultancy-Services-2015/ICCAT-E
 
 
 t2ce <- read.table('/home/doug/Dropbox/Globefish-Consultancy-Services-2015/ICCAT-Effdis-Contract-2015/Data/effdis_2011/input/t2ce.csv',sep=',')
+dimnames(t2ce)[[2]][55:56] <- c('longitude','latitude') # Have to be different.
 
 
 #####################################
