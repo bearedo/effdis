@@ -21,6 +21,11 @@ t2ceLL       <- import("/home/doug/Dropbox/Globefish-Consultancy-Services-2015/I
 t2ce         <- read.table("/home/doug/Dropbox/Globefish-Consultancy-Services-2015/ICCAT-Effdis-Contract-2015/Data/effdis_2011/input/t2ce.csv",sep=",",header=T)
 flags        <- import("/home/doug/Dropbox/Globefish-Consultancy-Services-2015/ICCAT-Effdis-Contract-2015/Data/effdis_2011/input/flags.csv")
 
+colnames(t1det9sp) <- tolower(colnames(t1det9sp))
+colnames(t2ce) <- tolower(colnames(t2ce))
+t2ce$trend <- trend.r(year=t2ce$yearc,month=t2ce$timeperiodid,start.year=1950)
+
+
 ## Load codes ## 
 
 codes_effort_types <- import("/home/doug/Dropbox/Globefish-Consultancy-Services-2015/ICCAT-Effdis-Contract-2015/Data/CODES_EffortTypes.xls")
