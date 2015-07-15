@@ -6,6 +6,8 @@ library(rio)
 library(RODBC)
 
 
+setwd("/home/doug/effdis")
+
 ## source some useful functions  ##
 
 source("/home/doug/effdis/R/utilityDB.R")
@@ -24,6 +26,46 @@ flags        <- import("/home/doug/Dropbox/Globefish-Consultancy-Services-2015/I
 colnames(t1det9sp) <- tolower(colnames(t1det9sp))
 colnames(t2ce) <- tolower(colnames(t2ce))
 t2ce$trend <- trend.r(year=t2ce$yearc,month=t2ce$timeperiodid,start.year=1950)
+dimnames(t2ce)[[2]][55:56] <- c('longitude','latitude') # Have to be different.
+
+# Get rid of all observations on land and add on string for region, Med or Atlantic #
+
+t2ce.spdf      <- SpatialPointsDataFrame(cbind(x=an(ac(t2ce$longitude)),y=an(ac(t2ce$latitude))),data=t2ce) # Create spatial points dataframe with t2ce data
+
+seas <- readOGR(dsn="/home/doug/effdis/data", layer="World_Seas") # World seas and oceans
+geogWGS84 <- CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs") # Make sure proj is what we think it is.
+seas@proj4string <- geogWGS84
+
+wo <- grep('Atl',seas.polys) # Find Atlantic polygons
+wi <- grep('Med',seas.polys)
+
+seas.polys[wi]
+
+atlantic <- seas[seas@data$NAME %in% seas.polys[wo],] # create object of Atlantic polygons
+med <-      seas[seas@data$NAME %in% seas.polys[wi],]
+
+plot(atlantic) # check
+plot(med)
+
+idx <- over(t2ce.spdf,atlantic)
+
+at.sea      <- rep(NA,length(grd[,1]))
+
+
+at.sea[which(is.na(idx[,1])==TRUE)] <- 'land'
+at.sea[which(is.na(idx[,1])==FALSE)] <- 'sea'
+
+grd$at.sea <- at.sea
+
+grd$cpue[grd$at.sea == 'land'] <- NA
+grd$prob[grd$at.sea == 'land'] <- NA
+grd$catch[grd$at.sea == 'land'] <- NA
+grd$hks[grd$at.sea == 'land'] <- NA
+grd$pcatch[grd$at.sea == 'land'] <- NA
+
+
+
+
 
 
 ## Load codes ## 
@@ -39,8 +81,8 @@ codes_square_types<- import("/home/doug/Dropbox/Globefish-Consultancy-Services-2
 
 # Add on fleet codes and flagnames
 
-t2ce$FleetCode <- flags$FleetCode[match(t2ce$FleetID,flags$FleetID)]
-t2ce$FlagName <- flags$FlagName[match(t2ce$FleetCode,flags$FleetCode)] 
+#t2ce$FleetCode <- flags$FleetCode[match(t2ce$FleetID,flags$FleetID)]
+#t2ce$FlagName <- flags$FlagName[match(t2ce$FleetCode,flags$FleetCode)] 
 
 # Create center point of each grid using Laurie's code lonLat #
 
@@ -57,7 +99,6 @@ for(i in 1:hl){
 t2ce$lon <- ndf$lon # add on lat and long to main database
 t2ce$lat <- ndf$lat
 
-dimnames(t2ce)[[2]][55:56] <- c('longitude','latitude') # Have to be different.
 
 ## Connect to postgres database on ICCAT server with RODBC and upload the data NB. you must edit etc/odbc.ini file and install the correct drivers etc.
 
@@ -100,6 +141,10 @@ sqlQuery(chan,"COMMENT ON COLUMN t2ce.lat IS 'see table codes_square_types';\n")
 sqlQuery(chan,"COMMENT ON COLUMN t2ce.longitude IS 'Center longitude of grid cell calculated according to latLon function of Kell';\n");
 sqlQuery(chan,"COMMENT ON COLUMN t2ce.latitude  IS 'Center latitude of grid cell calculated according to latLon function of Kell';\n");
 sqlQuery(chan,"COMMENT ON COLUMN t2ce.timeperiodid IS '1-12 is month, 13-16 is quarter, 17 is year, 18-19 are first and second semester';\n");
+
+sqlQuery(chan, "COMMENT ON TABLE t1det9sp IS 'These are ICCAT Task 1 landings data for raising the Task 2 data. Supplied by Carlos Palma carlos.palma@iccat.int';");
+
+
 
 # Add geo point #
 

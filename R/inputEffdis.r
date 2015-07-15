@@ -27,7 +27,7 @@ odbcClose(chan)
 #Connect to postgres server at tuna-cc1. NB. you must edit etc/odbc.ini file.
 chan <- odbcConnect("effdis-tuna-cc1", case="postgresql", believeNRows=FALSE)
 sqlTables(chan)  #List all tables in the DB
-t2ce <- sqlFetch(chan, "t2ce") # Return a table as a dataframe
+#t2ce <- sqlFetch(chan, "t2ce") # Return a table as a dataframe
 dimnames(t2ce)[[2]][55:56] <- c('longitude','latitude')
 #sqlQuery(chan,'drop table t2ce')
 #sqlSave(chan,t2ce,tablename='t2ce')
@@ -97,8 +97,8 @@ codes_time_periods <- import("/home/doug/Dropbox/Globefish-Consultancy-Services-
 
 
               
-t2ce$FleetCode <- flags$FleetCode[match(t2ce$FleetID,flags$FleetID)]
-t2ce$FlagName <- flags$FlagName[match(t2ce$FleetCode,flags$FleetCode)] 
+#t2ce$FleetCode <- flags$FleetCode[match(t2ce$FleetID,flags$FleetID)]
+#t2ce$FlagName <- flags$FlagName[match(t2ce$FleetCode,flags$FleetCode)] 
 
 
 dim(t2ce[t2ce$GearGrpCode == 'LL' & t2ce$SquareTypeCode %in% c('5x5'),])
@@ -294,34 +294,34 @@ dimnames(t2ce)[[2]][55:56] <- c('longitude','latitude') # Have to be different.
 head(t1det9sp)
 
 # Gear Groups
-table(t1det9sp$GearGrp)
+table(t1det9sp$geargrp)
 
 # BB    GN    HL    HP    HS    LL    PS    RR    SP    SU    TL    TN    TP    TR    TW    UN 
 # 2719  1143   860   271    81 11683  2661  1022   361   719    90     9   766   527   363  2008
 
-table(t1det9sp$Flag)
-t1ct <- t1det9sp[t1det9sp$Flag == 'Chinese Taipei' & t1det9sp$Region == 'AT',]
-table(t1ct$Species)
+table(t1det9sp$flag)
+t1ct <- t1det9sp[t1det9sp$flag == 'Chinese Taipei' & t1det9sp$region == 'AT',]
+table(t1ct$species)
 
 #Just long-lines
 
-t1ct <- t1ct[t1ct$GearGrp == 'LL',]
+t1ct <- t1ct[t1ct$geargrp == 'LL',]
 
-t1ct1 <- aggregate(Qty_t ~ YearC+Species,data=t1ct,sum)
+t1ct1 <- aggregate(qty_t ~ yearc+species,data=t1ct,sum)
 
 library(lattice)
 
-xyplot(log(Qty_t)~YearC|Species,data=t1ct1)
+xyplot(log(qty_t)~yearc|species,data=t1ct1)
 
 
 ## Task2: Total number of hooks observed ##
 
-table(t2ceLL$Eff1Type)
+table(t2ce$eff1type)
 
 #NO.HOOKS 
 #101514 
 
-aggregate(Eff1~FlagName,FUN=sum,data=t2ceLL)
+aggregate(eff1~flagname,FUN=sum,data=t2ce[t2ce$geargrpcode == 'LL',])
 
 # 1                       Belize   10312448
 # 2                      Brasil  227942668
@@ -637,7 +637,7 @@ plot(grd.spdf,pch='.')
 plot(data.spdf,add=T,col='red')
 map('worldHires',add=T,fill=T,col='green')
 
-#seas <- readOGR(dsn="/home/doug/effdis/data", layer="World_Seas") # World seas and oceans
+seas <- readOGR(dsn="/home/doug/effdis/data", layer="World_Seas") # World seas and oceans
 
 geogWGS84 <- CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs") # Make sure proj is what we think it is.
 seas@proj4string <- geogWGS84
