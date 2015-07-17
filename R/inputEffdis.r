@@ -16,13 +16,11 @@ library(maps)
 library(mapdata)
 library(COZIGAM)
 
-library(RODBC)
 # postgres server running locally (in gedt /etc/odbc.ini)
 chan <- odbcConnect("effdis-local", case="postgresql", believeNRows=FALSE)
 sqlTables(chan)  #List all tables in the DB
 #mydata <- sqlFetch(chan, "some_table") # Return a table as a dataframe
 odbcClose(chan)
-
 
 #Connect to postgres server at tuna-cc1. NB. you must edit etc/odbc.ini file.
 chan <- odbcConnect("effdis-tuna-cc1", case="postgresql", believeNRows=FALSE)
@@ -161,11 +159,9 @@ t2<-sort(table(t2ce$FleetCode)) # not available in the Access Db.
 
 t1<-sort(table(t1det9sp$Fleet))
 
-
 u2<-unique(t2ce$FleetCode) # NB. Not available in the Access Db.
 
 u1<-unique(t1det9sp$Fleet) 
-
 
 match(u1,u2) # Match fleet codes ? 
 
@@ -179,7 +175,6 @@ table(t2ce$DSetType)
 
 #--     n-     nw     -w 
 #     24 136211  85256 346010 
-
 
 table(t2ceLL$CatchUnit)
 #kg    nr 
@@ -279,7 +274,7 @@ t2ce$lat <- ndf$lat
 
 dim(t2ce)
 
-#write.table(t2ce,'/home/doug/effdis/data/t2ce.csv',sep=',')
+write.table(t2ce,'/home/doug/effdis/data/t2ce.csv',sep=',')
 write.table(t2ce,'/home/doug/Dropbox/Globefish-Consultancy-Services-2015/ICCAT-Effdis-Contract-2015/Data/effdis_2011/input/t2ce.csv',sep=',')
 
 
@@ -294,6 +289,7 @@ dimnames(t2ce)[[2]][55:56] <- c('longitude','latitude') # Have to be different.
 head(t1det9sp)
 
 # Gear Groups
+
 table(t1det9sp$geargrp)
 
 # BB    GN    HL    HP    HS    LL    PS    RR    SP    SU    TL    TN    TP    TR    TW    UN 
@@ -316,12 +312,10 @@ xyplot(log(qty_t)~yearc|species,data=t1ct1)
 
 ## Task2: Total number of hooks observed ##
 
-table(t2ce$eff1type)
+table(t2ce$geargrpcode, t2ce$eff1type)
 
-#NO.HOOKS 
-#101514 
 
-aggregate(eff1~flagname,FUN=sum,data=t2ce[t2ce$geargrpcode == 'LL',])
+aggregate(eff1~flagname,FUN=sum,data=t2ce[t2ce$geargrpcode == 'LL' & t2ce$region == 'AT',])
 
 # 1                       Belize   10312448
 # 2                      Brasil  227942668
@@ -352,7 +346,7 @@ aggregate(eff1~flagname,FUN=sum,data=t2ce[t2ce$geargrpcode == 'LL',])
 
 # Chinese Taipei in Atlantic Task 2#
 
-ct <- t2ceLL[t2ceLL$FlagName == 'Chinese Taipei'& t2ceLL$Region == 'AT',]
+ct <- t2ce[t2ce$flagname == 'Chinese Taipei'& t2ce$region == 'AT',]
 
 ## Sampling in space ##
 
@@ -381,20 +375,20 @@ spatial.coverage.by.month.task2.r(which.flag='U.S.A.')
 
 
 source("/home/doug/effdis/R/effort.by.year.task2.r")
-par(mfrow=c(2,1))
+par(mfrow=c(2,1),mar=c(4,4,4,4))
 effort.by.year.task2.r(which.flag='Chinese Taipei')
 effort.by.year.task2.r(which.flag='Japan')
 
 
 #Sum by year and month
 
-ct1 <- aggregate(Eff1~trend+TimePeriodID,data=ct,sum)
-ct1 <- orderBy(~trend+TimePeriodID,data=ct1)
+ct1 <- aggregate(eff1~trend+timeperiodid,data=ct,sum)
+ct1 <- orderBy(~trend+timeperiodid,data=ct1)
 
 
-plot(ct1$trend,log(ct1$Eff1),type='l',xaxt='n',ylab='Number of hooks',xlab="year")
-lines(supsmu(ct1$trend,log(ct1$Eff1)          ),col='green')
-xl <- seq(min(ct$YearC),max(ct$Year),by=5)
+plot(ct1$trend,log(ct1$eff1),type='l',xaxt='n',ylab='Number of hooks',xlab="year")
+lines(supsmu(ct1$trend,log(ct1$eff1)          ),col='green')
+xl <- seq(min(ct$yearc),max(ct$yearc),by=5)
 axis(1,at=seq(min(ct$trend),max(ct$trend),by=60),labels=as.character(xl))
 abline(v=seq(min(ct$trend),max(ct$trend),by=60),lty=2,col='blue')
 
@@ -403,28 +397,31 @@ abline(v=seq(min(ct$trend),max(ct$trend),by=60),lty=2,col='blue')
 
 par(mfrow=c(3,4),mar=c(1,1,3,1))
 for(i in 19:27){
-plot(log(ct[,i]),log(ct$Eff1),pch='.')
+plot(log(ct[,i]),log(ct$eff1),pch='.')
 title(colnames(ct)[i])
 }
-plot(log(ct$Total),log(ct$Eff1),pch='.')
-title('Total')
+#plot(log(ct$total),log(ct$eff1),pch='.')
+#title('Total')
 
 # Multivariate relationships in the Task 2 data #
 
-tdata <- t2ceLL
+tdata <- t2ce
 
-task2.simple <- data.frame(year=tdata$YearC,trend=tdata$trend,month=tdata$TimePeriodID,region = tdata$Region, flagname=tdata$FlagName, 
-                  fleetcode=tdata$FleetCode,lon=tdata$lon,lat=tdata$lat,hooks=tdata$Eff1,dsettype=tdata$DSetType,catchunit=tdata$CatchUnit,
-                  ALB=tdata$ALB,BFT=tdata$BFT,
-             BET=tdata$BET,SKJ=tdata$SKJ,YFT=tdata$YFT,SWO=tdata$SWO,BUM=tdata$BUM,SAI=tdata$SAI,WHM=tdata$WHM,Total=tdata$Total)
+task2.simple <- data.frame(year=tdata$yearc,trend=tdata$trend,month=tdata$timeperiodid,region = tdata$region, flagname=tdata$flagname, 
+                  fleetcode=tdata$fleetcode,geargrpcode=tdata$geargrpcode,longitude=tdata$longitude,latitude=tdata$latitude,
+                  eff1=tdata$eff1,eff1type=tdata$eff1type,dsettype=tdata$dsettype,
+                  catchunit=tdata$catchunit,
+                  alb=tdata$alb,bft=tdata$bft,
+             bet=tdata$bet,skj=tdata$skj,yft=tdata$yft,swo=tdata$swo,bum=tdata$bum,sai=tdata$sai,whm=tdata$whm,tot9sp=tdata$totsp9)
 
 #pairs(ct2,pch='.')
 
 dim(task2.simple)
 
-task2.simple[task2.simple$flagname == 'Chinese Taipei' & task2.simple$year == 1990 & task2.simple$month == 1,]
+ct90<-task2.simple[task2.simple$region == 'AT' & task2.simple$geargrpcode == 'LL' & task2.simple$flagname == 'Chinese Taipei' ,]
 
-cc <- round(cor(task2.simple[,-c(4,5,6,9,10,11)]),2)
+cc <- round(cor(ct90[,-c(1,2,3,4,5,6,7,8,9,11,12,13)],use='pairwise'),2)
+cc[cc==1]
 
 par(mfrow=c(1,1))
 image(cc)
@@ -434,55 +431,54 @@ image(cc)
 # Simplify t1ct
 # Take out longlines
 
-task1 <- t1det9sp[t1det9sp$GearGrp == 'LL',]
-task1.simple <- data.frame(year=task1$YearC,region=task1$Region,area=task1$Area,flagname=task1$Flag,fleetcode=task1$Fleet,
-                    species=task1$Species,total_catch_kgs=task1$Qty_t*1000)
+task1 <- t1det9sp
+task1.simple <- data.frame(year=task1$yearc,region=task1$region,area=task1$area,geargrp=task1$geargrp,flagname=task1$flag,fleetcode=task1$fleet,
+                           stock=task1$stock,
+                    species=task1$species,datatype=task1$datatype,total_catch_kgs=task1$qty_t*1000)
 
-# Sum over region, year, species fleetand flag
+# Sum over region, year, species fleet and flag for datatype = C
 
-task1.sum <- aggregate(total_catch_kgs~region+year+flagname+fleetcode+species,data=task1.simple,sum)
+task1.sum <- aggregate(total_catch_kgs~year+region+geargrp+flagname+fleetcode+species+datatype,data=task1.simple[task1.simple$datatype == 'C',],sum)
 
-# Convert task2 to long-format
+# Convert task2 to long-format #
 
 library(reshape2)
 
-task2.lf <- melt(task2.simple[,-21],id=c('year','trend','month','region','flagname','fleetcode','lon','lat','hooks','dsettype','catchunit'))
-dimnames(task2.lf)[[2]][12:13] <- c('species','measured_catch')
+task2.lf <- melt(task2.simple[,-23],id=c('year','trend','month','region','flagname','fleetcode','geargrpcode','longitude','latitude','eff1','eff1type','dsettype','catchunit'))
+dimnames(task2.lf)[[2]][14:15] <- c('species','measured_catch')
 
-dim(task2.lf) #= 913626
+dim(task2.lf) #= 5107509
 
-task2.lf [task2.lf$species == 'ALB' & task2.lf$flagname == 'Chinese Taipei' & task2.lf$year == 1990 & task2.lf$month == 1,]
+task2.lf [task2.lf$species == 'bft' & task2.lf$flagname == 'Chinese Taipei' & task2.lf$year == 1990 & task2.lf$month == 1,]
 task2.lf [task2.lf$flagname == 'EU.Greece' & task2.lf$month ==2 & task2.lf$year == 2000,]
 
-
-
 # Now merge task 1 and 2
-#long format
-task2.lf$total_catch_kgs <- 
-  task1.sum$total_catch_kgs[match(paste(task2.lf$year,task2.lf$region,task2.lf$flagname,
-                                        task2.lf$fleetcode,task2.lf$species),
+# long format
+task2.lf$total_catch_kgs <- ask1.sum$total_catch_kgs[match(paste(task2.lf$year,task2.lf$region,task2.lf$flagname,
+                                        task2.lf$fleetcode,task2.lf$geargrpcode,task2.lf$species),
                                         paste(task1.sum$year,task1.sum$region,task1.sum$flagname,
-                                              task1.sum$fleetcode,task1.sum$species))]
+                                              task1.sum$fleetcode,task1.sum$geargrp,task1.sum$species))]
 
+write.table(task2.lf,'/home/doug/effdis/data/task2.lf.csv',sep=',')
 
 task1.2.lf <- task2.lf
 
-sum(is.na(task1.2.lf$total_catch_kgs)) # 148966
+sum(is.na(task1.2.lf$total_catch_kgs)) # 3161381
 
 nas <- rep(0,length(task1.2.lf[,1]))
 nas[!is.na(task1.2.lf$total_catch_kgs)]<- 1
 table(nas)
-task1.2.lf <- task1.2.lf[!is.na(task1.2.lf$total_catch_kgs),]
+#task1.2.lf <- task1.2.lf[!is.na(task1.2.lf$total_catch_kgs),]
 #task1.2.lf$trend <- trend.r(year=task1.2.lf$year,month=task1.2.lf$month,start.year=1956)
 task1.2.lf <- orderBy(~trend+species+flagname,data=task1.2.lf)
 task1.2.lf$bin <- ifelse(task1.2.lf$measured_catch==0,0,1)
 
-task2.sum <- aggregate(cbind(measured_catch,hooks)~year+species+region+flagname+fleetcode+catchunit,
+task2.sum <- aggregate(cbind(measured_catch,eff1)~year+species+region+flagname+fleetcode+catchunit+eff1type,
                         data=task2.lf,sum,na.rm=T)
 
 head(task2.sum)
-dim(task2.sum) # = 6822
-task2.sum <- orderBy(~year+species+flagname+catchunit,data=task2.sum)
+dim(task2.sum) # = 34344
+task2.sum <- orderBy(~year+species+flagname+catchunit+eff1type,data=task2.sum)
 
 task1.2 <-merge(task2.sum,task1.sum,all.x=T)
 
@@ -903,8 +899,6 @@ map("worldHires",resolution=1,add=T,fill=TRUE,col=colland);map.axes();#box()
 #axis(1);axis(2,las=1); box()
 
 
-
-
 #-Add a legend
 legend(x='topright',fill=c('white',colintens),legend=legval$ALL,bg='white',title=unitval,box.lty=1)
 
@@ -916,7 +910,7 @@ mtext(yl$label,side=2,outer=T,line=-1.5,at=0.5,font=yl$font,cex=yl$cex)
 
 
 
-
+https://code.google.com/p/vmstools/wiki/Practicals9
 
 
 
