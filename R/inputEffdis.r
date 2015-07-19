@@ -830,6 +830,8 @@ coords@proj4string <- geogWGS84
 plot(coords)
 
 #######Plotting routines#############
+
+
 #- Define grid cell area
 resx        <- 5
 resy        <- 5
