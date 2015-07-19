@@ -24,7 +24,7 @@ sqlTables(chan)  #List all tables in the DB
 t2ce_lf_ll <- task2.lf[task2.lf$geargrpcode == 'LL',]
 t2ce_lf_ll <- orderBy(~flagname+trend,data=t2ce_lf_ll)
 
-for(i in c(4:7,12:15)) {t2ce_lf_ll[,i] <- ac(t2ce_lf_ll[,i])}
+for(i in c(4:7,12:14)) {t2ce_lf_ll[,i] <- ac(t2ce_lf_ll[,i])}
 
 
 dim(t2ce_lf_ll) # 2,458,134
@@ -80,12 +80,56 @@ only.nrs <- (1:length(tt2[,1]))[tt2$value ==0 & tt2$t_nr...4. > 0] # Combination
 # Do data with kgs only first #
 
 
+three.d.effort.by.year.r(what.year='2006',what.flag='Belize',scaling.f=100000)
+three.d.effort.by.year.r(what.year='2006',what.flag='Brasil',scaling.f=100000)
+three.d.effort.by.year.r(what.year='2006',what.flag='China P.R.',scaling.f=100000)
+three.d.effort.by.year.r(what.year='2006',what.flag='Chinese Taipei',scaling.f=100000)
+three.d.effort.by.year.r(what.year='2006',what.flag='Cuba',scaling.f=100000)
+three.d.effort.by.year.r(what.year='2006',what.flag='EU.Cyprus',scaling.f=100000)
+three.d.effort.by.year.r(what.year='2006',what.flag='EU.España',scaling.f=100000)
+three.d.effort.by.year.r(what.year='2006',what.flag='EU.Greece',scaling.f=100000)
+three.d.effort.by.year.r(what.year='2006',what.flag='EU.Italy',scaling.f=100000)
+three.d.effort.by.year.r(what.year='2006',what.flag='EU.Malta',scaling.f=100000)
+three.d.effort.by.year.r(what.year='2006',what.flag='EU.Portugal',scaling.f=100000)
+three.d.effort.by.year.r(what.year='2006',what.flag='Japan',scaling.f=100000)
+three.d.effort.by.year.r(what.year='2006',what.flag='Korea Rep',scaling.f=100000)
+three.d.effort.by.year.r(what.year='2006',what.flag='Maroc',scaling.f=100000)
+three.d.effort.by.year.r(what.year='2006',what.flag='Mexico',scaling.f=100000)
+three.d.effort.by.year.r(what.year='2006',what.flag='Namibia',scaling.f=100000)
+three.d.effort.by.year.r(what.year='2006',what.flag='Other',scaling.f=100000)
+three.d.effort.by.year.r(what.year='2006',what.flag='Panama',scaling.f=100000)
+three.d.effort.by.year.r(what.year='2006',what.flag='Philippines',scaling.f=100000)
+three.d.effort.by.year.r(what.year='2006',what.flag='South Africa',scaling.f=100000)
+three.d.effort.by.year.r(what.year='2006',what.flag='St. Vincent and Grenadines',scaling.f=100000)
+three.d.effort.by.year.r(what.year='2006',what.flag='Trinidad and Tobago',scaling.f=100000)
+three.d.effort.by.year.r(what.year='2006',what.flag='Uruguay',scaling.f=100000)
+three.d.effort.by.year.r(what.year='2006',what.flag='U.S.A',scaling.f=100000)
+three.d.effort.by.year.r(what.year='2006',what.flag='U.S.S.R',scaling.f=100000)
+three.d.effort.by.year.r(what.year='2006',what.flag='Vanuatu',scaling.f=100000)
+three.d.effort.by.year.r(what.year='2006',what.flag='Venezuala',scaling.f=100000)
+
+
+three.d.catch.by.year.r(tdata=t2ce_lf_ll,what.year='1984',what.flag='EU.Italy',what.species='alb',scaling.f=1,catchunit = "kg")
+
+yrs <- as.character(1950:2010)
+us <- ac(sort(unique(task2.lf$species)))
+flgs <- ac(sort(unique(task2.lf$flagname)))
+
+for(i in us){
+  for(j in yrs){
+    for(k in flgs){
+      print(c(i,j,k))
+three.d.catch.by.year.r(tdata = t2ce_lf_ll,what.year=j,what.flag=k,what.species=i,scaling.f=10,catchunit='kg')
+    }}}
 
 
 
-
-
-
+for(i in us){
+  for(j in yrs){
+    for(k in flgs){
+      print(c(i,j,k))
+      three.d.catch.by.year.r(tdata = t2ce_lf_ll,what.year=j,what.flag=k,what.species=i,scaling.f=10,catchunit='nr')
+    }}}
 
 
 

@@ -13,6 +13,7 @@ library(gam)
 library(maps)
 library(mapdata)
 library(COZIGAM)
+library(reshape2)
 
 ## Read in task 2 longline data from ICCAT DB ##
 
@@ -66,7 +67,26 @@ t2ce_lf_ll <- t2ce_lf_ll[t2ce_lf_ll$eff1type != '--',]
 t2ce_lf_ll <- t2ce_lf_ll[t2ce_lf_ll$catchunit != '--',]
 
 
-tt<- table(t2ce_lf_ll$flagname,t2ce_lf_ll$catchunit,t2ce_lf_ll$year)
+
+tt0<- table(t2ce_lf_ll$flagname,t2ce_lf_ll$catchunit,t2ce_lf_ll$year)
+tt1<- melt(tt0)
+
+t_kg <- tt1[tt1[,2]=='kg',]
+t_nr <- tt1[tt1[,2]=='nr',]
+tt2 <- data.frame(t_kg,t_nr[,4])
+
+only.nrs <- (1:length(tt2[,1]))[tt2$value ==0 & tt2$t_nr...4. > 0] # Combinations who only reported numbers. Mostly Japan and USA.
+
+# Do data with kgs only first #
+
+
+
+
+
+
+
+
+
 
 
 
