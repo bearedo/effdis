@@ -4,7 +4,7 @@ find.ocean.r <- function(input=grd)
   
   # Function takes a data frame of locations (must be called latitude and longitue) and adds a vector telling you 
   # whether it is in Atlantic, Pacific or Med. The definitions of the 'Atlantic' etc are very general.
-  
+  #input <- grd
   seas <- readOGR(dsn="/home/doug/effdis/data", layer="World_Seas") # World seas and oceans
   seas@proj4string <- geogWGS84
   seas.polys <- as.character(sort(unique(seas@data$NAME)))
@@ -51,9 +51,11 @@ find.ocean.r <- function(input=grd)
   # Add vector denoting which ocean
   
   which.ocean      <- rep(NA,length(input[,1]))
-  which.ocean[which(is.na(idx.atl[,1])==TRUE)] <- 'at'
-  which.ocean[which(is.na(idx.med[,1])==FALSE)] <- 'me'
-  which.ocean[which(is.na(idx.pac[,1])==FALSE)] <- 'pa'
+  which.ocean[which(!is.na(idx.atl[,1]))] <- 'atl'
+  which.ocean[which(!is.na(idx.med[,1]))] <- 'med'
+  which.ocean[which(!is.na(idx.pac[,1]))] <- 'pac'
+  which.ocean[is.na(which.ocean)]         <-'land'
+  
   
   input$which.ocean <- which.ocean
   

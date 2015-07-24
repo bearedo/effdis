@@ -14,7 +14,7 @@ library(vmstools)
 library(gam)
 library(maps)
 library(mapdata)
-library(COZIGAM)
+#library(COZIGAM)
 library(RODBC)
 
 setwd("/home/doug/effdis")

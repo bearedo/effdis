@@ -70,26 +70,7 @@ t2ce_lf_ll <- t2ce_lf_ll[t2ce_lf_ll$catchunit != '--',]
 
 # t2ce_distinct_locations <- readOGR(dsn="PG:dbname=effdis host=134.213.29.249 user=postgres password=Postgres1", layer = "public.world_seas", verbose = TRUE)
 
-t2ce_distinct_locations_covariates <- sqlQuery(chan, "SELECT *, ST_AsText(the_geom_4326) AS the_point from t2ce_distinct_locations_covariates;") 
-
-# m <- dbDriver("PostgreSQL")
-# con <- dbConnect(m, dbname="effdis", host = "134.213.29.249", user = "postgres")
-# q <- "SELECT *, ST_AsText(the_geom_4326) AS geom from t2ce_distinct_locations_covariates;"
-# rs <-  dbSendQuery(con,q)
-# df <-  fetch(rs,n=-1)
-
-tdlc     <- SpatialPointsDataFrame(cbind(x=an(ac(t2ce_distinct_locations_covariates$longitude)),y=an(ac(t2ce_distinct_locations_covariates$lat))),data=t2ce_distinct_locations_covariates)
-
-geogWGS84 <- CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs") # Make sure proj is what we think it is.
-
-tdlc@proj4string <- geogWGS84
-
-# Put covariates on
-
-t2ce_lf_ll$depth_m <- tdlc@data$depth_m[match(paste(t2ce_lf_ll$longitude,t2ce_lf_ll$latitude), paste(tdlc@data$longitude,tdlc@data$latitude))]
-t2ce_lf_ll$m_ann_sst <- tdlc@data$m_ann_sst[match(paste(t2ce_lf_ll$longitude,t2ce_lf_ll$latitude), paste(tdlc@data$longitude,tdlc@data$latitude))]
-t2ce_lf_ll$aq_prim_pro <- tdlc@data$aq_prim_pro[match(paste(t2ce_lf_ll$longitude,t2ce_lf_ll$latitude), paste(tdlc@data$longitude,tdlc@data$latitude))]
-t2ce_lf_ll$m_ann_chla <- tdlc@data$m_ann_chla[match(paste(t2ce_lf_ll$longitude,t2ce_lf_ll$latitude), paste(tdlc@data$longitude,tdlc@data$latitude))]
+t2ce_lf_ll <- add.covariates.r(input = t2ce_lf_ll, what.dsn = 'effdis-tuna-cc1')$output
 
 # Who reports kgs and/or nrs ?
 
@@ -155,7 +136,6 @@ tt1[only.nrs,]
 
 # Do data with kgs only first #
 
-
 three.d.effort.by.year.r(what.year='2006',what.flag='Belize',scaling.f=100000)
 three.d.effort.by.year.r(what.year='2006',what.flag='Brasil',scaling.f=100000)
 three.d.effort.by.year.r(what.year='2006',what.flag='China P.R.',scaling.f=100000)
@@ -185,7 +165,7 @@ three.d.effort.by.year.r(what.year='2006',what.flag='Vanuatu',scaling.f=100000)
 three.d.effort.by.year.r(what.year='2006',what.flag='Venezuela',scaling.f=100000)
 
 
-three.d.catch.by.year.r(tdata=t2ce_lf_ll,what.year='1984',what.flag='EU.Italy',what.species='alb',scaling.f=1,catchunit = "kg")
+three.d.catch.by.year.r(tdata=t2ce_lf_ll,what.year='2006',what.flag='All',what.species='alb',scaling.f=100,catchunit = "kg")
 
 ## Loop round catch and effort data ##
 
@@ -244,7 +224,7 @@ for(i in us){
 
 head(t2ce_lf_ll)
 
-## Split data into kg and nr
+## Split data into kg and nr ##
 
 t2ce_lf_ll_kg <- t2ce_lf_ll[t2ce_lf_ll$dsettype %in% c('-w','nw'),]
 t2ce_lf_ll_kg <- t2ce_lf_ll_kg[t2ce_lf_ll_kg$catchunit  != "--",]
@@ -286,145 +266,143 @@ t2ce_lf_ll$ldepth_m[t2ce_lf_ll$ldepth_m == 0] <- NA
 ##########################################
 
 
-dat <- t2ce_lf_ll[t2ce_lf_ll$year %in% c(2006,2007,2008) & t2ce_lf_ll$species =='alb',]
-# CPUE over all 9 species
-dat <- aggregate(list(measured_catch=dat$measured_catch,eff1=dat$eff1), 
-                  by=list(trend=dat$trend,longitude=dat$longitude,latitude=dat$latitude),sum)
+## Prepare data ## 
+
+us <- sort(unique(t2ce_lf_ll$species))
+
+for (i in us) {
+  print(i)
+what.species <- i
 
 
-dat$depth_m <- as.vector(tdlc@data$depth_m)[match(paste(dat$longitude,dat$latitude), paste(tdlc@data$longitude,tdlc@data$latitude))]
-dat$depth_m <- dat$depth_m 
+setwd('/home/doug/effdis/data')
+
+dat <- t2ce_lf_ll[t2ce_lf_ll$species ==what.species,]
+
+dat <- find.ocean.r(dat)$output
+dat <- dat[dat$which.ocean == 'atl',]
+
+## CPUE by species ##
+
+dat1 <- aggregate(list(measured_catch=dat$measured_catch,eff1=dat$eff1), 
+                  by=list(trend=dat$trend,month=dat$month,longitude=dat$longitude,latitude=dat$latitude),sum)
+
+#dat2 <- add.covariates.r(input=dat1)$output
+dat2 <- as.data.frame(dat2)
+
+#dat2$depth_m <- dat2$depth_m * -1
+#dat2$ldepth_m <- log(dat2$depth_m)
 
 #dat <- dat[!is.na(dat$ldepth_m),]
-dat$bin <- ifelse(dat$measured_catch==0,0,1)
-dat$lmeasured_catch <- log(dat$measured_catch+1)
 
+bin <- ifelse(dat2$measured_catch==0,0,1)
+dat2$bin <- bin
+#dat2$lmeasured_catch <- log(dat2$measured_catch+1)
 
 #Binomial model for probability of catch
-#b0 <- gam(bin~1,family=quasibinomial(link="logit"),data=dat)
-b1 <- gam(bin~te(longitude,latitude,by = trend,k=11),family=quasibinomial(link="logit"),method="REML",data=dat)
 
-#Gamma model for task 2 catch
-zz1 <- gam(measured_catch~te(longitude,latitude,by=trend,k=11),family=Gamma(link="log"),method="REML",
-           data=dat[dat$bin==1,])
+bs<-"cr"
 
+b1 <- gam(bin~te(longitude,latitude,k=12,bs=bs)+te(trend,k=6,bs=bs)+te(month,k=3,bs=bs),family=quasibinomial(link="logit"),method="REML",data=dat2)
 
+#Gamma model for task 2 catch 
 
+g1 <- gam(measured_catch~te(longitude,latitude,k=12,bs=bs)+te(trend,k=6,bs=bs)+te(month,k=3,bs=bs),family=Gamma(link="log"),method="REML",data=dat2[dat2$bin==1,])
 
-#b2 <- gam(bin~lo(trend)+lo(month)+lo(lon)+lo(lat)*species,family=quasibinomial(link="logit"),data=alb)
-#Poisson model for nhooks
-h0 <- gam(eff1~1,family=quasipoisson(link="log"),data=dat)
-h1 <- gam(eff1~te(longitude,latitude,by=trend,k=11),family=quasipoisson(link="log"),method="REML",data=dat)
-#detach("package:mgcv", unload=TRUE)
+# Poisson model for nhooks only needs to be done once
+ if (what.species == 'alb')
+   {
+h1 <- gam(eff1~te(longitude,latitude,k=12,bs=bs)+te(trend,k=6,bs=bs)+te(month,k=3,bs=bs),family=quasipoisson(link="log"),method="REML",data=dat2)
+}
 
-min.lat <- min(dat$latitude)
-max.lat <- max(dat$latitude)
-min.lon <- min(dat$longitude)
-max.lon <- max(dat$longitude)
+## Build grid for predictions ## 
+
+min.lat <- min(dat2$latitude+1)
+max.lat <- max(dat2$latitude-1)
+min.lon <- min(dat2$longitude+1)
+max.lon <- max(dat2$longitude-1)
 grid.res <- 5
-t1 <- min(dat$trend)
-t2 <- max(dat$trend)
+t1 <- min(dat2$trend)
+t2 <- max(dat2$trend)
 lonnie <- seq(min.lon,max.lon,by=grid.res)
 lattie <- seq(min.lat,max.lat,by=grid.res)
 lo <- length(lonnie)
 la <- length(lattie)
 
 grd <-data.frame(expand.grid(longitude=lonnie,latitude=lattie))
+grd <- find.ocean.r(input=grd[,c(1,2)])$output
 
-find.ocean.r <- function(data=grd)
-  {
+plot(grd$longitude[grd$which.ocean=='atl'],grd$latitude[grd$which.ocean=='atl'])
 
-   # Function takes a data frame of locations (must be called latitude and longitue) and adds a vector telling you 
-  # whether it is in Atlantic, Pacific or Med. The definitions of the 'Atlantic' etc are very general.
-  
-seas <- readOGR(dsn="/home/doug/effdis/data", layer="World_Seas") # World seas and oceans
-seas@proj4string <- geogWGS84
-seas.polys <- as.character(sort(unique(seas@data$NAME)))
+#grd <- add.covariates.r(input=grd)$output
+#grd <- as.data.frame(grd)
 
-wo <- grep('Atl',seas.polys) # Find all relevant polygons
-wi <- grep('Med',seas.polys)
-wj <- grep('Adriatic',seas.polys) # Find all relevant polygons
-wk <- grep('Aegean',seas.polys)
-wl <- grep('Balearic',seas.polys) # Find all relevant polygons
-wm <- grep('Bay of Biscay',seas.polys)
-wn <- grep('Bristol',seas.polys) # Find all relevant polygons
-wp <- grep('Caribbean',seas.polys)
-wq <- grep('Celtic',seas.polys) # Find all relevant polygons
-wr <- grep('English Channel',seas.polys)
-ws <- grep('Lawrence',seas.polys) # Find all relevant polygons
-wt <- grep('Inner Seas',seas.polys)
-wu <- grep('Ionian',seas.polys) # Find all relevant polygons
-wv <- grep('Irish',seas.polys)
-wx <- grep('North Sea',seas.polys) # Find all relevant polygons
-wz <- grep('Gibra',seas.polys) # Find all relevant polygons
-wa <- grep('Ligurian',seas.polys) # Find all relevant polygons
-wzz <- grep('Tyrr',seas.polys) # Find all relevant polygons
-wxx <- grep('Alb',seas.polys) # Find all relevant polygons
-wmm <- grep('Mex',seas.polys) # Find all relevant polygons
-wpa  <- grep('Pacific',seas.polys)
-gog  <- grep('Guin',seas.polys)
+#grd$ldepth_m <- grd$depth_m*-1
+#grd$ldepth_m <- log(grd$ldepth_m)
 
-# Create multi-polygons for selection.
-atlantic <- seas[seas@data$NAME %in% seas.polys[c(wo,wm,wn,wp,wq,wr,ws,wt,wv,wx,wmm,gog)],] # create object of Atlantic polygons
-med <-      seas[seas@data$NAME %in% seas.polys[c(wi,wj,wk,wl,wu,wz,wa,wzz,wxx)],]
-pacific   <- seas[seas@data$NAME %in% seas.polys[c(wpa)],]
 
-# Make SpatialPointsDataFrame
+start.year <- 1950
+end.year   <-  2010
+lyrs       <- length(start.year:end.year)
+ltrnd     <- lyrs*12
 
-data.spdf      <- SpatialPointsDataFrame(cbind(x=an(ac(data$longitude)),y=an(ac(grd$latitude))),data=grd)
-geogWGS84 <- CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs") # Make sure proj is what we think it is.
-data.spdf@proj4string <- geogWGS84
+ngrd <- data.frame(longitude=rep(grd$longitude,ltrnd),latitude=rep(grd$latitude,ltrnd),which.ocean=rep(grd$which.ocean,ltrnd),
+         year = rep(start.year:end.year,rep((lo*la),lyrs)), month = rep(rep(1:12,rep(lo*la,12)),lyrs))
+ngrd$trend <- trend.r(ngrd$year,ngrd$month,start.year=1950)
 
-# Work out which ocean the data are in
-idx.atl <- over(data.spdf,atlantic)
-idx.med <- over(data.spdf,med)
-idx.pac <- over(data.spdf,pacific)
+# Do the predictions over the grid #
 
-# Add vector denoting which ocean
+prob <- predict(b1,ngrd,type="response")
+measured_catch <- predict(g1,ngrd,type="response")
+eff <- predict(h1,ngrd,type="response")
 
-which.ocean      <- rep(NA,length(grd[,1]))
-which.ocean[which(is.na(idx.atl[,1])==TRUE)] <- 'at'
-which.ocean[which(is.na(idx.med[,1])==FALSE)] <- 'me'
-which.ocean[which(is.na(idx.pac[,1])==FALSE)] <- 'pa'
+# Block out the land #
 
-grd$which.ocean <- which.ocean
+prob[ngrd$which.ocean %in% c('land','med','pac')] <- NA
+measured_catch[ngrd$which.ocean %in% c('land','med','pac')] <- NA
+eff[ngrd$which.ocean %in% c('land','med','pac')] <- NA
 
-out <- list(output=data)
-out}
+# Convert to vectors
 
-grd$depth_m <- as.vector(tdlc@data$depth_m)[match(paste(grd$longitude,grd$latitude), paste(tdlc@data$longitude,tdlc@data$latitude))]
-grd$ldepth_m <- grd$depth_m*-1
-grd$ldepth_m <- log(grd$ldepth_m)
+ngrd$prob <- as.vector(prob)
+ngrd$measured_catch <- as.vector(measured_catch)
+ngrd$eff <- as.vector(eff)
 
-grd$month <- 6
-grd$trend <- 673
-grd$year <- 2006
-grd$species <- as.factor('ALB')
-prob <- predict(b1,grd,type="response")
-measured_catch <- predict(zz1,grd,type="response")
-eff <- predict(h1,grd,type="response")
+filename <- paste('model-data-',what.species,'.csv',sep='')
+write.table(ngrd,file=filename,sep=',',row.names=F)
 
-prob[which.ocean != 'AT'] <- NA
-measured_catch[which.ocean != 'AT'] <- NA
-eff[which.ocean != 'AT'] <- NA
+}
 
-grd$prob <- as.vector(prob)
-grd$measured_catch <- as.vector(measured_catch)
-grd$eff <- as.vector(eff)
-image(lonnie,lattie,matrix(grd$prob,length(lonnie),length(lattie)))
-contour(lonnie,lattie,matrix(grd$prob,length(lonnie),length(lattie)),add=T)
 
-image(lonnie,lattie,matrix(grd$measured_catch,length(lonnie),length(lattie)),col=topo.colors(10))
-contour(lonnie,lattie,matrix(grd$measured_catch,length(lonnie),length(lattie)),add=T)
 
-image(lonnie,lattie,matrix(grd$eff,length(lonnie),length(lattie)),col=topo.colors(10))
-contour(lonnie,lattie,matrix(grd$eff,length(lonnie),length(lattie)),add=T)
 
-grd$catch <- grd$prob*grd$measured_catch
-grd$cpue <- grd$catch/grd$eff
 
-image(lonnie,lattie,matrix(grd$catch,length(lonnie),length(lattie)),col=topo.colors(10000))
-contour(lonnie,lattie,matrix(grd$catch,length(lonnie),length(lattie)),add=T)
+
+### Plot the data to see if they look sensible ####
+
+which.trend <- 649
+
+image(lonnie,lattie,matrix(ngrd$prob[ngrd$trend == which.trend],length(lonnie),length(lattie)))
+contour(lonnie,lattie,matrix(ngrd$prob,length(lonnie),length(lattie)),add=T)
+
+image(lonnie,lattie,matrix(log(ngrd$measured_catch),length(lonnie),length(lattie)),col=topo.colors(1000))
+contour(lonnie,lattie,matrix(ngrd$measured_catch,length(lonnie),length(lattie)),add=T)
+
+
+image(lonnie,lattie,matrix(ngrd$eff,length(lonnie),length(lattie)),col=topo.colors(10))
+contour(lonnie,lattie,matrix(ngrd$eff,length(lonnie),length(lattie)),add=T)
+
+ngrd$catch <- ngrd$prob*ngrd$measured_catch
+ngrd$cpue <- ngrd$catch/ngrd$eff
+
+image(lonnie,lattie,matrix(log(ngrd$catch),length(lonnie),length(lattie)),col=topo.colors(100))
+contour(lonnie,lattie,matrix(log(ngrd$catch),length(lonnie),length(lattie)),add=T)
+
+#par(mfrow=c(1,1))
+for(i in 649:696){
+  print(i)
+symbols(dat2$longitude[dat2$trend == i],dat2$latitude[dat2$trend == i],sqrt(dat2$measured_catch[dat2$trend == i])/1000,add=T)
+}
 
 cc <- sum(grd$catch,na.rm=T)
 ee <- sum(grd$eff,na.rm=T)
