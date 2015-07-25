@@ -74,7 +74,7 @@ grd@data[names(table(idx)),1] <- aggregate(tdata1$eff1,by=list(tdata1$gridID),FU
 rr <- range(grd@data[an(names(table(idx))),1])
 
 cutbreaksval  <- list(ALL = c(-1,0,10,25,50,100,150,200))
-legval        <- list(ALL = c("0","0 <= 10","10 <= 25", "25 <= 50","50 <= 100","100 <= 200","200 <= 400"))
+legval        <- list(ALL = c("0","1 <= 10","10 <= 25", "25 <= 50","50 <= 100","100 <= 200","200 <= 400"))
 #- Potentially, divide your data by a certain constant and add this constant to the legend title
 valdiv        <- scaling.f # scaling the data
 unitval       <- paste('x',valdiv,'hooks')
@@ -94,7 +94,7 @@ grdPols <-
 cols<- c("white",colintens)[cut(grd@data[an(names(table(idx))),1]/valdiv,breaks=cutbreaksval$ALL)]
 plot(grdPols,col=cols,add=T,border='transparent')
 #plot(atl.countries,add=T,col=colland)
-#map("worldHires",resolution=1,add=T,fill=TRUE,col=colland);map.axes();#box()
+map("world",resolution=1,add=T,fill=TRUE,col=colland);map.axes();#box()
 #axis(1);axis(2,las=1); box()
 
 
@@ -104,17 +104,17 @@ legend(x='topright',fill=c('white',colintens),legend=legval$ALL,bg='white',title
 
 #- Add axis and title
 title(main=paste(what.flag,what.year,what.gear,effort.type),outer=F,cex=cl)
-mtext(xl$label,side=1,outer=T,line=-3,at=0.5,font=xl$font,cex=xl$cex)
-mtext(yl$label,side=2,outer=T,line=-1.5,at=0.5,font=yl$font,cex=yl$cex)                                                                                       
+#mtext(xl$label,side=1,outer=T,line=-3,at=0.5,font=xl$font,cex=xl$cex)
+#mtext(yl$label,side=2,outer=T,line=-1.5,at=0.5,font=yl$font,cex=yl$cex)                                                                                       
 
 
 grdPolsDF              <- as(grdPols,"SpatialPolygonsDataFrame")
 grdPolsDF@data         <- data.frame(value=grd@data[an(names(table(idx))),1],color=cols)
 proj4string(grdPolsDF) <- CRS("+proj=longlat +ellps=WGS84")
 #dir.create("/home/doug/effdis/shp_files/")
-setwd("/home/doug/effdis/shp_files/longline")
-layer.name <- paste(what.flag,what.year,what.gear,effort.type,sep="_")
-writeOGR(grdPolsDF, dsn = '.', layer = layer.name, overwrite_layer=TRUE,driver = "ESRI Shapefile")
+#setwd("/home/doug/effdis/shp_files/longline")
+#layer.name <- paste(what.flag,what.year,what.gear,effort.type,sep="_")
+#writeOGR(grdPolsDF, dsn = '.', layer = layer.name, overwrite_layer=TRUE,driver = "ESRI Shapefile")
 
 
 }

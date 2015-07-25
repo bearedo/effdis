@@ -8,15 +8,15 @@ yr.month.coverage.task2.r<-function(tdata=t2ce,start.year=1950,end.year=2010,whi
   fdata <- tdata1[tdata1$flagname == which.flag & tdata1$geargrpcode == which.gear & tdata1$region == which.region,]
   
   dd <- dim(fdata)
-  print(dd)
+  #print(dd)
   if(dd[1] == 0)
   {
-    print('There are no data')
+   #print('There are no data')
     }
   
   else{
   
-  par(mfrow=c(1,1),mar=c(3,3,3,3))
+  par(mfrow=c(1,1),mar=c(3,3,3,3),oma=c(4,4,4,4))
   
     fmat <- matrix(NA, length(start.year:end.year),12)
     dimnames(fmat) <- list(c(start.year:end.year),1:12)
