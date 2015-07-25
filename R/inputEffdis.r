@@ -214,7 +214,7 @@ source("/home/doug/effdis/R/yr.month.coverage.task2.r")
 yr.month.coverage.task2.r()
 yr.month.coverage.task2.r(tdata=t2ce,which.flag='Belize')
 yr.month.coverage.task2.r(tdata=t2ce,which.gear='LL',which.flag='China P.R.')
-yr.month.coverage.task2.r(which.flag='Chinese Taipei')
+yr.month.coverage.task2.r(tdata=t2ce,which.flag='Chinese Taipei')
 yr.month.coverage.task2.r(which.flag='Japan')
 yr.month.coverage.task2.r(which.flag='U.S.A.')
 

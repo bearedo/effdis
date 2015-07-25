@@ -48,6 +48,8 @@ find.ocean.r <- function(input=grd)
   idx.med <- over(input.spdf,med)
   idx.pac <- over(input.spdf,pacific)
   
+  print('found all points in polygons')
+  
   # Add vector denoting which ocean
   
   which.ocean      <- rep(NA,length(input[,1]))

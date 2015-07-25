@@ -70,6 +70,8 @@ t2ce_lf_ll <- t2ce_lf_ll[t2ce_lf_ll$catchunit != '--',]
 
 # t2ce_distinct_locations <- readOGR(dsn="PG:dbname=effdis host=134.213.29.249 user=postgres password=Postgres1", layer = "public.world_seas", verbose = TRUE)
 
+source('/home/doug/effdis/R/add.covariates.r')
+
 t2ce_lf_ll <- add.covariates.r(input = t2ce_lf_ll, what.dsn = 'effdis-tuna-cc1')$output
 
 # Who reports kgs and/or nrs ?
@@ -136,9 +138,11 @@ tt1[only.nrs,]
 
 # Do data with kgs only first #
 
+source('/home/doug/effdis/R/three.d.effort.by.year.r')
+
 three.d.effort.by.year.r(what.year='2006',what.flag='Belize',scaling.f=100000)
 three.d.effort.by.year.r(what.year='2006',what.flag='Brasil',scaling.f=100000)
-three.d.effort.by.year.r(what.year='2006',what.flag='China P.R.',scaling.f=100000)
+three.d.effort.by.year.r(tdata=t2ce,what.year='2006',what.flag='China P.R.',scaling.f=100000)
 three.d.effort.by.year.r(what.year='2006',what.flag='Chinese Taipei',scaling.f=100000)
 three.d.effort.by.year.r(what.year='2006',what.flag='Cuba',scaling.f=100000)
 three.d.effort.by.year.r(what.year='2006',what.flag='EU.Cyprus',scaling.f=100000)
@@ -148,6 +152,7 @@ three.d.effort.by.year.r(what.year='2006',what.flag='EU.Italy',scaling.f=100000)
 three.d.effort.by.year.r(what.year='2006',what.flag='EU.Malta',scaling.f=100000)
 three.d.effort.by.year.r(what.year='2006',what.flag='EU.Portugal',scaling.f=100000)
 three.d.effort.by.year.r(what.year='2006',what.flag='Japan',scaling.f=100000)
+par(mfrow=c(1,1),mar=c(3,3,3,3))
 three.d.effort.by.year.r(what.year='2006',what.flag='Korea Rep',scaling.f=100000)
 three.d.effort.by.year.r(what.year='2006',what.flag='Maroc',scaling.f=100000)
 three.d.effort.by.year.r(what.year='2006',what.flag='Mexico',scaling.f=100000)
@@ -164,6 +169,7 @@ three.d.effort.by.year.r(what.year='2006',what.flag='U.S.S.R',scaling.f=100000)
 three.d.effort.by.year.r(what.year='2006',what.flag='Vanuatu',scaling.f=100000)
 three.d.effort.by.year.r(what.year='2006',what.flag='Venezuela',scaling.f=100000)
 
+source('/home/doug/effdis/R/three.d.catch.by.year.r')
 
 three.d.catch.by.year.r(tdata=t2ce_lf_ll,what.year='2006',what.flag='All',what.species='alb',scaling.f=100,catchunit = "kg")
 
@@ -224,7 +230,7 @@ for(i in us){
 
 head(t2ce_lf_ll)
 
-## Split data into kg and nr ##
+### Split data into kg and nr ###
 
 t2ce_lf_ll_kg <- t2ce_lf_ll[t2ce_lf_ll$dsettype %in% c('-w','nw'),]
 t2ce_lf_ll_kg <- t2ce_lf_ll_kg[t2ce_lf_ll_kg$catchunit  != "--",]
@@ -260,6 +266,15 @@ t2ce_lf_ll$bin <- ifelse(t2ce_lf_ll$measured_catch==0,0,1)
 
 t2ce_lf_ll$ldepth_m[t2ce_lf_ll$ldepth_m == 0] <- NA
 
+# Add ocean on
+
+t2ce_lf_ll <- find.ocean.r(t2ce_lf_ll)$output
+
+write.table(t2ce_lf_ll[t2ce_lf_ll$flagname == 'China P.R.',],'/home/doug/effdis/data/t2ce_lf_ll_ChinaPR.csv',sep=',',row.names=F)
+
+t2ce_lf_ll_ChinaPR <- read.table('/home/doug/effdis/data/t2ce_lf_ll_ChinaPR.csv',sep=',',header=T)
+three.d.effort.by.year.r(tdata=t2ce_lf_ll_ChinaPR,what.year='2006',what.flag='China P.R.',scaling.f=100000)  
+
 
 ###########################################
 # Model measured catch in kilos with gam #
@@ -270,15 +285,21 @@ t2ce_lf_ll$ldepth_m[t2ce_lf_ll$ldepth_m == 0] <- NA
 
 us <- sort(unique(t2ce_lf_ll$species))
 
-for (i in us) {
-  print(i)
-what.species <- i
-
-
 setwd('/home/doug/effdis/data')
 
-dat <- t2ce_lf_ll[t2ce_lf_ll$species ==what.species,]
+source('/home/doug/effdis/R/find.ocean.r')
 
+# Start loop #
+
+for (i in 1) {
+
+what.species <- us[i]
+
+print(what.species)
+
+dat <- t2ce_lf_ll[t2ce_lf_ll$species == what.species,]
+
+# Take out Atlantic data #
 dat <- find.ocean.r(dat)$output
 dat <- dat[dat$which.ocean == 'atl',]
 
@@ -288,42 +309,50 @@ dat1 <- aggregate(list(measured_catch=dat$measured_catch,eff1=dat$eff1),
                   by=list(trend=dat$trend,month=dat$month,longitude=dat$longitude,latitude=dat$latitude),sum)
 
 #dat2 <- add.covariates.r(input=dat1)$output
-dat2 <- as.data.frame(dat2)
+#dat2 <- as.data.frame(dat2)
 
 #dat2$depth_m <- dat2$depth_m * -1
 #dat2$ldepth_m <- log(dat2$depth_m)
 
 #dat <- dat[!is.na(dat$ldepth_m),]
 
-bin <- ifelse(dat2$measured_catch==0,0,1)
-dat2$bin <- bin
-#dat2$lmeasured_catch <- log(dat2$measured_catch+1)
+bin <- ifelse(dat1$measured_catch==0,0,1)
+dat1$bin <- bin
+dat1$lmeasured_catch <- log(dat1$measured_catch+1)
 
 #Binomial model for probability of catch
 
 bs<-"cr"
 
-b1 <- gam(bin~te(longitude,latitude,k=12,bs=bs)+te(trend,k=6,bs=bs)+te(month,k=3,bs=bs),family=quasibinomial(link="logit"),method="REML",data=dat2)
+b1 <- gam(bin~te(longitude,latitude,k=12,bs=bs)+te(trend,k=6,bs=bs)+te(month,k=3,bs=bs),family=quasibinomial(link="logit"),method="REML",data=dat1)
+
+print(summary(b1))
 
 #Gamma model for task 2 catch 
 
-g1 <- gam(measured_catch~te(longitude,latitude,k=12,bs=bs)+te(trend,k=6,bs=bs)+te(month,k=3,bs=bs),family=Gamma(link="log"),method="REML",data=dat2[dat2$bin==1,])
+g1 <- gam(measured_catch~te(longitude,latitude,k=12,bs=bs)+te(trend,k=6,bs=bs)+te(month,k=3,bs=bs),family=Gamma(link="log"),method="REML",data=dat1[dat1$bin==1,])
+
+print(summary(g1))
+gc()
 
 # Poisson model for nhooks only needs to be done once
- if (what.species == 'alb')
-   {
-h1 <- gam(eff1~te(longitude,latitude,k=12,bs=bs)+te(trend,k=6,bs=bs)+te(month,k=3,bs=bs),family=quasipoisson(link="log"),method="REML",data=dat2)
-}
+ # if (what.species == 'alb')
+#{
+#h1 <- gam(eff1~te(longitude,latitude,k=6,bs=bs)+te(trend,k=6,bs=bs)+te(month,k=3,bs=bs),family=quasipoisson(link="log"),method="REML",data=dat1)
+#print(summary(h1))
+#}
+
 
 ## Build grid for predictions ## 
 
-min.lat <- min(dat2$latitude+1)
-max.lat <- max(dat2$latitude-1)
-min.lon <- min(dat2$longitude+1)
-max.lon <- max(dat2$longitude-1)
+min.lat <- min(dat1$latitude+1)
+max.lat <- max(dat1$latitude-1)
+min.lon <- min(dat1$longitude+1)
+max.lon <- max(dat1$longitude-1)
+
 grid.res <- 5
-t1 <- min(dat2$trend)
-t2 <- max(dat2$trend)
+t1 <- min(dat1$trend)
+t2 <- max(dat1$trend)
 lonnie <- seq(min.lon,max.lon,by=grid.res)
 lattie <- seq(min.lat,max.lat,by=grid.res)
 lo <- length(lonnie)
@@ -354,6 +383,8 @@ ngrd$trend <- trend.r(ngrd$year,ngrd$month,start.year=1950)
 
 prob <- predict(b1,ngrd,type="response")
 measured_catch <- predict(g1,ngrd,type="response")
+print(what.species)
+print(summary(measured_catch))
 eff <- predict(h1,ngrd,type="response")
 
 # Block out the land #
@@ -368,25 +399,115 @@ ngrd$prob <- as.vector(prob)
 ngrd$measured_catch <- as.vector(measured_catch)
 ngrd$eff <- as.vector(eff)
 
+print(head(ngrd),20)
+
 filename <- paste('model-data-',what.species,'.csv',sep='')
+
+print(filename)
 write.table(ngrd,file=filename,sep=',',row.names=F)
 
 }
 
 
+# EOF #
+
+alb <- read.table('model-data-alb.csv',sep=',',header=T)
+bet <- read.table('model-data-bet.csv',sep=',',header=T)
+bft <- read.table('model-data-bft.csv',sep=',',header=T)
+bum <- read.table('model-data-bum.csv',sep=',',header=T)
+sai <- read.table('model-data-sai.csv',sep=',',header=T)
+skj <- read.table('model-data-skj.csv',sep=',',header=T)
+swo <- read.table('model-data-swo.csv',sep=',',header=T)
+whm <- read.table('model-data-whm.csv',sep=',',header=T)
+yft <- read.table('model-data-whm.csv',sep=',',header=T)
 
 
+setwd('/home/doug/effdis/data')
+
+nmx <- as.list(1:9)
+for(i in 1:9)
+{
+  what.species <- us[i]
+  dat <- t2ce_lf_ll[t2ce_lf_ll$species == what.species,]
+  dat <- find.ocean.r(dat)$output
+  dat <- dat[dat$which.ocean == 'atl',]
+  
+  ## RAW CPUE by species ##
+  
+  dat1 <- aggregate(list(measured_catch=dat$measured_catch,eff=dat$eff1), 
+                    by=list(trend=dat$trend,month=dat$month,longitude=dat$longitude,latitude=dat$latitude),sum)
+  nmx[[i]] <- max(dat1$measured_catch,na.rm=T)
+  
+}
+
+alb$measured_catch <- ifelse(alb$measured_catch > nmx[[1]],nmx[[1]],alb$measured_catch)
+bet$measured_catch <- ifelse(bet$measured_catch > nmx[[2]],nmx[[2]],bet$measured_catch)
+bft$measured_catch <- ifelse(bft$measured_catch > nmx[[3]],nmx[[3]],bft$measured_catch)
+bum$measured_catch <- ifelse(bum$measured_catch > nmx[[4]],nmx[[4]],bum$measured_catch)
+sai$measured_catch <- ifelse(sai$measured_catch > nmx[[5]],nmx[[5]],sai$measured_catch)
+skj$measured_catch <- ifelse(skj$measured_catch > nmx[[6]],nmx[[6]],skj$measured_catch)
+swo$measured_catch <- ifelse(swo$measured_catch > nmx[[7]],nmx[[7]],swo$measured_catch)
+whm$measured_catch <- ifelse(whm$measured_catch > nmx[[8]],nmx[[8]],whm$measured_catch)
+yft$measured_catch <- ifelse(yft$measured_catch > nmx[[9]],nmx[[9]],yft$measured_catch)
+
+
+# Check raw data #
+
+#Get rid of too big values
+
+dat <- t2ce_lf_ll[t2ce_lf_ll$species == 'bft',]
+dat <- find.ocean.r(dat)$output
+dat <- dat[dat$which.ocean == 'atl',]
+
+## RAW CPUE by species ##
+
+  dat1 <- aggregate(list(measured_catch=dat$measured_catch,eff=dat$eff1), 
+                  by=list(trend=dat$trend,month=dat$month,longitude=dat$longitude,latitude=dat$latitude),sum)
+
+mx <- max(dat1$measured_catch,na.rm=T)
+
+#
+
+alb <- bft 
+
+alb$measured_catch <- ifelse(alb$measured_catch > mx,mx,alb$measured_catch)
+
+alb$catch <- alb$measured_catch*alb$prob
+
+
+alb$cpue  <- alb$catch/alb$eff
+
+alb<- alb[alb$which.ocean == "atl",]
+
+alb1 <- aggregate(list(catch=alb$catch,eff=alb$eff), 
+                          by=list(year=alb$year),sum,na.rm=T)
+
+
+plot(alb1$year,alb1$catch/1000)
+
+
+alb.t1 <- t1det9sp[t1det9sp$geargrp == 'LL' & t1det9sp$species == 'bft' & t1det9sp$region == 'AT' & t1det9sp$datatype == 'C',]
+
+alb.t1 <- aggregate(list(qty_t=alb.t1$qty_t),list(year=alb.t1$yearc),sum,na.rm=T)
+
+par(mfrow=c(1,1))
+plot(alb.t1$year,alb.t1$qty_t,xlim=c(1950,2010))
+lines(alb1$year,alb1$catch/1000)
 
 
 ### Plot the data to see if they look sensible ####
 
+ngrd <- alb
+
 which.trend <- 649
 
-image(lonnie,lattie,matrix(ngrd$prob[ngrd$trend == which.trend],length(lonnie),length(lattie)))
+ngrd <- ngrd [ngrd$trend == which.trend,]
+
+image(lonnie,lattie,matrix(ngrd$prob,length(lonnie),length(lattie)))
 contour(lonnie,lattie,matrix(ngrd$prob,length(lonnie),length(lattie)),add=T)
 
 image(lonnie,lattie,matrix(log(ngrd$measured_catch),length(lonnie),length(lattie)),col=topo.colors(1000))
-contour(lonnie,lattie,matrix(ngrd$measured_catch,length(lonnie),length(lattie)),add=T)
+contour(lonnie,lattie,matrix(log(ngrd$measured_catch),length(lonnie),length(lattie)),add=T)
 
 
 image(lonnie,lattie,matrix(ngrd$eff,length(lonnie),length(lattie)),col=topo.colors(10))
@@ -398,10 +519,24 @@ ngrd$cpue <- ngrd$catch/ngrd$eff
 image(lonnie,lattie,matrix(log(ngrd$catch),length(lonnie),length(lattie)),col=topo.colors(100))
 contour(lonnie,lattie,matrix(log(ngrd$catch),length(lonnie),length(lattie)),add=T)
 
+
+# Have a look at the raw data #
+
+dat <- t2ce_lf_ll[t2ce_lf_ll$species == 'alb',]
+dat <- find.ocean.r(dat)$output
+dat <- dat[dat$which.ocean == 'atl',]
+
+## CPUE by species ##
+
+dat1 <- aggregate(list(measured_catch=dat$measured_catch,eff1=dat$eff1), 
+                  by=list(trend=dat$trend,month=dat$month,longitude=dat$longitude,latitude=dat$latitude),sum)
+
+
+
 #par(mfrow=c(1,1))
-for(i in 649:696){
+for(i in 649){
   print(i)
-symbols(dat2$longitude[dat2$trend == i],dat2$latitude[dat2$trend == i],sqrt(dat2$measured_catch[dat2$trend == i])/1000,add=T)
+symbols(dat1$longitude[dat2$trend == i],dat1$latitude[dat2$trend == i],sqrt(dat1$measured_catch[dat2$trend == i])/1000000,add=T)
 }
 
 cc <- sum(grd$catch,na.rm=T)
