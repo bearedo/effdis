@@ -164,17 +164,10 @@ for(i in c(1,3,9,11)){
 ```{r global effort estimate, include=TRUE,echo=FALSE,message = FALSE, error=FALSE, warnings=FALSE}
 
 effdis <- read.table('/home/doug/effdis/data/effdis-estimate.csv',sep=',',header=T)
-
-par(mfrow=c(3,1))
-
-plot(effdis$year,effdis$catch,xlab='',ylab='task 1 catch',type='l',lwd=3)
+par(mfrow=c(1,1),mar=c(5,5,4,4))
+plot(effdis$year,effdis$effort,xlab='',ylab='hooks',type='l',lwd=3)
 abline(v=seq(1950,2010,by=10),lty=2,col='blue')
-plot(effdis$year,effdis$cpue,xlab='',ylab='task 2 cpue',type='l',lwd=3)
-abline(v=seq(1950,2010,by=10),lty=2,col='blue')
-plot(effdis$year,effdis$effort,xlab='',ylab='effort',type='l',lwd=3)
-abline(v=seq(1950,2010,by=10),lty=2,col='blue')
-
-
+title('Task 1 catch / Task 2 CPUE')
 ```
 
 

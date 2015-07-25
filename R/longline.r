@@ -531,9 +531,22 @@ big2 <- merge(big1,sum.t1)
 
 big2$effort <- sum.t1$qty_t/big2$cpue
 
-write.table(big2,'/home/doug/effdis/data/effdis-estimate.csv')
+write.table(big2,'/home/doug/effdis/data/effdis-estimate.csv',sep=',',row.names=F)
 
 plot(big2$year,big2$effort)
+
+effdis <- big2
+
+effdis <- read.table('/home/doug/effdis/data/effdis-estimate.csv',sep=',',header=T)
+
+par(mfrow=c(1,1),mar=c(5,5,4,4))
+
+
+plot(effdis$year,effdis$effort,xlab='',ylab='hooks',type='l',lwd=3)
+abline(v=seq(1950,2010,by=10),lty=2,col='blue')
+title('Task 1 catch / Task 2 CPUE')
+
+
 
 
 
