@@ -411,7 +411,7 @@ write.table(ngrd,file=filename,sep=',',row.names=F)
 
 # EOF #
 
-alb <- read.table('model-data-alb.csv',sep=',',header=T)
+alb <- read.table('/home/doug/effdis/data/model-data-alb.csv',sep=',',header=T)
 bet <- read.table('model-data-bet.csv',sep=',',header=T)
 bft <- read.table('model-data-bft.csv',sep=',',header=T)
 bum <- read.table('model-data-bum.csv',sep=',',header=T)
@@ -419,13 +419,13 @@ sai <- read.table('model-data-sai.csv',sep=',',header=T)
 skj <- read.table('model-data-skj.csv',sep=',',header=T)
 swo <- read.table('model-data-swo.csv',sep=',',header=T)
 whm <- read.table('model-data-whm.csv',sep=',',header=T)
-yft <- read.table('model-data-whm.csv',sep=',',header=T)
+yft <- read.table('/home/doug/effdis/data/model-data-yft.csv',sep=',',header=T)
 
 
 setwd('/home/doug/effdis/data')
 
 nmx <- as.list(1:9)
-for(i in 1:9)
+for(i in 7)
 {
   what.species <- us[i]
   dat <- t2ce_lf_ll[t2ce_lf_ll$species == what.species,]
@@ -450,8 +450,94 @@ swo$measured_catch <- ifelse(swo$measured_catch > nmx[[7]],nmx[[7]],swo$measured
 whm$measured_catch <- ifelse(whm$measured_catch > nmx[[8]],nmx[[8]],whm$measured_catch)
 yft$measured_catch <- ifelse(yft$measured_catch > nmx[[9]],nmx[[9]],yft$measured_catch)
 
+setwd('/home/doug/effdis/data')
+alb <- write.table(alb,'model-data-alb.csv',sep=',',row.names=F)
+bet <- write.table(bet,'model-data-bet.csv',sep=',',row.names=F)
+bft <- write.table(bft,'model-data-bft.csv',sep=',',row.names=F)
+bum <- write.table(bum,'model-data-bum.csv',sep=',',row.names=F)
+sai <- write.table(sai,'model-data-sai.csv',sep=',',row.names=F)
+skj <- write.table(skj,'model-data-skj.csv',sep=',',row.names=F)
+swo <- write.table(swo,'model-data-swo.csv',sep=',',row.names = F)
+whm <- write.table(whm,'model-data-whm.csv',sep=',',row.names=F)
+yft <- write.table(yft,'model-data-yft.csv',sep=',',row.names=F)
 
-# Check raw data #
+
+# Write out a small chunk of swordfish data for presentation #
+swo.2006 <- swo[swo$year == 2006 & swo$which.ocean == 'atl',]
+
+write.table(swo.2006,file='/home/doug/effdis/data/model-data-atl-swo-2006.csv', sep=',',row.names=F)
+
+mod.output <- read.table('/home/doug/effdis/data/model-data-alb.csv',sep=',',header=T)
+
+lonnie <- seq(-96.5,18.5,by=5)
+lattie <- seq(-56.5,58.5,by=5)
+lo<- length(lonnie)
+la<- length(lattie)
+par(mfrow=c(4,4),mar=c(1,1,3,1))
+
+for(i in c(1,3,9,11)){
+  
+  grd <- mod.output[mod.output$month == i & mod.output$year == 2006,]
+  grd$catch <- grd$measured_catch*grd$prob
+  
+  image(lonnie,lattie,matrix(grd$prob,lo,la),col=topo.colors(100),xlab='',ylab='',xaxt='n',yaxt='n')
+  contour(lonnie,lattie,matrix(grd$prob,lo,la),col=topo.colors(100),add=T)
+  map('worldHires',add=T,fill=T);title(paste('Probability of catch (P)',month.abb[i],'2006'))
+  
+  
+  image(lonnie,lattie,matrix(log(grd$measured_catch),lo,la),col=topo.colors(100),xlab='',ylab='',xaxt='n',yaxt='n')
+  contour(lonnie,lattie,matrix(log(grd$measured_catch),lo,la),col=topo.colors(100),add=T)
+  map('worldHires',add=T,fill=T);title(paste('Catch without zeros (C1)',month.abb[i],'2006'))
+  
+  image(lonnie,lattie,matrix(log(grd$catch),lo,la),col=topo.colors(100),xlab='',ylab='',xaxt='n',yaxt='n')
+  contour(lonnie,lattie,matrix(log(grd$catch),lo,la),col=topo.colors(100),add=T)
+  map('worldHires',add=T,fill=T);title(paste('Catch P x C1',month.abb[i],'2006'))
+  
+
+  image(lonnie,lattie,matrix(grd$eff,lo,la),col=topo.colors(100),xlab='',ylab='',xaxt='n',yaxt='n')
+  contour(lonnie,lattie,matrix(log(grd$eff),lo,la),col=topo.colors(100),add=T)
+  map('worldHires',add=T,fill=T);title(paste('No of hooks',month.abb[i],'2006'))
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+big <- rbind(alb,bet,bft,bum,sai,skj,swo,whm,yft)
+
+big<- big[big$which.ocean == "atl",]
+big$catch <- big$measured_catch*big$prob
+big$cpue  <- big$catch/big$eff
+
+big1 <- aggregate(list(catch=big$catch,eff=big$eff), 
+                  by=list(year=big$year),sum,na.rm=T)
+big1$cpue <- big1$catch/big1$eff
+
+dimnames(t1det9sp)[[2]] <- tolower(dimnames(t1det9sp)[[2]])
+
+
+sum.t1 <- t1det9sp[t1det9sp$geargrp == 'LL' & t1det9sp$region == 'AT' & t1det9sp$datatype == 'C',]
+sum.t1 <- aggregate(list(qty_t=sum.t1$qty_t),list(year=sum.t1$yearc),sum,na.rm=T)
+
+big2 <- merge(big1,sum.t1)
+
+big2$effort <- sum.t1$qty_t/big2$cpue
+
+write.table(big2,'/home/doug/effdis/data/effdis-estimate.csv')
+
+plot(big2$year,big2$effort)
+
+
+
+## Check raw data ###
 
 #Get rid of too big values
 
@@ -466,7 +552,7 @@ dat <- dat[dat$which.ocean == 'atl',]
 
 mx <- max(dat1$measured_catch,na.rm=T)
 
-#
+#######
 
 alb <- bft 
 
@@ -484,7 +570,6 @@ alb1 <- aggregate(list(catch=alb$catch,eff=alb$eff),
 
 
 plot(alb1$year,alb1$catch/1000)
-
 
 alb.t1 <- t1det9sp[t1det9sp$geargrp == 'LL' & t1det9sp$species == 'bft' & t1det9sp$region == 'AT' & t1det9sp$datatype == 'C',]
 
