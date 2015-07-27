@@ -5,8 +5,6 @@ date: "24 July 2015"
 output: beamer_presentation
 ---
 
-# SHORT-TERM CONTRACT: A MODELING APPROACH TO ESTIMATE OVERALL ATLANTIC FISHING EFFORT BY TIME-AREA STRATA (EFFDIS)
-
 ## Objectives
 
 * Develop a robust statistical modeling approach to estimate overall Atlantic fishing effort stratified by flag/fleet, gear, area (5ºx5º degree square grid), year and month (starting in 1950).
@@ -33,11 +31,10 @@ output: beamer_presentation
 
 + Exploring data for non-random, non-representative sampling (data catalogue)
 + Investigating the relationship (sum of products) between Task 1, which focuses on the total catches of 9 major tuna & tuna-like species (Albacore, Bluefin, Yellowfin, Bigeye, Skipjack, Swordfish, Blue Marlin, White Marlin, Sailfish), and Task 2 data which is more detailed containing more detailed information on location, season, etc.
-+ Exploring the relationship between weight and numbers. Note: some countries supply only numbers, some both and some just weights for Task 2
 + Developing multi-variate models (e.g. GAMs) for interpoplation
 + Integrating activities with an online geographic database system (based on Postgis)
 
-## Sampling by year and month - Chinese Taipei
+## Sampling by year and month - Japan
 
 ```{r code,include=FALSE}
 library(rio)
@@ -59,6 +56,7 @@ library(lattice)
 source("/home/doug/effdis/R/yr.month.coverage.task2.r")
 source("/home/doug/effdis/R/trend.r")
 source("/home/doug/effdis/R/spatial.coverage.by.year.task2.r")
+#chan <- odbcConnect("effdis-tuna-cc1", case="postgresql", believeNRows=FALSE)
 t2ce <- read.table("/home/doug/effdis/data/t2ce.csv",sep=",",header=T)
 t1det9sp <- import("/home/doug/effdis/data/t1det_9sp.xlsx")
 #colnames(t2ce) <- tolower(colnames(t2ce))
@@ -66,11 +64,7 @@ t1det9sp <- import("/home/doug/effdis/data/t1det_9sp.xlsx")
 #t2ce$trend <- trend.r(year=t2ce$yearc,month=t2ce$timeperiodid,start.year=1950)
 
 ```
-```{r temporal confounding Chinese Taipei,include=TRUE,echo=FALSE}
-yr.month.coverage.task2.r(tdata=t2ce,which.flag='Chinese Taipei')
-```
 
-## Sampling by year and month - Japan
 
 ```{r temporal confounding Japan,include=TRUE,echo=FALSE}
 yr.month.coverage.task2.r(tdata=t2ce,which.gear='LL',which.flag='Japan')
@@ -93,12 +87,12 @@ effort.by.year.task2.r(which.flag='Chinese Taipei')
 effort.by.year.task2.r(which.flag='Japan')
 ```
 
-
 ## No of hooks by year and location - China P.R.
 
 ```{r no of hooks shot by China P.R. in 2006 from task 2,include=TRUE,echo=FALSE,message = FALSE, error=FALSE, warnings=FALSE}
 source("/home/doug/effdis/R/three.d.effort.by.year.r")
 t2ce_lf_ll_ChinaPR <- read.table('/home/doug/effdis/data/t2ce_lf_ll_ChinaPR.csv',sep=',',header=T)
+
 par(mfrow=c(1,1),mar=c(3,3,3,3))
 three.d.effort.by.year.r(tdata=t2ce_lf_ll_ChinaPR,what.year='2006',what.flag='China P.R.',scaling.f=100000)  
 ```
@@ -111,6 +105,9 @@ par(mfrow=c(1,1),mar=c(3,3,3,3))
 three.d.catch.by.year.r(tdata=t2ce_lf_ll_ChinaPR,what.year='2006',what.species='alb',what.flag='China P.R.',scaling.f=1000)  
 ```
 
+## EFFDIS online database beta version
+
+![EFFDIS online database beta](/home/doug/effdis/effdis-snapshot.png)
 
 
 ## Relationship (sum of products) between Task 1 (the total catches of 9 major tuna & tuna-like species) and Task 2 (much more detailed) data for all fleet combinations
@@ -174,7 +171,7 @@ title('Task 1 catch / Task 2 CPUE')
 ## Conclusions
 + The data are complex with changing fleet aggregations etc
 + There is non-random, non-representative sampling
-+ There is a strong positive correlation between Task 1 and Task 2 data for most countries which is useful information
++ There is a strong positive correlation between Task 1 and Task 2 data for most countries
 + Provision of numbers for Task 2 (instead of weights) by e.g. USA creates problems
 + Regression modeling is a promising approach
 + A series of models can be fitted to the data and used for interpolation and variance estimation
