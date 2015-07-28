@@ -16,6 +16,7 @@ library(RPostgreSQL)
 #library(COZIGAM)
 library(reshape2)
 library(rgeos)
+library(knitr)
 
 
 ## Read in task 2 longline data from ICCAT DB ##
@@ -23,6 +24,8 @@ library(rgeos)
 chan <- odbcConnect("effdis-tuna-cc1", case="postgresql", believeNRows=FALSE)
 sqlTables(chan)  #List all tables in the DB
 #t2ce_lf_ll <- sqlQuery(chan, "SELECT * from t2ce_long_format_ll;") # Return a table as a dataframe. Note unless you have a good connection this will take a while.
+#load('/media/doug/My Passport/effdis/.RData')
+task2.lf <- read.table('/home/doug/effdis/data/task2.lf.csv',sep=',',header=T)
 
 t2ce_lf_ll <- task2.lf[task2.lf$geargrpcode == 'LL' & task2.lf$month < 13,]
 t2ce_lf_ll <- orderBy(~flagname+trend,data=t2ce_lf_ll)
