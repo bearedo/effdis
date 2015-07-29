@@ -3,7 +3,8 @@
 yr.month.coverage.task2.r<-function(tdata=t2ce,start.year=1950,end.year=2010,which.gear='LL',which.region ='AT', which.flag='EU.Portugal'){
   
   #3D plot to explore temporal confounding
-  #tdata <- t2ce; which.flag   <- 'U.S.A.'; which.gear <- 'LL'
+  #tdata <- t2ce; which.flag   <- 'Japan'; which.gear <- 'LL'
+  #start.year <- 1960; end.year <- 2005
   tdata1 <- tdata[tdata$timeperiodid < 13,]
   fdata <- tdata1[tdata1$flagname == which.flag & tdata1$geargrpcode == which.gear & tdata1$region == which.region,]
   
@@ -16,10 +17,10 @@ yr.month.coverage.task2.r<-function(tdata=t2ce,start.year=1950,end.year=2010,whi
   
   else{
   
-  par(mfrow=c(1,1),mar=c(3,3,3,3),oma=c(4,4,4,4))
+  #par(mfrow=c(1,1),mar=c(3,3,3,3),oma=c(4,4,4,4))
   
-    fmat <- matrix(NA, length(start.year:end.year),12)
-    dimnames(fmat) <- list(c(start.year:end.year),1:12)
+    fmat <- matrix(NA, length(1950:2015),12)
+    dimnames(fmat) <- list(c(1950:2015),1:12)
     
     ymc <- table(fdata$yearc,fdata$timeperiodid) # Number of observations by year and month
   dimnames(ymc)[[1]] <- sort(unique(fdata$yearc))
@@ -27,9 +28,9 @@ yr.month.coverage.task2.r<-function(tdata=t2ce,start.year=1950,end.year=2010,whi
   mm <- match(dimnames(ymc)[[1]],dimnames(fmat)[[1]])
   fmat[mm,] <- ymc
   
-  image(start.year:end.year,1:12,fmat,xaxt='n',yaxt='n',xlab="",ylab="",col=terrain.colors(100),
+  image(1950:2015,1:12,fmat,xaxt='n',yaxt='n',xlab="",ylab="",col=terrain.colors(100),
         xlim=c(start.year,end.year),ylim=range(fdata$timeperiodid,na.rm=T))
-  contour(start.year:end.year,1:12,fmat,add=T)
+  contour(1950:2015,1:12,fmat,add=T)
   
   axis(side=1,at=start.year:end.year,label=as.character(start.year:end.year))
   ms <- range(fdata$timeperiodid,na.rm=T)
