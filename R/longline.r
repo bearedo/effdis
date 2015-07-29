@@ -24,8 +24,28 @@ library(knitr)
 chan <- odbcConnect("effdis-tuna-cc1", case="postgresql", believeNRows=FALSE)
 sqlTables(chan)  #List all tables in the DB
 #t2ce_lf_ll <- sqlQuery(chan, "SELECT * from t2ce_long_format_ll;") # Return a table as a dataframe. Note unless you have a good connection this will take a while.
+
+t2ce_lf_ll <- sqlQuery(chan, "SELECT * from t2ce_long_format_ll;")
+
+
+effort_type_by_flag <- sqlQuery(chan, "SELECT flagname AS Flag, eff1type AS Effort_type, count(eff1type) as No_records
+                 FROM t2ce_long_format_ll
+                 WHERE region ='AT' AND month < 13 AND species ='alb'
+                 GROUP BY flagname, eff1type
+                 ORDER BY flagname, eff1type, No_records;")
+
+
+
+# SELECT region, flagname, yearc, the_point, longitude, latitude, sum(t2ce.alb) AS total_alb
+# FROM t2ce
+# WHERE region = 'AT'
+# AND flagname = 'Japan'
+# AND yearc = 2010
+# GROUP BY region, flagname, yearc, the_point, longitude, latitude
+
+
 #load('/media/doug/My Passport/effdis/.RData')
-task2.lf <- read.table('/home/doug/effdis/data/task2.lf.csv',sep=',',header=T)
+#task2.lf <- read.table('/home/doug/effdis/data/task2.lf.csv',sep=',',header=T)
 
 t2ce_lf_ll <- task2.lf[task2.lf$geargrpcode == 'LL' & task2.lf$month < 13,]
 t2ce_lf_ll <- orderBy(~flagname+trend,data=t2ce_lf_ll)
@@ -36,14 +56,20 @@ dim(t2ce_lf_ll) # 2,454,696
 
 head(t2ce_lf_ll)
 
+rm(task2.lf)
+gc(reset =T)
+
 # EDA # 
 
-table(t2ce_lf_ll$eff1type)
+table(t2ce_lf_ll$eff1type[t2ce_lf_ll$species == 'alb'])
 
-# D.AT SEA    D.FISH FISH.HOUR HOURS.SEA   KM.SETS LINE.DAYS  NO.BOATS  NO.HOOKS  NO.LINES    -none-   NO.NETS  NO.POLES   NO.SETS  NO.TRAPS  NO.TRIPS 
-# 0       999     42093         0         0         0         0       126   2326977         0     82845         0         0      2682         0      1827 
-# N.POLE-D  SUC.D.FI  SUC.SETS    TRAP D 
-# 0        36       549         0 
+# D.AT SEA    D.FISH FISH.HOUR HOURS.SEA   KM.SETS LINE.DAYS  NO.BOATS  NO.HOOKS 
+# 0       111      4675         0         0         0         0        13    258241 
+# NO.LINES    -none-   NO.NETS  NO.POLES   NO.SETS  NO.TRAPS  NO.TRIPS  N.POLE-D  SUC.D.FI 
+# 0      9138         0         0       298         0       203         0         4 
+# SUC.SETS    TRAP D 
+# 61         0 
+
 
 # Only use NO.HOOKS
 
@@ -87,50 +113,55 @@ t_nr <- tt1[tt1[,2]=='nr',]
 tt2 <- data.frame(t_kg,t_nr[,4])
 
 only.nrs <- (1:length(tt2[,1]))[tt2$value ==0 & tt2$t_nr...4. > 0] # Combinations who only reported numbers. Mostly Japan and USA.
+tt0
 
 # Who reports kgs and/or nrs by species ?
 
-pp0<- table(t2ce_lf_ll$flagname,t2ce_lf_ll$catchunit,t2ce_lf_ll$year,t2ce_lf_ll$species)
-pp1<- melt(pp0)
-dimnames(pp1)[[2]] <- c('flagname','catchunit','year','species','value')
+#pp0<- table(t2ce_lf_ll$flagname,t2ce_lf_ll$catchunit,t2ce_lf_ll$year,t2ce_lf_ll$species)
+#pp1<- melt(pp0)
+#dimnames(pp1)[[2]] <- c('flagname','catchunit','year','species','value')
+
+dat <- t2ce_lf_ll[t2ce_lf_ll$dsettype == 'nw',]
+pp0 <- aggregate(list(measured_catch=dat$measured_catch), 
+                  by=list(trend=dat$trend,month=dat$month,
+                          flagname=dat$flagname,catchunit=dat$catchunit,
+                          species=dat$species),sum)
+
+# Split into two
+
+pp0_nr <- pp0[pp0$catchunit == 'nr',]
+dimnames(pp0_nr)[[2]][6] <- 'measured_catch_nr'
+pp0_kg <- pp0[pp0$catchunit == 'kg',]
+dimnames(pp0_kg)[[2]][6] <- 'measured_catch_kg'
+
+pp0_kg_nr <- merge(pp0_kg[,-4],pp0_nr[,-4])
+
 
 # Plot the relationship between nrs and kgs for different species, flag combinations
 
 library(lattice)
-xyplot(value~year|catchunit*species,data=pp1)
+xyplot(log(measured_catch_kg)~log(measured_catch_nr),groups=flagname,data=pp0_kg_nr[pp0_kg_nr$species=='bft',])
 
-plot(pp1$value[pp1$catchunit=='nr'],pp1$value[pp1$catchunit =='kg'])
+xyplot(log(measured_catch_kg)~log(measured_catch_nr)|species,auto.key=TRUE,
+       groups=flagname,data=pp0_kg_nr)
 
-# Just the positive part will do
+head(pp0_kg_nr)
 
-pp1$value[pp1$value ==0] <- NA
+pp0_kg_nr$lnr <- log(pp0_kg_nr$measured_catch_nr)
+pp0_kg_nr$lkg <- log(pp0_kg_nr$measured_catch_kg)
 
-pp2 <- pp1[!is.na(pp1),]
-
-plot(pp1$value[pp1$catchunit=='nr'],pp1$value[pp1$catchunit =='kg'],type='n',xlim=c(0,2000),ylim=c(0,2000))
-text(pp1$value[pp1$catchunit=='nr'],pp1$value[pp1$catchunit =='kg'],pp1$flagname[pp1$catchunit=='kg'],cex=.5)
 
 # Model kg data as a function of nr, flag and species
 
-p_kg <- pp1[pp1$catchunit=='kg',]
-p_nr <- pp1[pp1$catchunit=='nr',]
-ppp <- data.frame(p_kg,nr=p_nr$value)
-dimnames(ppp)[[2]][5] <- 'kg'
+m1 <- lm(measured_catch_kg~measured_catch_nr,data=pp0_kg_nr,na.action='na.omit')
+m2 <- lm(measured_catch_kg~measured_catch_nr+trend,data=pp0_kg_nr,na.action='na.omit')
+m3 <- lm(measured_catch_kg~measured_catch_nr+trend+species,data=pp0_kg_nr,na.action='na.omit')
+m4 <- lm(measured_catch_kg~measured_catch_nr+trend+species+flagname,data=pp0_kg_nr,na.action='na.omit')
+m5 <- lm(measured_catch_kg~measured_catch_nr*trend*species*flagname,data=pp0_kg_nr,na.action='na.omit')
 
-plot(ppp$kg[ppp$species == 'bet'],ppp$nr[ppp$species == 'bet'])
+anova(m1,m2,m3,m4,m5)
 
-ppp$lkg <- log(ppp$kg)
-ppp$lnr <- log(ppp$nr)
-
-m1 <- lm(lkg~lnr,data=ppp,na.action='na.omit')
-m2 <- lm(lkg~lnr+year,data=ppp,na.action='na.omit')
-m3 <- lm(lkg~lnr+year+species,data=ppp,na.action='na.omit')
-m4 <- lm(lkg~lnr+year+species+flagname,data=ppp,na.action='na.omit')
-m5 <- lm(lkg~lnr+year+flagname,data=ppp,na.action='na.omit')
-
-anova(m1,m2,m3,m4)
-
-summary(m3)
+best.model <- step(m4,direction='both')
 
 t_kg <- tt1[tt1[,2]=='kg',]
 t_nr <- tt1[tt1[,2]=='nr',]

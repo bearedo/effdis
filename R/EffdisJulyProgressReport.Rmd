@@ -90,6 +90,8 @@ setwd("/home/doug/effdis/R")
 source("yr.month.coverage.task2.r")
 source("trend.r")
 source("spatial.coverage.by.year.task2.r")
+source("three.d.effort.by.year.r")
+source("three.d.catch.by.year.r")
 ```
 
 Once the RODBC library is installed and the /etc/odbc.ini file modified to include the effdis database the data can be accessed via R according to the following.
@@ -147,7 +149,7 @@ xyplot(log(measured_catch_kg)~log(measured_catch_nr)|species,auto.key=TRUE,
 
 On the basis of Figure 1 we decided to model the relationship between numbers and weights and use the parameters to impute weights for Task II where total numbers only were supplied. A stepwise model selection procedure resulted in the model summarised below (Table 4). The model fits the data well and the $R^2$ = 90%. Note: that when the bootstrap error variance estimation is done this process will need to be included.
 
-*Table 4. Linear model summarising the relationship between weights and numbers for countries that sent both to ICCAT for the Task II database *
+*Table 4. Linear model summarising the relationship between weights and numbers for countries that sent both to ICCAT for the Task II database*
 
 ```{r model weights versus numbers,include=TRUE,echo=FALSE}
 mod <- step(lm(measured_catch_kg~measured_catch_nr+trend+species+flagname,data=pp0_kg_nr,na.action='na.omit'),direction='both',trace=F)
@@ -156,6 +158,55 @@ pander(mod)
 #pander(anova(mod))
 #pander(summary(mod))
 ```
+
+
+### Sampling by year and month
+
+```{r temporal confounding Japan and Chinese Taipei,include=TRUE,echo=FALSE}
+par(mfrow=c(2,2),mar=c(2,2,2,2),oma=c(1,1,1,1))
+out <- sqlQuery(chan,"SELECT yearc AS year, trend, timeperiodid AS month, flagname, region, geargrpcode,longitude,latitude, eff1
+FROM t2ce
+WHERE region ='AT' AND timeperiodid < 13 AND eff1type='NO.HOOKS' AND flagname ='Japan' OR flagname = 'Chinese Taipei' OR flagname = 'Brasil' OR flagname = 'U.S.A.' OR flagname = 'China P.R.' AND geargrpcode ='LL';")
+yr.month.coverage.task2.r(tdata=out,which.gear='LL',start.year=1960,end.year=2010,which.flag='Japan')
+yr.month.coverage.task2.r(tdata=out,which.gear='LL',start.year=1960,end.year=2010,which.flag='Chinese Taipei')
+yr.month.coverage.task2.r(tdata=out,which.gear='LL',start.year=1960,end.year=2010,which.flag='Brasil')
+yr.month.coverage.task2.r(tdata=out,which.gear='LL',start.year=1960,end.year=2010,which.flag='U.S.A.')
+
+```
+
+## Sampling in space by year - Brazil
+
+```{r spatial confounding Chinese Taipei,include=TRUE,echo=FALSE}
+par(mfrow=c(4,4),mar=c(0,0,1,0))
+spatial.coverage.by.year.task2.r(tdata=out,start.year=1975,end.year=1990,which.gear='LL',which.flag='Brasil')
+```
+
+## Sampling in space by year - Japan 
+
+```{r spatial confounding Japan, include=TRUE,echo=FALSE}
+par(mfrow=c(4,4),mar=c(0,0,1,0))
+spatial.coverage.by.year.task2.r(tdata=out,start.year=1985,end.year=2000,which.gear='LL',which.flag='Japan')
+```
+
+## No of hooks by year and location - China P.R.
+
+```{r no of hooks shot by China P.R. in 2006 from task 2,include=TRUE,echo=FALSE,message = FALSE, error=FALSE, warnings=FALSE}
+
+t2ce_lf_ll_ChinaPR <- read.table('/home/doug/effdis/data/t2ce_lf_ll_ChinaPR.csv',sep=',',header=T)
+
+par(mfrow=c(1,1),mar=c(3,3,3,3))
+three.d.effort.by.year.r(tdata=out,what.year='2006',what.flag='China P.R.',scaling.f=100000)  
+```
+
+## Weight of albacore caught by year and location - China P.R.
+
+```{r kg albacore caught by China P.R. in 2006 from task 2,include=TRUE,echo=FALSE,message = FALSE, error=FALSE, warnings=FALSE}
+source("/home/doug/effdis/R/three.d.catch.by.year.r")
+par(mfrow=c(1,1),mar=c(3,3,3,3))
+three.d.catch.by.year.r(tdata=t2ce_lf_ll_ChinaPR,what.year='2006',what.species='alb',what.flag='China P.R.',scaling.f=1000)  
+```
+
+
 
 ##Regression modeling
 

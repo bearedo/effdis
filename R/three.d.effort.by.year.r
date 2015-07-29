@@ -3,14 +3,22 @@
 
 three.d.effort.by.year.r <- function(tdata = task2.lf, what.gear = 'LL', what.year = 2005, gridx=5,gridy=5,effort.type='NO.HOOKS', what.flag = 'All',scaling.f=1000000)
 {
-  #tdata<-task2.lf; what.gear <- 'LL'; what.year <- 2005; gridx <- 5; gridy <- 5; what.flag <- 'EU.Cyprus'
+  #tdata<-t2ce_lf_ll[t2ce_lf_ll$species == 'alb',]; what.gear <- 'LL'; what.year <- 2005; 
+  #gridx <- 5; gridy <- 5; what.flag <- 'EU.Cyprus'
+
+  
+  tdata1 <- aggregate(list(eff1=tdata$eff1), 
+                     by=list(trend=tdata$trend,month=tdata$month,
+        flagname=tdata$flagname,longitude=tdata$longitude,latitude=tdata$latitude),unique)
+  
+  
   
   if(what.flag == 'All'){
-  tdata1 <- tdata[tdata$geargrpcode == what.gear & tdata$month < 13 & tdata$year == what.year & tdata$eff1type == effort.type,]
+  tdata1 <- tdata1[tdata1$geargrpcode == what.gear & tdata1$month < 13 & tdata1$year == what.year & tdata1$eff1type == effort.type,]
   }
   else{
     
-    tdata1 <- tdata[tdata$geargrpcode == what.gear & tdata$month < 13 & tdata$year == what.year & tdata$eff1type == effort.type & tdata$flagname == what.flag,]
+    tdata1 <- tdata1[tdata1$geargrpcode == what.gear & tdata1$month < 13 & tdata1$year == what.year & tdata1$eff1type == effort.type & tdata1$flagname == what.flag,]
   }
   
   dd <- dim(tdata1)

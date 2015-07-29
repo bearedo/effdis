@@ -34,7 +34,7 @@ output: beamer_presentation
 + Developing multi-variate models (e.g. GAMs) for interpoplation
 + Integrating activities with an online geographic database system (based on Postgis)
 
-## Sampling by year and month - Japan
+
 
 ```{r code,include=FALSE}
 library(rio)
@@ -65,15 +65,16 @@ t1det9sp <- import("/home/doug/effdis/data/t1det_9sp.xlsx")
 
 ```
 
+## Sampling by year and month - Japan
 
 ```{r temporal confounding Japan,include=TRUE,echo=FALSE}
+par(mfrow=c(1,1),mar=c(3,3,3,3))
 yr.month.coverage.task2.r(tdata=t2ce,which.gear='LL',which.flag='Japan')
 ```
 
 ## Sampling in space by year - Chinese Taipei 
 
 ```{r spatial confounding China,include=TRUE,echo=FALSE}
-library(maps)
 par(mfrow=c(5,5),mar=c(0,0,1,0))
 spatial.coverage.by.year.task2.r(tdata=t2ce,start.year=1986,end.year=2010,which.gear='LL',which.flag='Chinese Taipei')
 ```
@@ -90,7 +91,7 @@ effort.by.year.task2.r(which.flag='Japan')
 ## No of hooks by year and location - China P.R.
 
 ```{r no of hooks shot by China P.R. in 2006 from task 2,include=TRUE,echo=FALSE,message = FALSE, error=FALSE, warnings=FALSE}
-source("/home/doug/effdis/R/three.d.effort.by.year.r")
+
 t2ce_lf_ll_ChinaPR <- read.table('/home/doug/effdis/data/t2ce_lf_ll_ChinaPR.csv',sep=',',header=T)
 
 par(mfrow=c(1,1),mar=c(3,3,3,3))
