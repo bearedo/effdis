@@ -3,14 +3,21 @@
 
 three.d.effort.by.year.r <- function(tdata = task2.lf, what.gear = 'LL', what.year = 2005, gridx=5,gridy=5,effort.type='NO.HOOKS', what.flag = 'All',scaling.f=1000000)
 {
-  #tdata<-t2ce_lf_ll[t2ce_lf_ll$species == 'alb',]; what.gear <- 'LL'; what.year <- 2005; 
-  #gridx <- 5; gridy <- 5; what.flag <- 'EU.Cyprus'
+  
+    #tdata<-out; what.gear <- 'LL'; 
+    #what.year <- 2006;  gridx <- 5; 
+    #gridy <- 5; what.flag <- 'China P.R.'
+   #effort.type <- 'NO.HOOKS'
 
+   # If you have numbers and weights (nw) then effort is duplicated 
+   
+   n0 <- tdata[tdata$dsettype == 'n-',]
+   nw <- tdata[tdata$dsettype == 'nw',]
+   mm <- duplicated(nw[,-9])
+   nw <- nw[mm==TRUE,]
+   w0 <- tdata[tdata$dsettype == '-w',]
   
-  tdata1 <- aggregate(list(eff1=tdata$eff1), 
-                     by=list(trend=tdata$trend,month=tdata$month,
-        flagname=tdata$flagname,longitude=tdata$longitude,latitude=tdata$latitude),unique)
-  
+  tdata1 <- rbind(n0,nw,w0)
   
   
   if(what.flag == 'All'){
@@ -41,8 +48,8 @@ three.d.effort.by.year.r <- function(tdata = task2.lf, what.gear = 'LL', what.ye
 resx        <- gridx
 resy        <- gridy
 
-cl          <- 1.1  #cex.lab
-ca          <- 1    #cex.axis
+cl          <- 0.9  #cex.lab
+ca          <- 0.9    #cex.axis
 fonts       <- 2    #font
 xl          <- list(label="Longitude",font=fonts,cex=cl) #x-label
 yl          <- list(label="Latitude",font=fonts,cex=cl)  #y-label

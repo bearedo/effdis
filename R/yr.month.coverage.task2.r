@@ -22,7 +22,7 @@ yr.month.coverage.task2.r<-function(tdata=t2ce,start.year=1950,end.year=2010,whi
     fmat <- matrix(NA, length(1950:2015),12)
     dimnames(fmat) <- list(c(1950:2015),1:12)
     
-    ymc <- table(fdata$yearc,fdata$month) # Number of observations by year and month
+    ymc <- table(fdata$year,fdata$month) # Number of observations by year and month
   dimnames(ymc)[[1]] <- sort(unique(fdata$year))
   dimnames(ymc)[[2]] <- month.abb
   mm <- match(dimnames(ymc)[[1]],dimnames(fmat)[[1]])

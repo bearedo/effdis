@@ -3,7 +3,7 @@ three.d.catch.by.year.r <- function(tdata = task2.lf, what.gear = 'LL', what.yea
   
     {
     
-    #tdata<-t2ce_lf_ll; what.gear <- 'LL'; what.flag<- 'EU.Italy'; what.year <- 1984; gridx <- 5; gridy <- 5;  what.species <- 'alb'; catchunit <- 'kg'
+    #tdata<-alb; what.gear <- 'LL'; what.flag<- 'Brasil'; what.year <- 1984; gridx <- 5; gridy <- 5;  what.species <- 'alb'; catchunit <- 'kg'
     #what.flag<- 'All'
   
     if(what.flag == 'All'){
