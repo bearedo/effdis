@@ -17,10 +17,7 @@ The Sub-Committee was supportive of the work, approved the outline methodology, 
 
 
 #Introduction
-The International Commission for the Conservation of Atlantic Tunas (ICCAT) (www.iccat.int), an intergovernmental organization whose Secretariat headquarters is based in Madrid, Spain, contracted Globefish Consultancy Services (GCS) to develop a modeling approach to estimate overall Atlantic long-line (LL), bait-boat (BB) and Purse Seine (PS) effort by time-area strata (EFFDIS). Using the ICCAT fisheries data currently available at the Secretariat, GCS is required generate a database of historic and current fishing effort distribution that meets the stated needs of the ICCAT Standing Committee on Research and Statistics (SCRS).  The update of the EFFDIS dataset is believed to be critical, especially with regard to by-catch evaluations.  
-
-##The Proposal
-GCS is developing a statistical modeling approach to estimating overall Atlantic fishing effort stratified by flag/fleet, gear, area (5ºx5º degree square grid), year and month.  The current EFFDIS estimations for longline (LL) gear are being updated using the new modeling approach.  Effort estimation procedures for baitboat (BB) and purse-seine (PS) gears will then also be developed with the appropriate units of effort. Tangible deliverables are scheduled to take the form of the outputs summarized below.
+The International Commission for the Conservation of Atlantic Tunas (ICCAT) (www.iccat.int), an intergovernmental organization whose Secretariat headquarters is based in Madrid, Spain, contracted Globefish Consultancy Services (GCS) to develop a statistical modeling approach to estimate overall Atlantic long-line (LL), bait-boat (BB) and purse seine (PS) effort by time-area strata (EFFDIS) that will meet the stated needs of the ICCAT Standing Committee on Research and Statistics (SCRS).  This update of the EFFDIS dataset is critical, especially with regard to by-catch evaluations.  Tangible deliverables are scheduled to take the form of the outputs summarized below.
 
 
 ##Deliverables
@@ -38,20 +35,20 @@ GCS is developing a statistical modeling approach to estimating overall Atlantic
 Detailed descriptions of the methodological approach have been submitted to the ICCAT Secretariat (Deliverable 1). The status of development of the work for LL estimations (Deliverable 2) was presented to the 2015 Sub-Committee on Ecosystems (SCRS/P/2015/026) by Dr L. Kell between June 8 to 12 since GCS were unable to attend. Details are available in the final report here, http://www.iccat.es/en/meetingscurrent.htm and a summary of the recommendations is presented below. The presentation, current report and verbal discussions that took place at the Blue Shark Stock Assessment satisfy the requirements of Deliverable 3. Deliverables 4 - 7 are in progress.
 
 ##Recommendations of the Sub-Committee on Ecosystems (SCRS/P/2015/026)
-In the past, both the Sub-Committee on Ecosystems and the Working Group on Stock Assessment Methods have both made a number of recommendations for updating and improving EFFDIS, which will be incorporated in the new estimates. The Sub-Committee agreed that the EFFDIS data are complex.  GCS has been working to understand the data and identify issues related to non-random, non-representative sampling. All the analysis are being made available on a github repository http://iccat-stats.github.io/. 
+In the past, the Sub-Committee on Ecosystems and the Working Group on Stock Assessment Methods have both made a number of recommendations for updating and improving EFFDIS, which will be incorporated in the new estimates. The Sub-Committee agreed that the EFFDIS data are complex, and difficult to analyse.  GCS has been working to understand the data and identify issues related to non-random, non-representative sampling. All the analysis are being made available on a github repository http://iccat-stats.github.io/. 
 
-It was also clarified that the EFFDIS data are reliant on Task II catch and effort information, and it is known that there are errors in these data. The secretariat clarified that data screening will take place to eliminate problems such as effort duplication. This revision should reduce the amount of problematic data used for the EFFDIS estimation. The secretariat and GCS are also working to harmonise the very heterogeneous catch and effort data in order to make it comparable and facilitate its use in the development of EFFDIS. 
+It was also clarified that the EFFDIS data are reliant on Task II catch and effort information, and it is known that there are errors in these data. The secretariat said that data screening would take place to eliminate problems such as effort duplication. This revision should reduce the amount of problematic data used for the EFFDIS estimation. The secretariat and GCS are also working to harmonise the very heterogeneous catch and effort data in order to make it comparable, and facilitate its use in the development of EFFDIS. 
 
 It was also discussed that the EFFDIS estimations rely on species composition information (for key target species). This is problematic when applying to by-catch species since the composition is biased towards target species and there are in-consistent historical trends in this bias. GCS is hoping to address this issue using cross-validation although non-random bias remains a complicated problem. The Sub-Committee also requested the addition of southern Bluefin tuna catch information into the estimation of EFFDIS.  
 
-Due to the fact that by-catch information is usually recorded on a set by set basis for purse seine, this unit of effort would be the most appropriate for use as the effort metric in the EFFDIS dataset for this gear. It is not, however, the most frequently reported unit of effort for purse seines, and thus GCS will have to evaluate the practicality of using this metric. 
+Due to the fact that by-catch information is usually recorded on a set by set basis for purse seine, this unit of effort would be the most appropriate metric in the EFFDIS dataset for this gear. It is not, however, the most frequently reported unit of effort for purse seines, and thus GCS will have to evaluate the practicality of using this metric. 
 
 The Sub-committee also discussed the proposal by the 2013 Working group on stock assessment methods (WGSAM) regarding the additional gears that should be included in the EFFDIS estimation. Previously, it was requested that estimations be done for both purse seine and baitboat fleets. It was pointed out, however, that EFFDIS is only used to assess the fishing impacts of ICCAT fleets on by-catch species, and since by-catch in baitboat fisheries is minimal, there is no point in conducting this exercise for that gear. It was thus agreed that GCS should focus on the more important longline and purse seine estimations under the current contract. 
 
-The Sub-Committee also suggested that, when examining 'fleet profiles' for the purse seine fleet, instead of just separating the effort into 'FAD' or 'Free school fishing', an additional category, namely the Ghanaian purse seine/baitboat cooperative fishery should be considered. This is due to the different catchability apparent for this fleet due to the close cooperation in fishing operations between these two gear types and the sharing of catch, which could bias effort estimates. It was suggested that Ghanaian scientists should be consulted to fully explore this unique sector.
+The Sub-Committee also suggested that, when examining 'fleet profiles' for the purse seine fleet, instead of just separating the effort into 'FAD' or 'Free school fishing', an additional category, namely the Ghanaian purse seine/baitboat co-operative fishery should be considered. This is due to the different catchability apparent for this fleet due to the close co-operation in fishing operations between these two gear types and the sharing of catch, which could bias effort estimates. It was suggested that Ghanaian scientists be consulted to fully explore this unique sector.
 
 ##Timeline
-The contract between GCS and ICCAT was formally signed by Driss Meski on 26 May 2015. The project is on track to fulfill all Deliverables within the total 6 months allotted. The original agreed Timetable is duplicated below (Table 1) with comments on progress. 
+The contract between GCS and ICCAT was formally signed by Driss Meski on 26 May 2015. The project is on track to fulfill its objectives and all Deliverables will be finalised within the total 6 months allotted. The original agreed Timetable is duplicated below (Table 1) with comments on progress. 
 
 
 ```{r attach libraries, include =TRUE, echo=FALSE, message=FALSE,error=FALSE,warning=FALSE}
@@ -82,7 +79,7 @@ pander(workplan)
 ```
 
 ##Data, servers, and version control
-An Ubuntu cloud server with a static IP address (134.213.29.249, effdis-tuna-cc1) has been set up by ICCAT specifically for the current project. GCS has also set up a PostGIS enabled PostgreSQL server on this machine where all data related to the project are being stored.  The database can be accessed directly from the command line of any unix machine with PostgreSQL installed (psql -h 134.213.29.249 -d effdis -U postgres) or with ODBC via R.  
+An Ubuntu cloud server with a static IP address (134.213.29.249, effdis-tuna-cc1) was set up by the ICCAT Secretariat specifically for the current project. GCS has also set up a PostGIS enabled PostgreSQL server on this machine where all data related to the project are being stored.  The database can be accessed directly from the command line of any unix machine with PostgreSQL installed (psql -h 134.213.29.249 -d effdis -U postgres) or with ODBC via R.  
 
 The effdis-tuna-cc1 server also hosts the online geographic information system being trialled for the EFFDIS project by GCS (http://134.213.29.249/effdis/#).  All scripts (R, Rmarkdown, Shell, PHP) developed by the project are being backed up on GitHub (https://github.com/bearedo/effdis). Furthermore all reports and presentations are being done with Rmarkdown, linked to GitHub. This should all facilitate any future modification and updating.
 
@@ -278,7 +275,16 @@ image(lonnie,lattie,matrix(grd$eff,lo,la),col=topo.colors(100),xlab='',ylab='',x
 
 ```
 
+## First estimate 
 
+```{r global effort estimate, include=TRUE,echo=FALSE,message = FALSE, error=FALSE, warnings=FALSE}
+
+effdis <- read.table('/home/doug/effdis/data/effdis-estimate.csv',sep=',',header=T)
+par(mfrow=c(1,1),mar=c(5,5,4,4))
+plot(effdis$year,effdis$effort,xlab='',ylab='hooks',type='l',lwd=3,xlim=c(1960,2010))
+abline(v=seq(1960,2010,by=10),lty=2,col='blue')
+title('Task 1 Catch / Task 2 CPUE')
+```
 
 
 
