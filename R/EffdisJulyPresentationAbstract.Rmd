@@ -1,0 +1,14 @@
+---
+title: "EffdisJulyPresentationAbstract"
+author: "Doug Beare"
+date: "23 July 2015"
+output: word_document
+---
+
+#A Modeling Approach to Estimate Atlantic Fishing Effort by Time-Area Strata
+##Abstract
+
+A statistical modeling framework approach to estimating overall Atlantic fishing effort on tuna and tuna-like species is being developed using 'Task 1' and 'Task 2' data from the EFFDIS database. The main problem arises because Task 1 data, which are thought to be totally comprehensive, are available only as annual totals for each species, flag and gear combination.  Task 2 data, on the other hand, are more detailed and information is available for location and seasonality but are often incomplete.  The challenge then is to combine both sources of information to produce the best estimates of fishing effort. 
+
+The method currently being developed relies on a suite of generalised additive models (GAMs) being fitted to the Task 2 data.  GAMs were selected because they are highly flexible, they can deal with skew distributions, and high prevalences of zeros; both features of the EFFDIS data.  The models take the relevant variables (e.g. number of hooks shot) and model them as smooth functions of various combinations of covariates of location (e.g. latitude, longitude, depth) and time (e.g. month and long-term trend). Specific model formulations can also deal with interactions between terms, hence allowing the shapes of spatial distributions generated to change with time which is important.  Once fitted and tested the models can then be used to 'predict' values of catch-per-unit-effort as functions of any combination of the relevant covariates together with error or variance.  Total effort is estimated by 'raising' with the Task 1 totals according to the formula : Effort (Task 1) = Catch (Task 1) / CPUE (Task 2). Initial findings are promising but problems of confounding (non-random sampling in both space and time) are substantial and proving difficult to ignore. The purpose of the presentation will be to describe the models, the outputs and the estimates of fishing effort made for the Atlantic thus far.
+
