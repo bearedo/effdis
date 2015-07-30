@@ -7,6 +7,10 @@ output: word_document
 subtitle: Interim Progress Report to the ICCAT secretariat
 header-includes: \usepackage{tabularx}
 ---
+```{r global_options, include=FALSE}
+knitr::opts_chunk$set(fig.width=8, fig.height=10, fig.path='Figs/',
+                      echo=FALSE, warning=FALSE, message=FALSE)
+```
 
 #Executive summary
 The Sub-Committee was supportive of the work, approved the outline methodology, and recommended that GCS focus on longline and purse-seine fisheries since by-catch is typically low in baitboat fisheries. It was also suggested that Ghanaian scientists be consulted on the analysis of their purse-seine fisheries which are particularly interesting due to the close working relationships among 'fishing cooperatives' in that country. 
@@ -132,7 +136,7 @@ Another problem with the Task II data is the fact that some countries report cat
 ```{r weights versus numbers,include=TRUE,echo=FALSE}
 pp0 <- sqlQuery(chan, "SELECT trend, month, flagname, catchunit, species, sum(measured_catch) as measured_catch
 FROM t2ce_long_format_ll
-WHERE region ='AT' AND month < 13 AND eff1type='NO.HOOKS' AND dsettype = 'nw'
+WHERE region ='AT' AND month < 13 AND eff1type='NO.HOOKS' AND dsettype = 'nw' AND catchunit != '--'
                  GROUP BY trend,month,flagname,catchunit, species
                  ORDER BY flagname,trend,month;")
 # Split into two data frames
@@ -162,11 +166,11 @@ pander(mod)
 
 ### Sampling by year and month
 
-```{r temporal confounding Japan and Chinese Taipei,include=TRUE,echo=FALSE}
+```{r temporal confounding Japan and Chinese Taipei,include=TRUE,echo=FALSE,fig.height=6}
 par(mfrow=c(2,2),mar=c(2,2,2,2),oma=c(1,1,1,1))
-out <- sqlQuery(chan,"SELECT yearc AS year, trend, timeperiodid AS month, flagname, region, geargrpcode,longitude,latitude, eff1
+out <- sqlQuery(chan,"SELECT yearc AS year, trend, timeperiodid AS month, flagname, region, geargrpcode,longitude,latitude, catchunit, dsettype, eff1, eff1type
 FROM t2ce
-WHERE region ='AT' AND timeperiodid < 13 AND eff1type='NO.HOOKS' AND flagname ='Japan' OR flagname = 'Chinese Taipei' OR flagname = 'Brasil' OR flagname = 'U.S.A.' OR flagname = 'China P.R.' AND geargrpcode ='LL';")
+WHERE region ='AT' AND timeperiodid < 13 AND eff1type='NO.HOOKS' AND geargrpcode = 'LL' AND flagname IN ('Japan', 'Chinese Taipei','Brasil', 'U.S.A.','China P.R.') AND catchunit != '--' ;")
 yr.month.coverage.task2.r(tdata=out,which.gear='LL',start.year=1960,end.year=2010,which.flag='Japan')
 yr.month.coverage.task2.r(tdata=out,which.gear='LL',start.year=1960,end.year=2010,which.flag='Chinese Taipei')
 yr.month.coverage.task2.r(tdata=out,which.gear='LL',start.year=1960,end.year=2010,which.flag='Brasil')
@@ -176,7 +180,7 @@ yr.month.coverage.task2.r(tdata=out,which.gear='LL',start.year=1960,end.year=201
 
 ## Sampling in space by year - Brazil
 
-```{r spatial confounding Chinese Taipei,include=TRUE,echo=FALSE}
+```{r spatial confounding Brasil,include=TRUE,echo=FALSE}
 par(mfrow=c(4,4),mar=c(0,0,1,0))
 spatial.coverage.by.year.task2.r(tdata=out,start.year=1975,end.year=1990,which.gear='LL',which.flag='Brasil')
 ```
@@ -188,27 +192,97 @@ par(mfrow=c(4,4),mar=c(0,0,1,0))
 spatial.coverage.by.year.task2.r(tdata=out,start.year=1985,end.year=2000,which.gear='LL',which.flag='Japan')
 ```
 
-## No of hooks by year and location - China P.R.
+## Sampling in space by year - Chinese Taipei
+
+```{r spatial confounding Chinese Taipei, include=TRUE,echo=FALSE}
+par(mfrow=c(4,4),mar=c(0,0,1,0))
+spatial.coverage.by.year.task2.r(tdata=out,start.year=1995,end.year=2010,which.gear='LL',which.flag='Chinese Taipei')
+```
+
+
+## No of hooks by year and location
 
 ```{r no of hooks shot by China P.R. in 2006 from task 2,include=TRUE,echo=FALSE,message = FALSE, error=FALSE, warnings=FALSE}
-
-t2ce_lf_ll_ChinaPR <- read.table('/home/doug/effdis/data/t2ce_lf_ll_ChinaPR.csv',sep=',',header=T)
-
 par(mfrow=c(1,1),mar=c(3,3,3,3))
-three.d.effort.by.year.r(tdata=out,what.year='2006',what.flag='China P.R.',scaling.f=100000)  
+three.d.effort.by.year.r(tdata=out,what.year=2006,what.flag='China P.R.',scaling.f=10000)  
 ```
+
+
+```{r no of hooks shot by Chinese Taipei in 2006 from task 2,include=TRUE,echo=FALSE,message = FALSE, error=FALSE, warnings=FALSE}
+three.d.effort.by.year.r(tdata=out,what.year=2006,what.flag='Chinese Taipei',scaling.f=10000)  
+```
+
+```{r no of hooks shot by Brasil in 2006 from task 2,include=TRUE,echo=FALSE,message = FALSE, error=FALSE, warnings=FALSE}
+three.d.effort.by.year.r(tdata=out,what.year=2006,what.flag='Brasil',scaling.f=10000)  
+```
+
+```{r no of hooks shot by USA in 2006 from task 2,include=TRUE,echo=FALSE,message = FALSE, error=FALSE, warnings=FALSE}
+three.d.effort.by.year.r(tdata=out,what.year=2006,what.flag='U.S.A.',scaling.f=10000)  
+```
+
+
 
 ## Weight of albacore caught by year and location - China P.R.
 
-```{r kg albacore caught by China P.R. in 2006 from task 2,include=TRUE,echo=FALSE,message = FALSE, error=FALSE, warnings=FALSE}
+```{r kg albacore caught by selected flags in 2006 from task 2,include=TRUE,echo=FALSE,message = FALSE, error=FALSE, warnings=FALSE}
+
+alb <- sqlQuery(chan,"SELECT yearc AS year, trend, timeperiodid AS month, flagname, region, geargrpcode,longitude,latitude, catchunit, dsettype, eff1, eff1type, alb as measured_catch
+FROM t2ce
+WHERE region ='AT' AND timeperiodid < 13 AND eff1type='NO.HOOKS' AND geargrpcode = 'LL' AND flagname IN ('Japan', 'Chinese Taipei','Brasil', 'U.S.A.','China P.R.') AND catchunit != '--' ;")
+
+alb$species <- 'alb'
+
 source("/home/doug/effdis/R/three.d.catch.by.year.r")
-par(mfrow=c(1,1),mar=c(3,3,3,3))
-three.d.catch.by.year.r(tdata=t2ce_lf_ll_ChinaPR,what.year='2006',what.species='alb',what.flag='China P.R.',scaling.f=1000)  
+three.d.catch.by.year.r(tdata=alb,what.year=2006,what.species='alb',what.flag='Brasil',scaling.f=100,catchunit='kg')  
+
+three.d.catch.by.year.r(tdata=alb,what.year=2006,what.species='alb',what.flag='Japan',scaling.f=10,catchunit='nr')  
+
+three.d.catch.by.year.r(tdata=alb,what.year=2006,what.species='alb',what.flag='U.S.A.',scaling.f=10,catchunit='nr')  
+
+```
+
+##Regression modeling
+
+```{r regression modeling ,include=TRUE,echo=FALSE,message = FALSE, error=FALSE, warnings=FALSE}
+
+mod.output <- sqlQuery(chan,"SELECT *
+FROM t2ce_model
+WHERE species = 'alb' AND year = 2006;")
+
+lonnie <- seq(-96.5,18.5,by=5)
+lattie <- seq(-56.5,58.5,by=5)
+lo<- length(lonnie)
+la<- length(lattie)
+
+par(mfrow=c(4,3),mar=c(1,1,2,1),oma=c(0,0,0,0))
+
+for(i in c(1,3,9,11))
+  {
+  
+  grd <- mod.output[mod.output$month == i ,]
+
+  image(lonnie,lattie,matrix(grd$prob,lo,la),col=topo.colors(100),xlab='',ylab='',xaxt='n',yaxt='n')
+  contour(lonnie,lattie,matrix(grd$prob,lo,la),col=topo.colors(100),add=T)
+  map('worldHires',add=T,fill=T);title(paste('P(catch)',month.abb[i],'2006'))
+  
+#   image(lonnie,lattie,matrix(log(grd$measured_catch),lo,la),col=topo.colors(100),xlab='',ylab='',xaxt='n',yaxt='n')
+#   contour(lonnie,lattie,matrix(log(grd$measured_catch),lo,la),col=topo.colors(100),add=T)
+#   map('worldHires',add=T,fill=T);title(paste('Catch without zeros (C1)',month.abb[i],'2006'))
+  
+  image(lonnie,lattie,matrix(log(grd$catch),lo,la),col=topo.colors(100),xlab='',ylab='',xaxt='n',yaxt='n')
+  contour(lonnie,lattie,matrix(log(grd$catch),lo,la),col=topo.colors(100),add=T)
+  map('worldHires',add=T,fill=T);title(paste('P x C',month.abb[i],'2006'))
+  
+image(lonnie,lattie,matrix(grd$eff,lo,la),col=topo.colors(100),xlab='',ylab='',xaxt='n',yaxt='n')
+  contour(lonnie,lattie,matrix(log(grd$eff),lo,la),col=topo.colors(100),add=T)
+  map('worldHires',add=T,fill=T);title(paste('# hooks',month.abb[i],'2006'))
+
+
+}
+
 ```
 
 
-
-##Regression modeling
 
 
 
