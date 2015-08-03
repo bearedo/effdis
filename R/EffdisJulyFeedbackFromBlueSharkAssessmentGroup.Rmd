@@ -1,0 +1,89 @@
+---
+title: "A Modeling Approach to Estimate Atlantic Fishing Effort by Time-Area Strata"
+author: "Doug Beare"
+date: "23 July 2015"
+output: word_document
+---
+
+
+#Feedback from Blue Shark Assessment group 27 July 2015
+
+## Background
+Progress on a statistical modeling approach to estimating overall Atlantic fishing effort on tuna and tuna-like species was described to the Blue Shark Assessment group that met in Lisbon between 27 and 31 July 2015. 
+
+The method developed uses a suite of generalised additive models (GAMs) fitted to the Task 2 catch and effort data.  GAMs were selected because they are highly flexible and they can deal with skew distributions and high prevalences of zeros.  The models take the relevant variables (eg. number of hooks shot) and model them as smooth functions of various combinations of covariates of location and time.  Once assessed for adequacy of fit the model parameters are used to 'predict' values of catch, effort and catch-per-unit-effort as functions of selected covariates together with error or variance.  Some flags report catches in terms of only weight, some in terms of only numbers (eg. U.S.A.) while others report both (eg. Japan). In most cases there is a strong linear relationship between weights and numbers reported which was used to estimate weights for those fleets/flags that only provide numbers for Task 2.  
+
+Total effort was estimated by 'raising' with Task 1 totals according to the formula : Effort (Task 1) = Catch (Task 1) / CPUE (Task 2). In this version of the method the data are first aggregated (summed) by location, month, and year prior to modeling, meaning that information on fleet/flag is effectively ignored. The contractor noted that fishing effort is usually estimated by combining a measure of activity such as days at sea with a measure of capacity (eg. main engine horsepower).  In the absence of any data on capacity, any effort estimates would, therefore, be questionable. The contractor was reminded, however, that in the case of longline data measures of capacity have been found to be not particularly informative.  
+
+### Example of GAM regression model output - Albacore in 2006
+
+```{r regression modeling, include=TRUE,echo=FALSE,message = FALSE, error=FALSE, warnings=FALSE}
+
+library(maps)
+library(mapdata)
+
+mod.output <- read.table('/home/doug/effdis/data/model-data-alb.csv',sep=',',header=T)
+
+lonnie <- seq(-96.5,18.5,by=5)
+lattie <- seq(-56.5,58.5,by=5)
+lo<- length(lonnie)
+la<- length(lattie)
+
+par(mfrow=c(4,4),mar=c(.5,.5,1,.5))
+
+for(i in c(1,3,9,11)){
+  
+  grd <- mod.output[mod.output$month == i & mod.output$year == 2006,]
+  grd$catch <- grd$measured_catch*grd$prob
+  
+  image(lonnie,lattie,matrix(grd$prob,lo,la),col=topo.colors(100),xlab='',ylab='',xaxt='n',yaxt='n')
+  contour(lonnie,lattie,matrix(grd$prob,lo,la),col=topo.colors(100),add=T)
+  map('worldHires',add=T,fill=T);title(paste('Probability of catch (P)',month.abb[i],'2006'),cex.main=0.7)
+  
+  image(lonnie,lattie,matrix(log(grd$measured_catch),lo,la),col=topo.colors(100),xlab='',ylab='',xaxt='n',yaxt='n')
+  contour(lonnie,lattie,matrix(log(grd$measured_catch),lo,la),col=topo.colors(100),add=T)
+  map('worldHires',add=T,fill=T);title(paste('Catch without zeros (C1)',month.abb[i],'2006'),cex.main=0.7)
+  
+  image(lonnie,lattie,matrix(log(grd$catch),lo,la),col=topo.colors(100),xlab='',ylab='',xaxt='n',yaxt='n')
+  contour(lonnie,lattie,matrix(log(grd$catch),lo,la),col=topo.colors(100),add=T)
+  map('worldHires',add=T,fill=T);title(paste('Catch P x C1',month.abb[i],'2006'),cex.main=0.7)
+  
+  image(lonnie,lattie,matrix(grd$eff,lo,la),col=topo.colors(100),xlab='',ylab='',xaxt='n',yaxt='n')
+  contour(lonnie,lattie,matrix(log(grd$eff),lo,la),col=topo.colors(100),add=T)
+  map('worldHires',add=T,fill=T);title(paste('No of hooks',month.abb[i],'2006'),cex.main=0.7)
+}
+
+```
+
+**Figure 1.** Excerpts of GAM regression model output. Albacore in January, March, September and November 2006. Column 1 starting on left is the probability of catch, column 2 is positive catch, column 3 is catch x P and column 4 is number of hooks all modeled as functions of location and time.
+
+### Estimate of total effort
+
+```{r global effort estimate, include=TRUE,echo=FALSE,message = FALSE, error=FALSE, warnings=FALSE}
+
+effdis <- read.table('/home/doug/effdis/data/effdis-estimate.csv',sep=',',header=T)
+par(mfrow=c(1,1),mar=c(5,5,4,4))
+plot(effdis$year,effdis$effort,xlab='',ylab='hooks',type='l',lwd=3)
+abline(v=seq(1950,2010,by=10),lty=2,col='blue')
+title('Task 1 catch / Task 2 CPUE')
+```
+
+**Figure 2.** Estimate of total effort (no of hooks) calculated according to $C_{task1}/U_{task2}$ where C=catch and U = catch-per-unit effort.
+
+
+## Feedback
+
+Feedback from the group was positive and the overall modeling strategy/framework was approved. Some members of the group were, however, concerned about the treatment of the 'fleet' or 'flag'.  Aggregating the data by location and temporal variables could be too much of an oversimplification. Some fleets, for example, set surface longlines, others set them in mid or deepwater. Hooks sizes, baits and targeting strategies all vary, and have varied substantially over time. 
+
+Given that the data are particularly patchy prior to the 1960s it was suggested that the modeling framework could concentrate on more recent years only. This would substantially reduce the burden on computation.  Also the contractor was asked to incude data on artisanal fisheries and to consider ways to include information on fleet/flag combinations that report only Task 1 data. Data catalogues, prepared by Carlos Palma, are freely available for this. 
+
+The method being developed is modular in nature so it could easily be altered to include information from fleet or flag. Polygons could be set up around the data for each fleet and the same regression model (ie. catch fitted to covariates of location and time) fitted to the data within each.  'Surfaces' estimated using the models could then be built up for each fleet, and effort estimated in the same manner as described above.  The contractor agreed that aggregation of data was probably only 'hiding' the underlying variability due to the fleet effect and agreed to experiment with this but noted that problems would arise because of: (i) non-random sampling in space and time; (ii) the fact that some fleets fail to report task 2 data at all; and (iii) that the difficulty understanding the different fishing methods/activities is daunting. 
+
+The contractor was urged to remember the purpose of the work in the first place. The main interest in the spatio-temporal effort estimates is driven by the need to identify areas, times of year that by-catch species (eg. turtles, seabirds) are particularly vulnerable to mortality from fishing year. Whatever approach is taken to dealing with the fleet/flag affect, effort 'hotspots' identified in space and time would probably be the same/similar. It was also suggesed that task 2 data on their own would be enough for this and that the 'raising' to task 1 might be unnecessary.  
+
+The contractor was also asked to consider the inclusion of artisanal fisheries which are important but it remains unclear where the data for this would come from and their likely quality.  
+
+###Summary
+
+In summary the contractor agreed to explore the effect of fleet/flag in more detail and make more effort to understand the needs of the potential 'customers' for these data. The contractor is also extending the analysis too far south and the ICCAT secretariat agreed to provide more realistic boundaries within which interpolation would take place. 
+
