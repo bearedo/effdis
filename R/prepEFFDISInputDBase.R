@@ -24,7 +24,7 @@ setwd("/home/doug/effdis")
 source("/home/doug/effdis/R/utilityDB.R")
 source("/home/doug/effdis/R/trend.r")
 
-
+chan <- odbcConnect("effdis-tuna-cc1", case="postgresql", believeNRows=FALSE)
 ## Load data sets from ICCAT ## 
 
 mean_weights <- import("/home/doug/Dropbox/Globefish-Consultancy-Services-2015/ICCAT-Effdis-Contract-2015/Data/effdis_2011/input/MeanWeights2011.xlsx")
@@ -33,6 +33,10 @@ t1det9sp     <- import("/home/doug/Dropbox/Globefish-Consultancy-Services-2015/I
 t2ceLL       <- import("/home/doug/Dropbox/Globefish-Consultancy-Services-2015/ICCAT-Effdis-Contract-2015/Data/effdis_2011/input/t2ce_LL_raw5x5.xlsx")
 t2ce         <- read.table("/home/doug/Dropbox/Globefish-Consultancy-Services-2015/ICCAT-Effdis-Contract-2015/Data/effdis_2011/input/t2ce.csv",sep=",",header=T)
 flags        <- import("/home/doug/Dropbox/Globefish-Consultancy-Services-2015/ICCAT-Effdis-Contract-2015/Data/effdis_2011/input/flags.csv")
+
+workplan <- import('/home/doug/effdis/data/EFFDIS-Workplan.xlsx')
+sqlSave(chan,workplan,'workplan',rownames=FALSE)
+
 
 colnames(t1det9sp) <- tolower(colnames(t1det9sp))
 t1det9sp$species <- tolower(t1det9sp$species)
