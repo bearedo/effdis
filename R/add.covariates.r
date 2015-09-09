@@ -30,5 +30,5 @@ add.covariates.r <- function(input = t2ce_lf_ll,what.dsn = 'effdis-tuna-cc1')
   input$aq_prim_pro <- tdlc@data$aq_prim_pro[match(paste(input$longitude,input$latitude), paste(tdlc@data$longitude,tdlc@data$latitude))]
   input$m_ann_chla <- tdlc@data$m_ann_chla[match(paste(input$longitude,input$latitude), paste(tdlc@data$longitude,tdlc@data$latitude))]
   
-  out <- list(output=input)
+  out <- input
   out}
