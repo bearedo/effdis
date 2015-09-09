@@ -25,6 +25,8 @@ source("/home/doug/effdis/R/utilityDB.R")
 source("/home/doug/effdis/R/trend.r")
 
 chan <- odbcConnect("effdis-tuna-cc1", case="postgresql", believeNRows=FALSE)
+chan <- odbcConnect("effdis-local", case="postgresql", believeNRows=FALSE) # Local machine
+
 ## Load data sets from ICCAT ## 
 
 mean_weights <- import("/home/doug/Dropbox/Globefish-Consultancy-Services-2015/ICCAT-Effdis-Contract-2015/Data/effdis_2011/input/MeanWeights2011.xlsx")
@@ -46,7 +48,7 @@ dimnames(t2ce)[[2]][55:56] <- c('longitude','latitude') # Have to be different.
 sp9 <- data.frame(alb=t2ce$alb,bft=t2ce$bft,bet=t2ce$bet,skj=t2ce$skj,yft=t2ce$yft,swo=t2ce$swo,bum=t2ce$bum,sai=t2ce$sai,whm=t2ce$whm) 
 t2ce$totsp9 <- apply(sp9,1,sum)
 
-# Tidy up flag codes using those in t2ceLL file supplied by Carlos - all others get to be other.
+# Tidy up flag codes using those in t2ceLL file supplied by Carlos - all others get to be 'other'.
 
 flgs <- as.character(sort(unique(t2ceLL$FlagName)))
 mm <- match(as.character(t2ce$flagname),flgs)
@@ -199,12 +201,12 @@ codes_square_types<- import("/home/doug/Dropbox/Globefish-Consultancy-Services-2
 
 # Add on fleet codes and flagnames
 
-#t2ce$FleetCode <- flags$FleetCode[match(t2ce$FleetID,flags$FleetID)]
-#t2ce$FlagName <- flags$FlagName[match(t2ce$FleetCode,flags$FleetCode)] 
+t2ce$fleetcode <- flags$FleetCode[match(t2ce$fleetid,flags$FleetID)]
+t2ce$flagname <- flags$FlagName[match(t2ce$fleetcode,flags$FleetCode)] 
 
 # Create center point of each grid using Laurie's code lonLat #
 
-df <- data.frame(quad=t2ce$QuadID,lat=t2ce$Lat,lon=t2ce$Lon,square=t2ce$SquareTypeCode) # simplify data.frame
+df <- data.frame(quad=t2ce$quadid,lat=t2ce$L=lat,lon=t2ce$lon,square=t2ce$squaretypecode) # simplify data.frame
 df$square <- as.character(df$square) # function requires input to be 'character'
 
 hl <- length(df[,1])
@@ -227,8 +229,8 @@ sqlTables(chan)  # List all tables in the DB
 
 # Load data
 
-#sqlQuery(chan,'drop table t2ce') # upload the data. Takes ages so only need to do once.
-#sqlSave(chan,t2ce,tablename='t2ce')
+sqlQuery(chan,'drop table t2ce') # upload the data. Takes ages so only need to do once.
+sqlSave(chan,t2ce,tablename='t2ce')
 sqlQuery(chan,'drop table t2ce_long_format')
 sqlSave(chan,task2.lf[1,],tablename='t2ce_long_format')
 #sqlSave(chan,mean_weights,tablename='mean_weights') # 

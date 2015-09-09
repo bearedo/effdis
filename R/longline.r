@@ -45,9 +45,9 @@ effort_type_by_flag <- sqlQuery(chan, "SELECT flagname AS Flag, eff1type AS Effo
 
 
 #load('/media/doug/My Passport/effdis/.RData')
-#task2.lf <- read.table('/home/doug/effdis/data/task2.lf.csv',sep=',',header=T)
+task2.lf <- read.table('/home/doug/effdis/data/task2.lf.csv',sep=',',header=T)
 
-t2ce_lf_ll <- task2.lf[task2.lf$geargrpcode == 'LL' & task2.lf$month < 13,]
+#t2ce_lf_ll <- task2.lf[task2.lf$geargrpcode == 'LL' & task2.lf$month < 13,]
 t2ce_lf_ll <- orderBy(~flagname+trend,data=t2ce_lf_ll)
 
 for(i in c(4:7,12:14)) {t2ce_lf_ll[,i] <- ac(t2ce_lf_ll[,i])}

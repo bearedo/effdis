@@ -3,7 +3,7 @@ title: A MODELING APPROACH TO ESTIMATE OVERALL ATLANTIC FISHING EFFORT BY TIME-A
   STRATA (EFFDIS)
 author: "Globefish Consultancy Services"
 date: "14 July 2015"
-output: html_document
+output: pdf_document
 header-includes: \usepackage{tabularx}
 subtitle: Interim Progress Report to the ICCAT secretariat
 Grmd::docx_document:
