@@ -43,16 +43,15 @@ pp0_kg_nr$lnr <- log(pp0_kg_nr$measured_catch_nr)
 pp0_kg_nr$lkg <- log(pp0_kg_nr$measured_catch_kg)
 
 
-# Model kg data as a function of nr, flag and species
+# Model kg data as a function of nr and species
 
-m1 <- lm(measured_catch_kg~measured_catch_nr,data=pp0_kg_nr,na.action='na.omit')
-m2 <- lm(measured_catch_kg~measured_catch_nr+trend,data=pp0_kg_nr,na.action='na.omit')
-m3 <- lm(measured_catch_kg~measured_catch_nr+trend+species,data=pp0_kg_nr,na.action='na.omit')
-m4 <- lm(measured_catch_kg~measured_catch_nr+trend+species+flagname,data=pp0_kg_nr,na.action='na.omit')
+m1 <- lm(lkg~lnr,data=pp0_kg_nr,na.action='na.omit')
+m2 <- lm(lkg~lnr+trend,data=pp0_kg_nr,na.action='na.omit')
+m3 <- lm(lkg~lnr+trend+species,data=pp0_kg_nr,na.action='na.omit')
 
 #anova(m1,m2,m3,m4)
 
-best.model <- step(m4,direction='both')
+best.model <- step(m3,direction='both')
 
 
 print(summary(best.model))
