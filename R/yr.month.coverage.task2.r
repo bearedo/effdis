@@ -5,8 +5,19 @@ yr.month.coverage.task2.r<-function(tdata=t2ce,start.year=1950,end.year=2010,whi
   #3D plot to explore temporal confounding
   #tdata <- out; which.flag   <- 'Japan'; which.gear <- 'LL'
   #start.year <- 1960; end.year <- 2005
+  
+
+  n0 <- tdata[tdata$dsettype == 'n-',]
+  nw <- tdata[tdata$dsettype == 'nw',]
+  mm <- duplicated(nw[,-9])
+  nw <- nw[mm==TRUE,]
+  w0 <- tdata[tdata$dsettype == '-w',]
+  
+  tdata1 <- rbind(n0,nw,w0)
+  
   tdata1 <- tdata[tdata$month < 13,]
   fdata <- tdata1[tdata1$flagname == which.flag & tdata1$geargrpcode == which.gear & tdata1$region == which.region,]
+  
   
   dd <- dim(fdata)
   #print(dd)
