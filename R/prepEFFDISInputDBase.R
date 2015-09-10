@@ -229,15 +229,23 @@ sqlTables(chan)  # List all tables in the DB
 
 # Load data
 
+t2ce<- read.table('/home/doug/effdis/data/t2ce.csv',header=T,sep=',') # Read in from cloud server.
+
+
+
 sqlQuery(chan,'drop table t2ce') # upload the data. Takes ages so only need to do once.
-sqlSave(chan,t2ce,tablename='t2ce')
-sqlQuery(chan,'drop table t2ce_long_format')
-sqlSave(chan,task2.lf[1,],tablename='t2ce_long_format')
-#sqlSave(chan,mean_weights,tablename='mean_weights') # 
-#sqlSave(chan,fleet_ranks,tablename='fleet_ranks') # A worksheet
-#sqlSave(chan,t1det9sp,tablename='t1det9sp') # task1 data for raising
-#sqlSave(chan,flags,tablename='codes_flags_fleets') 
+#t2ce<- t2ce[,-1]
+#for(i in 19:55) {t2ce[,i]<-as.numeric(t2ce[,i])}
+#t2ce$fleetcode <- 
+sqlSave(chan,t2ce[1,],tablename='t2ce')
+#sqlQuery(chan,'drop table t2ce_long_format')
+#sqlSave(chan,task2.lf[1,],tablename='t2ce_long_format')
+sqlSave(chan,mean_weights,tablename='mean_weights') # 
+sqlSave(chan,fleet_ranks,tablename='fleet_ranks') # A worksheet
+sqlSave(chan,t1det9sp,tablename='t1det9sp') # task1 data for raising
+sqlSave(chan,flags,tablename='codes_flags_fleets') 
 psql -d effdis -U postgres -c "\COPY public.t2ce_long_format FROM '/home/dbeare/effdis/data/task2.lf.csv' WITH delimiter ',' CSV HEADER NULL AS 'NA';"
+psql -d effdis -h localhost -U postgres -c "\COPY public.t2ce FROM '/home/doug/effdis/data/t2ce.csv' WITH delimiter ',' CSV HEADER NULL AS 'NA';"
 
 
 # Load codes #
@@ -250,7 +258,7 @@ sqlSave(chan,codes_time_periods,tablename='codes_time_periods')
 
 # Get the data from the database to check #
 
-#t2ce <- sqlQuery(chan, "SELECT * FROM t2ce LIMIT 5;") # Extract first five rows
+t2ce <- sqlQuery(chan, "SELECT * FROM t2ce LIMIT 5;") # Extract first five rows
 #t2ce$trend <- trend.r(year=t2ce$yearc,month=t2ce$timeperiodid,start.year=1950)
 
 
