@@ -3,7 +3,7 @@ convert2long.format.t2.r<-function(input=t2ce)
   
 # Convert standard task2 input data to long format using output of get.effdis.data.r and prepare.effdis.data.r
   
-tdata <- ps
+tdata <- input
 
 #Just use relevant columns
 
@@ -28,6 +28,5 @@ task2.lf
 
 }
 
-ps <- get.effdis.t2.data.r(which.gear='LL',which.flag='All',which.effort='NO.HOOKS')
-#ps<-prepare.effdis.data.r(input=ps)
-#pslf <- convert2long.format.t2.r(input =ps)
+
+
