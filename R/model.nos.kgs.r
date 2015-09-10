@@ -1,6 +1,6 @@
 
 
-model.nos.kgs.r <- function(input = pslf,which.gear='LL',which.effort='NO.HOOKS')
+model.nos.kgs.r <- function(which.gear='LL',which.effort='NO.HOOKS')
 {
   #Function finds the data in the task2 db which is available for both weights (kgs) and numbers. It then models kgs as a function of nos plus some other relevant covariates.
   ps <- get.effdis.t2.data.r(which.gear=which.gear,which.flag='All',which.effort=which.effort,which.dsettype = 'nw') # Get data for which there are nos and weights
@@ -32,7 +32,7 @@ pp0_kg_nr <- merge(pp0_kg[,-4],pp0_nr[,-4])
 # Plot the relationship between nrs and kgs for different species, flag combinations
 
 #library(lattice)
-#xyplot(log(measured_catch_kg)~log(measured_catch_nr),groups=flagname,data=pp0_kg_nr[pp0_kg_nr$species=='bft',])
+xyplot(log(measured_catch_kg)~log(measured_catch_nr),groups=flagname,data=pp0_kg_nr[pp0_kg_nr$species=='bft',])
 
 #xyplot(log(measured_catch_kg)~log(measured_catch_nr)|species,auto.key=TRUE,groups=flagname,data=pp0_kg_nr)
 
@@ -43,7 +43,11 @@ pp0_kg_nr$lnr <- log(pp0_kg_nr$measured_catch_nr)
 pp0_kg_nr$lkg <- log(pp0_kg_nr$measured_catch_kg)
 
 
+
 # Model kg data as a function of nr and species
+
+pp0_kg_nr$lnr[pp0_kg_nr$lnr == '-Inf'] <- NA
+pp0_kg_nr$lkg[pp0_kg_nr$lkg == '-Inf'] <- NA
 
 m1 <- lm(lkg~lnr,data=pp0_kg_nr,na.action='na.omit')
 m2 <- lm(lkg~lnr+trend,data=pp0_kg_nr,na.action='na.omit')
