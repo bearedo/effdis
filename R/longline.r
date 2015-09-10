@@ -95,9 +95,9 @@ t2ce_lf_ll <- t2ce_lf_ll[t2ce_lf_ll$catchunit != '--',]
 
 ## Get the depths ## 
 
-# t2ce_distinct_locations <- readOGR(dsn="PG:host=134.213.29.249 user=postgres password=Postgres1 dbname=effdis port=5432", layer = "public.t2ce_distinct_locations_covariates", verbose = TRUE)
+t2ce_distinct_locations <- readOGR(dsn="PG:host=134.213.29.249 user=postgres password=Postgres1 dbname=effdis port=5432", layer = "public.t2ce_distinct_locations_covariates", verbose = TRUE)
 
-# t2ce_distinct_locations <- readOGR(dsn="PG:dbname=effdis host=134.213.29.249 user=postgres password=Postgres1", layer = "public.world_seas", verbose = TRUE)
+t2ce_distinct_locations <- readOGR(dsn="PG:dbname=effdis host=134.213.29.249 user=postgres password=Postgres1", layer = "public.world_seas", verbose = TRUE, encoding = "")
 
 source('/home/doug/effdis/R/add.covariates.r')
 

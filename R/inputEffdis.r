@@ -28,7 +28,7 @@ sqlTables(chan)  #List all tables in the DB
 #t2ce <- sqlFetch(chan, "t2ce") # Return a table as a dataframe
 dimnames(t2ce)[[2]][55:56] <- c('longitude','latitude')
 #sqlQuery(chan,'drop table t2ce')
-#sqlSave(chan,t2ce,tablename='t2ce')
+sqlSave(chan,t2ce,tablename='t2ce')
 
 
 #Add comments
