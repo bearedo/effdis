@@ -267,9 +267,10 @@ head(t2ce_lf_ll)
 ### Split data into kg and nr ###
 
 t2ce_lf_ll_kg <- t2ce_lf_ll[t2ce_lf_ll$dsettype %in% c('-w','nw'),]
+
 t2ce_lf_ll_kg <- t2ce_lf_ll_kg[t2ce_lf_ll_kg$catchunit  != "--",]
 
-t2ce_lf_ll_nr <- t2ce_lf_ll[t2ce_lf_ll$dsettype == 'n-',] # Only data where only nunmbers have been supplied
+t2ce_lf_ll_nr <- t2ce_lf_ll[t2ce_lf_ll$dsettype == 'n-',] # Only data where ONLY numbers have been supplied
 
 # Convert measured catch to kgs with m5 #
 
@@ -278,6 +279,7 @@ t2ce_lf_ll_nr$lnr<- log(t2ce_lf_ll_nr$measured_catch)
 aa <- predict(m1,t2ce_lf_ll_nr,type='response')
 
 t2ce_lf_ll_nr$measured_catch <- exp(aa)
+
 aa[t2ce_lf_ll_nr$measured_catch == 0] <- 0
 
 # Recombine with t2ce_lf_ll_kg #
