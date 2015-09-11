@@ -10,7 +10,7 @@ get.effdis.t2.data.r <- function(which.dsn="effdis-tuna-cc1",which.gear='LL',whi
   
   # Function to extract task 2 data from effdis cloud server ()
   
-  chan <- odbcConnect("effdis-tuna-cc1", case="postgresql", believeNRows=FALSE) # Connect to database
+  chan <- odbcConnect(which.dsn, case="postgresql", believeNRows=FALSE) # Connect to database
   
 if(which.flag=='All') # If which.flag is 'All' extract all data
   {
