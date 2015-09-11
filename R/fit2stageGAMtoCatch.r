@@ -17,8 +17,8 @@ fit2stageGAMtoCatch.r <- function (input = pslf,which.species ='bft',start.year=
     
    input$lmeasured_catch <- log(input$measured_catch+1)
   
-  ## Binomial (Bernoulli) model for probability of catch
-  
+  ## Bernouilli model for probability of catch
+   
   bs<-"cr"
   
   b1 <- gam(bin~te(longitude,latitude,k=12,bs=bs)+te(trend,k=6,bs=bs)+te(month,k=3,bs=bs),family=quasibinomial(link="logit"),method="REML",data=input)
