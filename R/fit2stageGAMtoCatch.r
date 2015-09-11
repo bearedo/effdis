@@ -1,7 +1,8 @@
-fit2stageGAMtoCatch.r <- function (input = pslf)
+fit2stageGAMtoCatch.r <- function (input = pslf,which.species ='bft')
 {
   
-   input <- xxx
+   which.species <- 'bft'
+   input <- xxx[xxx$species == which.species,]
   
   ## Take out the kgs. [NB. The flags which report only numbers have been converted.]
   
@@ -30,6 +31,7 @@ fit2stageGAMtoCatch.r <- function (input = pslf)
   
   b1 <- gam(bin~te(longitude,latitude,k=12,bs=bs)+te(trend,k=6,bs=bs)+te(month,k=3,bs=bs),family=quasibinomial(link="logit"),method="REML",data=dat1)
   
+
   print(summary(b1))
   
   #Gamma model for task 2 catch 
@@ -38,14 +40,5 @@ fit2stageGAMtoCatch.r <- function (input = pslf)
   
   print(summary(g1))
   gc()
-  
-  
-  
-  
-  
-  
-  
-  
-  
   
 }
