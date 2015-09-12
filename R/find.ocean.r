@@ -2,7 +2,7 @@
 find.ocean.r <- function(input=grd)
 {
   
-  # Function takes a data frame of locations (must be called latitude and longitue) and adds a vector telling you 
+  # Function takes a data frame of locations (must be called latitude and longitude) and adds a vector telling you 
   # whether it is in Atlantic, Pacific or Med. The definitions of the 'Atlantic' etc are very general.
   #input <- grd
   seas <- readOGR(dsn="/home/doug/effdis/data", layer="World_Seas") # World seas and oceans
@@ -61,6 +61,6 @@ find.ocean.r <- function(input=grd)
   
   input$which.ocean <- which.ocean
   
-  out <- list(output=input)
-  out
+  input
+  
 }
