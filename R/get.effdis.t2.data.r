@@ -1,12 +1,12 @@
 get.effdis.t2.data.r <- function(which.dsn="effdis-tuna-cc1",which.gear='LL',which.region='AT',which.flag='All',
-                                 which.effort='NO.HOOKS',which.dsettype='-w')
+                                 which.dsettype='-w')
 {
 
-  #which.gear <- "LL"
-  #which.region <- "AT"
-  #which.flag <- "EU.Portugal"
-  #which.effort <- "NO.HOOKS"
-  #which.dsettype <- 'nw'
+ # which.gear <- "LL"
+ # which.region <- "AT"
+ # which.flag <- "EU.Portugal"
+ # which.effort <- "NO.HOOKS"
+ # which.dsettype <- 'nw'
   
   # Function to extract task 2 data from effdis cloud server ()
   
@@ -18,8 +18,8 @@ if(which.flag=='All') # If which.flag is 'All' extract all data
 geargrpcode,longitude,latitude, catchunit, dsettype, eff1, eff1type,
 alb,bft,bet,skj,yft,swo,bum,sai,whm,totsp9
 FROM t2ce
-WHERE region =","'",which.region,"'","AND timeperiodid < 13 AND eff1type=","'",which.effort,"'",
-                  "AND geargrpcode=","'",which.gear,"'","AND dsettype=","'",which.dsettype,"'")
+WHERE region =","'",which.region,"'","AND timeperiodid < 13 AND geargrpcode=","'",which.gear,"'",
+                  "AND dsettype=","'",which.dsettype,"'")
   }
 
 else{
@@ -28,14 +28,15 @@ geargrpcode,longitude,latitude, catchunit, dsettype, eff1, eff1type,
 alb,bft,bet,skj,yft,swo,bum,sai,whm,totsp9
 
 FROM t2ce
-WHERE region =","'",which.region,"'","AND timeperiodid < 13 AND eff1type=","'",which.effort,"'",
-"AND geargrpcode=","'",which.gear,"'","AND flagname=","'",which.flag,"'","AND dsettype=","'",which.dsettype,"'")
+WHERE region =","'",which.region,"'","AND timeperiodid < 13 AND geargrpcode=","'",which.gear,"'",
+                "AND flagname=","'",which.flag,"'","AND dsettype=","'",which.dsettype,"'")
 }
 
   out <- sqlQuery(chan,query)
   
-  out
+  odbcClose(chan)
   
+  out
 }
 
 

@@ -6,6 +6,7 @@ find.ocean.r <- function(input=grd)
   # whether it is in Atlantic, Pacific or Med. The definitions of the 'Atlantic' etc are very general.
   #input <- grd
   seas <- readOGR(dsn="/home/doug/effdis/data", layer="World_Seas") # World seas and oceans
+  geogWGS84 <- CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs") # Make sure proj is what we think it is.
   seas@proj4string <- geogWGS84
   seas.polys <- as.character(sort(unique(seas@data$NAME)))
   
@@ -33,7 +34,7 @@ find.ocean.r <- function(input=grd)
   gog  <- grep('Guin',seas.polys)
   
   # Create multi-polygons for selection.
-  atlantic <- seas[seas@data$NAME %in% seas.polys[c(wo,wm,wn,wp,wq,wr,ws,wt,wv,wx,wmm,gog)],] # create object of Atlantic polygons
+  atlantic <- seas[seas@data$NAME %in% seas.polys[c(wo,wp,ws,wv,wmm,gog)],] # create object of Atlantic polygons
   med <-      seas[seas@data$NAME %in% seas.polys[c(wi,wj,wk,wl,wu,wz,wa,wzz,wxx)],]
   pacific   <- seas[seas@data$NAME %in% seas.polys[c(wpa)],]
   
