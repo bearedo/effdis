@@ -16,6 +16,8 @@ library(maps)
 library(mapdata)
 #library(COZIGAM)
 library(RODBC)
+library(reshape2)
+library(mgcv)
 
 setwd("/home/doug/effdis")
 

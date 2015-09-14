@@ -1,24 +1,16 @@
 
 
-model.nos.kgs.r <- function(which.gear='LL',which.effort='NO.HOOKS')
+model.nos.kgs.r <- function(input=pslf,which.dsn='effdis-local',which.gear='LL')
 {
-  #Function finds the data in the task2 db which is available for both weights (kgs) and numbers. It then models kgs as a function of nos plus some other relevant covariates.
-  ps <- get.effdis.t2.data.r(which.gear=which.gear,which.flag='All',which.effort=which.effort,which.dsettype = 'nw') # Get data for which there are nos and weights
-  print(dim(ps))
-  ps<-prepare.effdis.data.r(input=ps)
-  pslf <- convert2long.format.t2.r(input =ps)
-  
-  
-  input <- pslf
-
-
+  #Function finds the data in the task2 db (long-format) which is available for both weights (kgs) and numbers. 
+  #It then models kgs as a function of nos plus some other relevant covariates.
+ 
 #Sum catches (kgs and nos) over catchunit
 
 pp0 <- aggregate(list(measured_catch=input$measured_catch), 
                  by=list(trend=input$trend,month=input$month,
                          flagname=input$flagname,catchunit=input$catchunit,
                          species=input$species),sum,na.rm=T)
-
 # Split into two
 
 pp0_nr <- pp0[pp0$catchunit == 'nr',]
