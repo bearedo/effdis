@@ -1,31 +1,36 @@
 
 
 
-fit2stageGAMtoCatch.r <- function (input = pslf,which.species ='bft',start.year=1950, end.year=2015,which.flag='Japan')
+fit2stageGAMtoCatch.r <- function (input = pslf,which.species ='bft',start.year=1950, end.year=2015,which.flag='Japan',kk=6)
 
    # Function to fit GAMs to Effdis catch data. 
    # b1 is the probability of catching a fish as a function of location and time.
    # g1 models the positive component of the catch as a function of location and time.
   {
   
-  # which.species <- 'alb'
-  # which.flag <- 'Japan'
-  # start.year <- 1990
-  # end.year   <- 2010
+   #input <- long_line_lf;which.species <- 'bft';which.flag <- 'Japan';start.year <- 1990; end.year   <- 2010
    
-   input <- lllf[lllf$species == which.species,]
+   input <- input[input$species == which.species,]
    input <- input[input$year >= start.year & input$year <= end.year,]
    
    if(which.flag=='All')
-   {input <- input; print('Modeling all data')}
+   {
+     input <- input; print('Modeling all data')
+     }
    
-   else{input <- input[input$flagname == which.flag,]
-   print(paste('Modeling',which.flag))}
+   else{
+     input <- input[input$flagname == which.flag,]
+   #print(paste('Modeling',which.flag))
+   }
    
    bin <- ifelse(input$measured_catch==0,0,1) # Binary variable
    input$bin <- bin
    
-  ## Take out the kgs. [NB. The flags which report only numbers have been converted.]
+   tbin <- table(input$bin)
+   
+   if(tbin[2] > 99)
+   {
+  ## Take out only the kgs. [NB. The flags which report only numbers have been converted.]
   
    input <- input[input$catchunit == 'kg',]
     
@@ -35,9 +40,9 @@ fit2stageGAMtoCatch.r <- function (input = pslf,which.species ='bft',start.year=
    
   bbs<-"cr"
   
-  b1 <- gam(bin~te(longitude,latitude,k=12,bs=bbs)+te(trend,k=6,bs=bbs)+te(month,k=3,bs=bbs),family=quasibinomial(link="logit"),method="REML",data=input)
+  b1 <- gam(bin~te(longitude,latitude,k=kk,bs=bbs)+te(trend,k=6,bs=bbs)+te(month,k=3,bs=bbs),family=quasibinomial(link="logit"),method="REML",data=input)
   
-  print(summary(b1))
+  #print(summary(b1))
   
   #Gamma model for the positive component of task 2 catch data
   
@@ -48,14 +53,19 @@ fit2stageGAMtoCatch.r <- function (input = pslf,which.species ='bft',start.year=
   input1$bin <- bin
   input2 <- input1[input1$bin == 1,]
   
-  g1 <- gam(measured_catch~te(longitude,latitude,k=6,bs=bbs)+te(trend,k=6,bs=bbs)+te(month,k=3,bs=bbs),family=Gamma(link="log"),method="REML",data=input2)
+  g1 <- gam(measured_catch~te(longitude,latitude,k=kk,bs=bbs)+te(trend,k=6,bs=bbs)+te(month,k=3,bs=bbs),family=Gamma(link="log"),method="REML",data=input2)
   
-  print(summary(g1))
+  #print(summary(g1))
   
   gc(reset=T)
   
   mods <- list(pmod = b1, pmod.data=input, gmod = g1, gmod.data = input2)
   
   mods
+   }
+  
+  else{ print ('Insufficient data to support model')}
+  
+  
 }
 

@@ -18,28 +18,7 @@ library(RODBC)
 library(reshape2)
 library(mgcv)
 
-
-
-
-# Purse-seine example #
-
-psn <- get.effdis.t2.data.r(which.gear='PS',which.flag='All',which.effort='D.FISH',which.dsettype = 'n-')
-psnw <- get.effdis.t2.data.r(which.gear='PS',which.flag='All',which.effort='D.FISH',which.dsettype = 'nw')
-psw <- get.effdis.t2.data.r(which.gear='PS',which.flag='All',which.effort='D.FISH',which.dsettype = '-w')
-
-ps1 <- rbind(psn,psnw,psw)
-
-ps1<-prepare.effdis.data.r(input=ps1)
-ps1<-find.ocean.r(ps1)$output
-ps1 <- ps1[ps1$which.ocean == 'atl',]
-
-pslf <- convert2long.format.t2.r(input =ps1)
-bm <- model.nos.kgs.r(input=t2ce)
-
-xxx <- kgs.from.nos.r(pslf)
-
-
-# Longline example #
+# Load scripts #
 
 setwd('/home/doug/effdis/R')
 source('fitGAMtoEffort.r')
@@ -52,13 +31,173 @@ source('kgs.from.nos.r')
 source('predict.effdis.t2.data.r')
 source('find.ocean.r')
 
+# Purse-seine example #
+
+# Get data for each dsettype
+
+psn  <- get.effdis.t2.data.r(which.dsn='effdis-local',which.gear='PS',which.flag='All',which.dsettype = 'n-')
+psnw <- get.effdis.t2.data.r(which.dsn='effdis-local',which.gear='PS',which.flag='All',which.dsettype = 'nw')
+psw  <- get.effdis.t2.data.r(which.dsn='effdis-local',which.gear='PS',which.flag='All',which.dsettype = '-w')
+
+ps1 <- rbind(psn,psnw,psw)
+
+table(ps1$squaretypecode,ps1$flagname)
+
+#t2 <- tapply(ll1$totsp9,list(ll1$flagname,ll1$year),sum,na.rm=T)
+
+ps1<-find.ocean.r(ps1)
+ps1 <- ps1[ps1$which.ocean == 'atl',]
+ps1<-prepare.effdis.data.r(input=ps1)
+ps1<-ps1[ps1$squaretypecode == '1x1',]
+
+library(reshape2)
+pslf <- convert2long.format.t2.r(input =ps1)
+
+#bm <- model.nos.kgs.r(input=pslf,which.gear='PS')
+
+#pslf <- kgs.from.nos.r(pslf) # Not relevant for PS 
+
+table(pslf$eff1type)
+
+# D.AT SEA    D.FISH  NO.BOATS    -none- FISH.HOUR HOURS.SEA   NO.SETS  NO.TRIPS  SUC.D.FI  SUC.SETS 
+# 2457    643176       297      2376    925920         0     28008       423         9        72 
+
+pslf <- pslf[pslf$eff1type %in% c('D.FISH','FISH.HOUR'),]
+pslf$eff1[pslf$eff1type == 'D.FISH'] <- pslf$eff1[pslf$eff1type == 'D.FISH']*24
+pslf$eff1type <- 'FISH.HOUR'
+
+w0 <- (1:length(pslf$year))[pslf$catchunit == 'kg']
+
+round(tapply(pslf$measured_catch[w0],list(pslf$flagname[w0],pslf$species[w0]),sum,na.rm=T))/1000
+
+#                alb       bft        bet         skj         yft   swo   bum  sai whm
+# U.S.A.         25.825 31397.963   2360.765  128429.735  103531.315 0.000 0.000 0.00   0
+# EU.España    4521.090   903.900 168162.540 1140806.620 1216948.670 0.000 0.000 0.00   0
+# Other        4299.320  3451.287 274045.180 1279444.048 1629395.695 0.000 0.000 0.00   0
+# Belize         96.125     0.000      0.000       0.000       0.000 0.000 0.000 0.00   0
+# Brasil          0.000     0.000      0.000     808.425     504.000 0.000 0.000 0.00   0
+# EU.Malta           NA        NA         NA          NA          NA    NA    NA   NA  NA
+# EU.Portugal     7.120     0.865      0.000      14.069       0.437 0.026 0.797 0.31   0
+# Japan          25.100     0.000    182.700   23822.400   18998.900 0.000 0.000 0.00   0
+# Panama         38.530     0.000  16523.880   76855.650   43251.450 0.000 0.000 0.00   0
+# South Africa    0.000     0.000      0.000     122.000     151.000 0.000 0.000 0.00   0
+# U.S.S.R.           NA        NA         NA          NA          NA    NA    NA   NA  NA
+# Venezuela    2941.085     0.000   6041.951  120893.778  194309.645 0.000 0.000 0.00   0
+            
+alb.ps <- fit2stageGAMtoCatch.r(input=pslf,which.flag='EU.España',which.species='alb',start.year=1970,end.year=2010)
+#bft.ps <- fit2stageGAMtoCatch.r(input=pslf,which.flag='EU.España',which.species='bft',start.year=1970,end.year=2010,kk=3)
+bet.ps <- fit2stageGAMtoCatch.r(input=pslf,which.flag='EU.España',which.species='bet',start.year=1970,end.year=2010)
+skj.ps <- fit2stageGAMtoCatch.r(input=pslf,which.flag='EU.España',which.species='skj',start.year=1970,end.year=2010)
+yft.ps <- fit2stageGAMtoCatch.r(input=pslf,which.flag='EU.España',which.species='yft',start.year=1970,end.year=2010)
+
+# Do we just assume here that once we've modeled NO.HOOKS as a function of time we can use that sensibly ?
+
+emod.ps <- fitGAMtoEffort.r(input=pslf,which.flag='EU.España',which.effort='FISH.HOUR',start.year=1990,end.year=2010)
+
+# Create grids and predict over them ###
+
+alb.aa.ps <- predict.effdis.t2.data.r(cmod=alb.ps, effmod=emod.ps,grid.res=1,start.year=1970,end.year=2010,which.flag='EU.España',which.gear = 'PS')
+#bft.aa.ps <- predict.effdis.t2.data.r(cmod=bft.ps, effmod=emod.ps,grid.res=5,start.year=1970,end.year=2010,which.flag='EU.España',which.gear = 'PS')
+bet.aa.ps <- predict.effdis.t2.data.r(cmod=bet.ps, effmod=emod.ps,grid.res=1,start.year=1970,end.year=2010,which.flag='EU.España',which.gear = 'PS')
+skj.aa.ps <- predict.effdis.t2.data.r(cmod=skj.ps, effmod=emod.ps,grid.res=1,start.year=1970,end.year=2010,which.flag='EU.España',which.gear = 'PS')
+yft.aa.ps <- predict.effdis.t2.data.r(cmod=yft.ps, effmod=emod.ps,grid.res=1,start.year=1970,end.year=2010,which.flag='EU.España',which.gear = 'PS')
+
+
+# Plot data 
+par(mfrow=c(3,3))
+plot.mods.r(input=alb.aa.ps,cmod=alb.ps,what.year = 1992,what.month=1,what.value = 'catch',grid.res=1)
+#plot.mods.r(input=bft.aa,cmod=bft,what.year = 1995,what.month=1,what.value = 'prob',grid.res=5)
+plot.mods.r(input=bet.aa.ps,cmod=bet.ps,what.year = 1994,what.month=3,what.value = 'catch',grid.res=1,plot.samples.only=T)
+plot.mods.r(input=skj.aa.ps,cmod=skj.ps,what.year = 1995,what.month=1,what.value = 'catch',grid.res=1)
+par(mfrow=c(3,4))
+for(i in 1:12)
+{
+plot.mods.r(input=yft.aa.ps,cmod=yft.ps,what.year = 1995,what.month=i,what.value = 'prob',grid.res=1)
+}
+
+plot(alb.aa$longitude,alb.aa$latitude)
+points(alb$pmod.data$longitude,alb$pmod.data$latitude,col='red')
+
+#Get Task 1 data
+
+ps.t1 <- get.effdis.t1.data.r(which.dsn='effdis-local',which.gear = 'PS',which.region='AT',which.flag='EU.España')
+#ll.t1 <- get.effdis.t1.data.r(which.dsn='effdis-local',which.gear = 'LL',which.region='AT',which.flag='All')
+
+w1 <- (1:length(ps.t1[,1]))[ps.t1$yearc == 1990]
+tapply(ps.t1$qty_t[w1],list(ps.t1$flag[w1],ps.t1$species[w1]),sum,na.rm=T)
+
+# See task 1 totals by species
+
+t1x <- aggregate(list(qty_t=ps.t1$qty_t),list(year=ps.t1$yearc,species = ps.t1$species),sum,na.rm=T)
+t1x[t1x$species == 'bet',]
+
+#Bind up estimates for 4 different species
+
+big <- rbind(alb.aa.ps,bet.aa.ps,skj.aa.ps,yft.aa.ps)
+
+big<- big[big$which.ocean == "atl",]
+
+big$catch[big$observation == FALSE] <- NA
+big$prob[big$observation == FALSE] <- NA
+big$measured_catch[big$observation == FALSE] <- NA
+big$eff[big$observation == FALSE]  <- NA
+
+#xxx <- aggregate(list(measured_catch=big$measured_catch,catch=big$catch,eff=big$eff), 
+#by=list(year=big$year,species=big$species),sum,na.rm=T)
+
+#xxx.90 <- xxx[xxx$year == 1990 & xxx$species == 'bft',]
+#sum(xxx.90$catch)/1000
+
+
+#Convert catch to tonnes from kgs
+
+big$catch <- big$catch/1000
+big$measured_catch <- big$measured_catch/1000
+big$eff <- big$eff/4 # Effort is the same for each species so divide by 4
+
+
+big1 <- aggregate(list(measured_catch=big$measured_catch,catch=big$catch,eff=big$eff), 
+                  by=list(year=big$year),sum,na.rm=T)
+
+big1$cpue <- big1$catch/big1$eff
+
+
+# Aggregate estimates from Task 1
+
+sum.t1 <- aggregate(list(qty_t=ll.t1$qty_t),list(year=ll.t1$yearc),sum,na.rm=T)
+
+# Merge t1 and t2
+
+big2 <- merge(big1,sum.t1)
+
+big2$cpue <- big2$measured_catch/big2$eff
+
+
+plot(big2$year,big2$catch,ylim=c(range(big2$catch,big2$qty_t)))
+lines(big2$year,big2$qty_t)
+
+
+big2$new.effort <- big2$qty_t/big2$cpue
+
+write.table(big2,'/home/doug/effdis/data/effdis-estimate.csv',sep=',',row.names=F)
+
+par(mfrow=c(1,1))
+plot(big2$year,big2$new.effort/1000000,xlim=c(1970,2010),type='l')
+
+##########################################
+######## Longline example ################
+##########################################
+
+
 # Get data for each dsettype
 
 lln  <- get.effdis.t2.data.r(which.dsn='effdis-local',which.gear='LL',which.flag='All',which.dsettype = 'n-')
 llnw <- get.effdis.t2.data.r(which.dsn='effdis-local',which.gear='LL',which.flag='All',which.dsettype = 'nw')
 llw  <- get.effdis.t2.data.r(which.dsn='effdis-local',which.gear='LL',which.flag='All',which.dsettype = '-w')
-
 ll1 <- rbind(lln,llnw,llw)
+
+#t2 <- tapply(ll1$totsp9,list(ll1$flagname,ll1$year),sum,na.rm=T)
+
 ll1<-find.ocean.r(ll1)
 ll1 <- ll1[ll1$which.ocean == 'atl',]
 ll1<-prepare.effdis.data.r(input=ll1)
@@ -70,6 +209,16 @@ bm <- model.nos.kgs.r(input=lllf,which.gear='LL')
 
 lllf <- kgs.from.nos.r(lllf) # for those fleets that supply only number
 
+three.d.catch.by.year.r(tdata=lllf,scaling.f=100)
+
+t2 <- aggregate(list(measured_catch=lllf$measured_catch),
+                list(species=lllf$species,catchunit=lllf$catchunit,flagname=lllf$flagname,year=lllf$year),sum,na.rm=T)
+
+xx <- t2[t2$year == 1990 & t2$flagname == 'Japan' & t2$catchunit == 'kg',]
+
+xx$measured_catch<- xx$measured_catch/1000
+
+
 table(lllf$eff1type)
 
 # D.AT SEA   D.FISH NO.BOATS NO.HOOKS   -none-  NO.SETS NO.TRIPS SUC.D.FI SUC.SETS 
@@ -77,62 +226,151 @@ table(lllf$eff1type)
 
 lllf <- lllf[lllf$eff1type=='NO.HOOKS',]
 
-round(tapply(lllf$measured_catch,list(lllf$flagname,lllf$species),sum))
-# 
-#                                   alb       bft       bet     skj       yft       swo      bum      sai      whm
-# Belize                        1071895         0    234674     221   3703162    607120     6972    86433        0
-# Brasil                       29528868     36689  23280684  304638  23561886  44227091  4165724  2695229  2539062
-# China P.R.                    1680863    651431  71963332       0  11669700   4907148   578185    75977    92565
-# Chinese Taipei             1112048944   2268735 427433167 4050376 168825153  63878088 21988107  4491598 16863009
-# Cuba                          2318702    140124  17544588  194544  46411223  12586091  1526797        0        0
-# EU.España                           0       583         0       0         0 330590030        0        0        0
-# EU.Portugal                    401905      5671   1025803   85984    980496   7590550   186347   253279    46087
-# Japan                       427690181 108263219 885670651  391070 530186651 153341434 63410090 30414446 22801198
-# Korea Rep.                   22400908     52906  87711722   53955  58933158   7521993  1855169   488125   619906
-# Maroc                               0         0    173004       0         0   1569999        0        0        0
-# Mexico                            161    168022     52345   58300  12145359    357940   680208  1054383   175191
-# Namibia                       3904680         0   1069953    2001    152481   4476566        0        0        0
-# Other                       234209669   2365851  84171421      20  79942111   4041531    25248     1129     3737
-# Panama                         454275      7750    472800       0   3408783    151500        0        0        0
-# Philippines                    365909         0  13197249       0   1657759    268181    10851        0     2986
-# South Africa                  3164360         0   2075170   88103   1570356   2257357     6201       70     1800
-# St. Vincent and Grenadines    3259883         0   1671089  587912  13679789    148932        0   353133    43775
-# Trinidad and Tobago            101989         0    216221      75   3528001    319819   114491    96471    64113
-# Uruguay                        999233      2800   4061848       0    429170  13341174        0        0        0
-# U.S.A.                        9377762   4084505  29461113  313144  88348762 164941702  2164056   632043   796426
-# U.S.S.R.                            0         0   9325000       0   3826000    430000   112000    52000        0
-# Vanuatu                       3384988         0    274000       0   2265401    117402     3418        0      260
-# Venezuela                     2894234         0   7682840    7200  14322296    214114   720908   741495   647481
+w0 <- (1:length(lllf$year))[lllf$catchunit == 'kg' & lllf$year == 1990]
 
-alb <- fit2stageGAMtoCatch.r(input=lllf,which.flag='All',which.species='alb',start.year=1990,end.year=2010)
-bft <- fit2stageGAMtoCatch.r(input=lllf,which.flag='All',which.species='bft',start.year=1990,end.year=2010)
-bet <- fit2stageGAMtoCatch.r(input=lllf,which.flag='All',which.species='bet',start.year=1990,end.year=2010)
-skj <- fit2stageGAMtoCatch.r(input=lllf,which.flag='All',which.species='skj',start.year=1990,end.year=2010)
-yft <- fit2stageGAMtoCatch.r(input=lllf,which.flag='All',which.species='yft',start.year=1990,end.year=2010)
-swo <- fit2stageGAMtoCatch.r(input=lllf,which.flag='All',which.species='swo',start.year=1990,end.year=2010)
-bum <- fit2stageGAMtoCatch.r(input=lllf,which.flag='All',which.species='bum',start.year=1990,end.year=2010)
-sai <- fit2stageGAMtoCatch.r(input=lllf,which.flag='All',which.species='sai',start.year=1990,end.year=2010)
-whm <- fit2stageGAMtoCatch.r(input=lllf,which.flag='All',which.species='whm',start.year=1990,end.year=2010)
+round(tapply(lllf$measured_catch[w0],list(lllf$flagname[w0],lllf$species[w0]),sum,na.rm=T))/1000
 
+#                                  alb      bft       bet   skj      yft       swo      bum     sai     whm
+# Belize                            NA       NA        NA    NA       NA        NA       NA      NA      NA
+# Brasil                       312.900    0.200   366.700 0.000   91.800   657.300   32.800  10.800 114.800
+# China P.R.                        NA       NA        NA    NA       NA        NA       NA      NA      NA
+# Chinese Taipei             20626.300    0.000  7382.400 0.000 4790.700  1376.100  842.900   0.000 382.900
+# Cuba                          18.614    0.000   119.952 0.000  720.171   659.487   94.863   0.000   0.000
+# EU.España                      0.000    0.000     0.000 0.000    0.000 11499.900    0.000   0.000   0.000
+# EU.Portugal                    0.000    0.000    15.800 0.000    0.000     5.700    0.000   0.000   0.000
+# Japan                       2786.086 1773.345 28676.396 3.286 6845.953  6891.250 1018.155 206.046 150.495
+# Korea Rep.                    25.300    0.000  1038.800 0.000  336.900   155.800   45.000   5.100  10.900
+# Maroc                             NA       NA        NA    NA       NA        NA       NA      NA      NA
+# Mexico                            NA       NA        NA    NA       NA        NA       NA      NA      NA
+# Namibia                           NA       NA        NA    NA       NA        NA       NA      NA      NA
+# Other                             NA       NA        NA    NA       NA        NA       NA      NA      NA
+# Panama                            NA       NA        NA    NA       NA        NA       NA      NA      NA
+# Philippines                       NA       NA        NA    NA       NA        NA       NA      NA      NA
+# South Africa                      NA       NA        NA    NA       NA        NA       NA      NA      NA
+# St. Vincent and Grenadines        NA       NA        NA    NA       NA        NA       NA      NA      NA
+# Trinidad and Tobago               NA       NA        NA    NA       NA        NA       NA      NA      NA
+# Uruguay                        0.000    0.000    37.148 0.000    0.000   271.758    0.000   0.000   0.000
+# U.S.A.                       427.526   73.961  1350.313 0.000 3315.303 10648.827    9.271   2.941   2.532
+# U.S.S.R.                       0.000    0.000    95.000 0.000  190.000     0.000    0.000   0.000   0.000
+# Vanuatu                           NA       NA        NA    NA       NA        NA       NA      NA      NA
+# Venezuela                         NA       NA        NA    NA       NA        NA       NA      NA      NA
 
+alb <- fit2stageGAMtoCatch.r(input=lllf,which.flag='Japan',which.species='alb',start.year=1970,end.year=2010)
+bft <- fit2stageGAMtoCatch.r(input=lllf,which.flag='Japan',which.species='bft',start.year=1970,end.year=2010)
+bet <- fit2stageGAMtoCatch.r(input=lllf,which.flag='Japan',which.species='bet',start.year=1970,end.year=2010)
+skj <- fit2stageGAMtoCatch.r(input=lllf,which.flag='Japan',which.species='skj',start.year=1970,end.year=2010)
+yft <- fit2stageGAMtoCatch.r(input=lllf,which.flag='Japan',which.species='yft',start.year=1970,end.year=2010)
+swo <- fit2stageGAMtoCatch.r(input=lllf,which.flag='Japan',which.species='swo',start.year=1970,end.year=2010)
+bum <- fit2stageGAMtoCatch.r(input=lllf,which.flag='Japan',which.species='bum',start.year=1970,end.year=2010)
+sai <- fit2stageGAMtoCatch.r(input=lllf,which.flag='Japan',which.species='sai',start.year=1970,end.year=2010)
+whm <- fit2stageGAMtoCatch.r(input=lllf,which.flag='Japan',which.species='whm',start.year=1970,end.year=2010)
 
 # Do we just assume here that once we've modeled NO.HOOKS as a function of time we can use that sensibly ?
 
-emod <- fitGAMtoEffort.r(input=lllf,which.flag='All',which.effort='NO.HOOKS',start.year=1970,end.year=2010)
+emod <- fitGAMtoEffort.r(input=lllf,which.flag='Japan',which.effort='NO.HOOKS',start.year=1970,end.year=2010)
 
-# Create grids and predict over them 
+# Create grids and predict over them ###
 
-aa <- predict.effdis.t2.data.r(cmod=swo, emod=emod,grid.res=2,start.year=1970,end.year=2010)
+alb.aa <- predict.effdis.t2.data.r(cmod=alb, effmod=emod,grid.res=5,start.year=1970,end.year=2010,which.flag='Japan')
+bft.aa <- predict.effdis.t2.data.r(cmod=bft, effmod=emod,grid.res=5,start.year=1970,end.year=2010,which.flag='Japan')
+bet.aa <- predict.effdis.t2.data.r(cmod=bet, effmod=emod,grid.res=5,start.year=1970,end.year=2010,which.flag='Japan')
+skj.aa <- predict.effdis.t2.data.r(cmod=skj, effmod=emod,grid.res=5,start.year=1970,end.year=2010,which.flag='Japan')
+yft.aa <- predict.effdis.t2.data.r(cmod=yft, effmod=emod,grid.res=5,start.year=1970,end.year=2010,which.flag='Japan')
+swo.aa <- predict.effdis.t2.data.r(cmod=swo, effmod=emod,grid.res=5,start.year=1970,end.year=2010,which.flag='Japan')
+bum.aa <- predict.effdis.t2.data.r(cmod=bum, effmod=emod,grid.res=5,start.year=1970,end.year=2010,which.flag='Japan')
+sai.aa <- predict.effdis.t2.data.r(cmod=sai, effmod=emod,grid.res=5,start.year=1970,end.year=2010,which.flag='Japan')
+whm.aa <- predict.effdis.t2.data.r(cmod=whm, effmod=emod,grid.res=5,start.year=1970,end.year=2010,which.flag='Japan')
 
 
-plot.mods.r(what.year = 1985,what.month=6,what.value = 'prob',grid.res=2)
-plot.mods.r(what.year = 1985,what.month=6,what.value = 'measured_catch',grid.res=2)
-plot.mods.r(what.year = 1985,what.month=6,what.value = 'cpue',grid.res=2)
+# Plot data 
+
+
+par(mfrow=c(3,3))
+plot.mods.r(input=alb.aa,cmod=alb,what.year = 1995,what.month=1,what.value = 'prob',grid.res=5)
+plot.mods.r(input=bft.aa,cmod=bft,what.year = 1995,what.month=1,what.value = 'prob',grid.res=5)
+plot.mods.r(input=bet.aa,cmod=bet,what.year = 1995,what.month=1,what.value = 'prob',grid.res=5)
+plot.mods.r(input=skj.aa,cmod=skj,what.year = 1995,what.month=1,what.value = 'prob',grid.res=5)
+plot.mods.r(input=yft.aa,cmod=yft,what.year = 1995,what.month=1,what.value = 'prob',grid.res=5)
+plot.mods.r(input=swo.aa,cmod=swo,what.year = 1995,what.month=1,what.value = 'prob',grid.res=5)
+plot.mods.r(input=bum.aa,cmod=bum,what.year = 1995,what.month=1,what.value = 'prob',grid.res=5)
+plot.mods.r(input=sai.aa,cmod=sai,what.year = 1995,what.month=6,what.value = 'prob',grid.res=5)
+plot.mods.r(input=whm.aa,cmod=whm,what.year = 1995,what.month=6,what.value = 'prob',grid.res=5)
+
+plot(alb.aa$longitude,alb.aa$latitude)
+points(alb$pmod.data$longitude,alb$pmod.data$latitude,col='red')
+
+#Get Task 1 data
+
+ll.t1 <- get.effdis.t1.data.r(which.dsn='effdis-local',which.gear = 'LL',which.region='AT',which.flag='Japan')
+#ll.t1 <- get.effdis.t1.data.r(which.dsn='effdis-local',which.gear = 'LL',which.region='AT',which.flag='All')
+
+w1 <- (1:length(ll.t1[,1]))[ll.t1$yearc == 1990]
+tapply(ll.t1$qty_t[w1],list(ll.t1$flag[w1],ll.t1$species[w1]),sum,na.rm=T)
+
+# See task 1 totals by species
+
+t1x <- aggregate(list(qty_t=ll.t1$qty_t),list(year=ll.t1$yearc,species = ll.t1$species),sum,na.rm=T)
+t1x[t1x$species == 'bft',]
+
+
+#Bind up estimates for 9 different species
+
+big <- rbind(alb.aa,bet.aa,bft.aa,bum.aa,sai.aa,skj.aa,swo.aa,whm.aa,yft.aa)
+
+big<- big[big$which.ocean == "atl",]
+
+big$catch[big$observation == FALSE] <- NA
+big$prob[big$observation == FALSE] <- NA
+big$measured_catch[big$observation == FALSE] <- NA
+big$eff[big$observation == FALSE]  <- NA
+
+#xxx <- aggregate(list(measured_catch=big$measured_catch,catch=big$catch,eff=big$eff), 
+                  #by=list(year=big$year,species=big$species),sum,na.rm=T)
+
+#xxx.90 <- xxx[xxx$year == 1990 & xxx$species == 'bft',]
+#sum(xxx.90$catch)/1000
+
+
+#Convert catch to tonnes from kgs
+
+big$catch <- big$catch/1000
+big$measured_catch <- big$measured_catch/1000
+big$eff <- big$eff/9 # Effort is the same for each species so divide by 9
+
+
+big1 <- aggregate(list(measured_catch=big$measured_catch,catch=big$catch,eff=big$eff), 
+                  by=list(year=big$year),sum,na.rm=T)
+
+big1$cpue <- big1$catch/big1$eff
+
+
+# Aggregate estimates from Task 1
+
+sum.t1 <- aggregate(list(qty_t=ll.t1$qty_t),list(year=ll.t1$yearc),sum,na.rm=T)
+
+# Merge t1 and t2
+
+big2 <- merge(big1,sum.t1)
+
+big2$cpue <- big2$catch/big2$eff
+
+
+plot(big2$year,big2$catch,ylim=c(range(big2$catch,big2$qty_t)))
+lines(big2$year,big2$qty_t)
+
+
+big2$new.effort <- big2$qty_t/big2$cpue
+
+write.table(big2,'/home/doug/effdis/data/effdis-estimate.csv',sep=',',row.names=F)
+
+
+plot(big2$year,big2$new.effort/1000000)
+
 
 
 plot(aa$month,aa$prob)
 boxplot(catch~month,data=aa)
-plot(aa$trend,aa$catch/1000,pch='.')
+plot(aa$trend,log(aa$catch/1000),pch='.')
 abline(v=seq(1,756,by=12),lty=2,col='blue')
 
 

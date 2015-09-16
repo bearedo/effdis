@@ -3,8 +3,8 @@ three.d.catch.by.year.r <- function(tdata = task2.lf, what.gear = 'LL', what.yea
   
     {
     
-    #tdata<-alb; what.gear <- 'LL'; what.flag<- 'Brasil'; what.year <- 1984; gridx <- 5; gridy <- 5;  what.species <- 'alb'; catchunit <- 'kg'
-    #what.flag<- 'All'
+    #tdata<-alb; what.gear <- 'PS'; what.flag<- 'EU.España'; what.year <- 1994; gridx <- 1; gridy <- 1;  what.species <- 'alb'; catchunit <- 'kg'
+    #what.flag<- 'Japan'
   
     if(what.flag == 'All'){
       tdata1 <- tdata[tdata$geargrpcode == what.gear & tdata$month < 13 & tdata$year == what.year & tdata$species == what.species & tdata$catchunit == catchunit,]

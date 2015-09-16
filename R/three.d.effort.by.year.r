@@ -1,13 +1,11 @@
 
 #######3D Plotting routine for EFFDIS #############
 
-three.d.effort.by.year.r <- function(tdata = task2.lf, what.gear = 'LL', what.year = 2005, gridx=5,gridy=5,effort.type='NO.HOOKS', what.flag = 'All',scaling.f=1000000)
+three.d.effort.by.year.r <- function(tdata = task2.lf, what.gear = 'LL', what.year = 2005, gridx=5,gridy=5,effort.type='NO.HOOKS', 
+                                     what.flag = 'All',scaling.f=1000000)
 {
   
-    #tdata<-out; what.gear <- 'LL'; 
-    #what.year <- 2006;  gridx <- 5; 
-    #gridy <- 5; what.flag <- 'China P.R.'
-   #effort.type <- 'NO.HOOKS'
+  #tdata<-ps; what.gear <- 'PS'; what.year <- 2006;  gridx <- 5;  gridy <- 5; what.flag <- 'EU.España'; effort.type <-'FISH.HOUR'
 
    # If you have numbers and weights (nw) then effort is duplicated 
    
@@ -19,24 +17,36 @@ three.d.effort.by.year.r <- function(tdata = task2.lf, what.gear = 'LL', what.ye
   
   tdata1 <- rbind(n0,nw,w0)
   
+  tdata1$flagname <- as.character(tdata1$flagname)
   
-  if(what.flag == 'All'){
-  tdata1 <- tdata1[tdata1$geargrpcode == what.gear & tdata1$month < 13 & tdata1$year == what.year & tdata1$eff1type == effort.type,]
-  }
-  else{
-    
-    tdata1 <- tdata1[tdata1$geargrpcode == what.gear & tdata1$month < 13 & tdata1$year == what.year & tdata1$eff1type == effort.type & tdata1$flagname == what.flag,]
-  }
+  #tdata1$flagname[tdata1$flagname == 'EU.España'] <- 'Spain'
   
-  dd <- dim(tdata1)
-  ulocs <- length(unique(tdata1$longitude))
+  
+  if(what.flag == 'All')
+    {
+   
+   tdata2 <- tdata1[tdata1$month < 13 & tdata1$year == what.year & tdata1$eff1type == effort.type & tdata1$geargrpcode == what.gear,]
+  print(dim(tdata2))
+  #print('Plotting all data')
+  
+  }
+  if(what.flag != 'All')
+  {
+ 
+  tdata2 <- tdata1[tdata1$month < 13 & tdata1$year == what.year & tdata1$eff1type == effort.type & tdata1$flagname == what.flag & tdata1$geargrpcode == what.gear,]
+  #print(paste('Plotting',what.flag))
+  print(dim(tdata2))
+    }
+  
+  dd <- dim(tdata2)
+  ulocs <- length(unique(tdata2$longitude))
   if (dd[1] < 1 | ulocs < 6)
     {
-    print('No Data')
+    #print('No Data')
   }
   else{
     
-  coords      <- SpatialPointsDataFrame(cbind(x=an(ac(tdata1$longitude)),y=an(ac(tdata1$latitude))),data=tdata1[,c(4,5)])
+  coords      <- SpatialPointsDataFrame(cbind(x=an(ac(tdata2$longitude)),y=an(ac(tdata2$latitude))),data=tdata2[,c(4,5)])
   
   geogWGS84 <- CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs") # Make sure proj is what we think it is.
   
@@ -48,8 +58,8 @@ three.d.effort.by.year.r <- function(tdata = task2.lf, what.gear = 'LL', what.ye
 resx        <- gridx
 resy        <- gridy
 
-cl          <- 0.9  #cex.lab
-ca          <- 0.9    #cex.axis
+cl          <- 0.8  #cex.lab
+ca          <- 0.8    #cex.axis
 fonts       <- 2    #font
 xl          <- list(label="Longitude",font=fonts,cex=cl) #x-label
 yl          <- list(label="Latitude",font=fonts,cex=cl)  #y-label
@@ -74,16 +84,15 @@ grd@proj4string <- geogWGS84
 #- Reset values
 grd@data[] <- 0
 
-
 #-Create column to aggregate over (most often, this column already exists and is output from your previous analyses)
 #tacsat                        <- intervalTacsat(tacsat,level="vessel",fill.na=T)
 
 idx                           <- over(as(coords,"SpatialPoints"),as(grd,"SpatialGrid"))
-tdata1$gridID                 <- idx
+tdata2$gridID                 <- idx
 
 
 #- Here we aggregate data to the grid cell. You can aggregate any column you like, we use INTV as an example here.
-grd@data[names(table(idx)),1] <- aggregate(tdata1$eff1,by=list(tdata1$gridID),FUN=sum,na.rm=T)$x
+grd@data[names(table(idx)),1] <- aggregate(tdata2$eff1,by=list(tdata2$gridID),FUN=sum,na.rm=T)$x
 
 #Look at value ranges:
 rr <- range(grd@data[an(names(table(idx))),1])
@@ -92,7 +101,7 @@ cutbreaksval  <- list(ALL = c(-1,0,10,25,50,100,150,200))
 legval        <- list(ALL = c("0","1 <= 10","10 <= 25", "25 <= 50","50 <= 100","100 <= 200","200 <= 400"))
 #- Potentially, divide your data by a certain constant and add this constant to the legend title
 valdiv        <- scaling.f # scaling the data
-unitval       <- paste('x',valdiv,'hooks')
+unitval       <- paste('x',valdiv,'effort units')
 
 
 plot(1,1,col="white",xlim=spatBound$xrange,ylim=spatBound$yrange,xlab="",ylab="",
@@ -130,8 +139,6 @@ proj4string(grdPolsDF) <- CRS("+proj=longlat +ellps=WGS84")
 #setwd("/home/doug/effdis/shp_files/longline")
 #layer.name <- paste(what.flag,what.year,what.gear,effort.type,sep="_")
 #writeOGR(grdPolsDF, dsn = '.', layer = layer.name, overwrite_layer=TRUE,driver = "ESRI Shapefile")
-
-
 }
 }
 

@@ -4,7 +4,8 @@ model.nos.kgs.r <- function(input=pslf,which.dsn='effdis-local',which.gear='LL')
 {
   #Function finds the data in the task2 db (long-format) which is available for both weights (kgs) and numbers. 
   #It then models kgs as a function of nos plus some other relevant covariates.
- 
+
+  #input <- pslf
 #Sum catches (kgs and nos) over catchunit
 
 pp0 <- aggregate(list(measured_catch=input$measured_catch), 
@@ -23,10 +24,10 @@ pp0_kg_nr <- merge(pp0_kg[,-4],pp0_nr[,-4])
 
 # Plot the relationship between nrs and kgs for different species, flag combinations
 
-#library(lattice)
-#xyplot(log(measured_catch_kg)~log(measured_catch_nr),groups=flagname,data=pp0_kg_nr[pp0_kg_nr$species=='bft',])
+library(lattice)
+xyplot(log(measured_catch_kg)~log(measured_catch_nr),groups=flagname,data=pp0_kg_nr[pp0_kg_nr$species=='bft',])
 
-#xyplot(log(measured_catch_kg)~log(measured_catch_nr)|species,auto.key=TRUE,groups=flagname,data=pp0_kg_nr)
+xyplot(log(measured_catch_kg)~log(measured_catch_nr)|species,auto.key=TRUE,groups=flagname,data=pp0_kg_nr)
 
 #head(pp0_kg_nr)
 

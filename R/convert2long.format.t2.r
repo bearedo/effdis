@@ -15,14 +15,14 @@ task2.simple <- data.frame(year=tdata$year,trend=tdata$trend,month=tdata$month,r
                            alb=tdata$alb,bft=tdata$bft,
                            bet=tdata$bet,skj=tdata$skj,yft=tdata$yft,swo=tdata$swo,bum=tdata$bum,sai=tdata$sai,whm=tdata$whm,tot9sp=tdata$totsp9)
 
-print(dim(task2.simple))
+#print(dim(task2.simple))
 
 # remember to install reshape
 
 task2.lf <- melt(task2.simple[,-23],id=c('year','trend','month','region','flagname','fleetcode','geargrpcode','longitude','latitude','eff1','eff1type','dsettype','catchunit'))
 dimnames(task2.lf)[[2]][14:15] <- c('species','measured_catch')
 
-print(dim(task2.lf))
+#print(dim(task2.lf))
 
 task2.lf
 
