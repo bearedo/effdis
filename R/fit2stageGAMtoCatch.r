@@ -8,7 +8,7 @@ fit2stageGAMtoCatch.r <- function (input = pslf,which.species ='bft',start.year=
    # g1 models the positive component of the catch as a function of location and time.
   {
   
-   #input <- long_line_lf;which.species <- 'bft';which.flag <- 'Japan';start.year <- 1990; end.year   <- 2010
+   # input <- lllf;which.species <- 'skj';which.flag <- 'China P.R.';start.year <- 1970; end.year   <- 2010
    
    input <- input[input$species == which.species,]
    input <- input[input$year >= start.year & input$year <= end.year,]
@@ -28,7 +28,7 @@ fit2stageGAMtoCatch.r <- function (input = pslf,which.species ='bft',start.year=
    
    tbin <- table(input$bin)
    
-   if(tbin[2] > 99)
+   if(sum(bin) >= 10)
    {
   ## Take out only the kgs. [NB. The flags which report only numbers have been converted.]
   
