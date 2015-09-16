@@ -26,7 +26,7 @@ three.d.effort.by.year.r <- function(tdata = task2.lf, what.gear = 'LL', what.ye
     {
    
    tdata2 <- tdata1[tdata1$month < 13 & tdata1$year == what.year & tdata1$eff1type == effort.type & tdata1$geargrpcode == what.gear,]
-  print(dim(tdata2))
+  #print(dim(tdata2))
   #print('Plotting all data')
   
   }
@@ -35,7 +35,7 @@ three.d.effort.by.year.r <- function(tdata = task2.lf, what.gear = 'LL', what.ye
  
   tdata2 <- tdata1[tdata1$month < 13 & tdata1$year == what.year & tdata1$eff1type == effort.type & tdata1$flagname == what.flag & tdata1$geargrpcode == what.gear,]
   #print(paste('Plotting',what.flag))
-  print(dim(tdata2))
+  #print(dim(tdata2))
     }
   
   dd <- dim(tdata2)
