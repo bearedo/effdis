@@ -17,7 +17,7 @@ kgs.from.nos.r <- function(input=pslf)
   if (dd[1]>0)
 
     {
-  # Convert measured catch to kgs with m5 #
+  # Convert measured catch to kgs with bm #
   
   t2ce_lf_nr$lnr<- log(t2ce_lf_nr$measured_catch_nr)
   
