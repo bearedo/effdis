@@ -52,6 +52,25 @@ predict.effdis.t2.data.r <- function (cmod=mods, effmod=emod,grid.res=5,start.ye
   ngrd$flagname <- which.flag
   ngrd$geargrp <- which.gear
   
+  #Set up the harmonics
+  
+  
+  dat0 <- ngrd # input data is dat0
+  
+  ss = cc = matrix(NA,nr=length(dat0[,1]), nc=6)
+  
+  for (i in 1:6)
+  { cc[,i] <- cos(2*pi*i*dat0$trend/12)                                                              
+  ss[,i] <- sin(2*pi*i*dat0$trend/12) } # set up the regressors
+  
+  ss <- ss[,-6]
+  dat1 <- cbind(dat0,ss,cc)
+  dd <- dim(dat0)
+  dimnames(dat1)[[2]][(dd[2]+1):(dim(dat1)[2])] <- c(paste('sin',1:5,sep=''),paste('cos',1:6,sep=''))
+  
+
+  ngrd <- dat1
+  
   # Do the predictions over the grid #
   
   prob <- predict(cmod$pmod,ngrd,type="response")
