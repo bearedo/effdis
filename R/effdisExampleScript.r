@@ -27,6 +27,7 @@ source("spatial.coverage.by.year.task2.r")
 source("three.d.effort.by.year.r")
 source("three.d.catch.by.year.r")
 source('fitGAMtoEffort.r')
+source('convert2long.format.t2.r')
 source('fit2stageGAMtoCatch.r')
 source('get.effdis.t2.data.r')
 source('get.effdis.t1.data.r')
@@ -34,6 +35,7 @@ source('plot.mods.r')
 source('prepare.effdis.data.r')
 source('model.nos.kgs.r')
 source('kgs.from.nos.r')
+<<<<<<< HEAD
 source('convert2long.format.t2.r')
 source('predict.effdis.t2.data.r')
 source('find.ocean.r')
@@ -41,6 +43,14 @@ source('find.ocean.r')
 #########################
 ## Purse-seine example ##
 #########################
+=======
+#source('predict.effdis.t2.data.r')
+source('three.d.catch.by.year.r')
+source('find.ocean.r')
+
+
+# Purse-seine example #
+>>>>>>> 59aae5a5b7d5ae841ae8da64ed24c25804c56f24
 
 # Get data for each dsettype
 
@@ -199,9 +209,9 @@ plot(big2$year,big2$new.effort/1000000,xlim=c(1970,2010),type='l')
 
 # Get data for each dsettype
 
-lln  <- get.effdis.t2.data.r(which.dsn='effdis-local',which.gear='LL',which.flag='All',which.dsettype = 'n-')
-llnw <- get.effdis.t2.data.r(which.dsn='effdis-local',which.gear='LL',which.flag='All',which.dsettype = 'nw')
-llw  <- get.effdis.t2.data.r(which.dsn='effdis-local',which.gear='LL',which.flag='All',which.dsettype = '-w')
+lln  <- get.effdis.t2.data.r(which.dsn='effdis-tuna-cc1',which.gear='LL',which.flag='All',which.dsettype = 'n-')
+llnw <- get.effdis.t2.data.r(which.dsn='effdis-tuna-cc1',which.gear='LL',which.flag='All',which.dsettype = 'nw')
+llw  <- get.effdis.t2.data.r(which.dsn='effdis-tuna-cc1',which.gear='LL',which.flag='All',which.dsettype = '-w')
 ll1 <- rbind(lln,llnw,llw)
 
 #t2 <- tapply(ll1$totsp9,list(ll1$flagname,ll1$year),sum,na.rm=T)
