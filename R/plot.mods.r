@@ -1,5 +1,5 @@
 
-plot.mods.r <- function(input=bft.aa,cmod=bft,what.year=1995,what.month=1,grid.res=5,what.value = 'prob',what.gear='PS',plot.samples.only=TRUE)
+plot.mods <- function(input=bft.aa,cmod=bft,what.year=1995,what.month=1,grid.res=5,what.value = 'prob',what.gear='PS',plot.samples.only=TRUE)
 {
  
   #cmod <- alb.ps;what.year=1990;what.month=1;grid.res=1;what.value='catch';input <- model.data
