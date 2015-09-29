@@ -1,5 +1,5 @@
 
-find.ocean.r <- function(input=grd)
+find.ocean <- function(input=grd)
 {
   
   # Function takes a data frame of locations (must be called latitude and longitude) and adds a vector telling you 

@@ -1,4 +1,4 @@
-convert2long.format.t2.r<-function(input=t2ce)
+convert2long.format.t2<-function(input=t2ce)
 { 
   
 # Convert standard task2 input data to long format using output of get.effdis.data.r and prepare.effdis.data.r

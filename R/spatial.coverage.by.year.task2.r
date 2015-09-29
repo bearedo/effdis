@@ -1,5 +1,5 @@
 
-spatial.coverage.by.year.task2.r <- function(tdata=t2ce,start.year=1950, end.year=2010, which.region = 'AT', which.gear='LL',which.flag='EU.Portugal'){
+spatial.coverage.by.year.task2 <- function(tdata=t2ce,start.year=1950, end.year=2010, which.region = 'AT', which.gear='LL',which.flag='EU.Portugal'){
   #tdata <- out
   #which.gear <- 'LL'
   #which.flag   <- 'Brasil'

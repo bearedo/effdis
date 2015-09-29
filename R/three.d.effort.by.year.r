@@ -1,7 +1,7 @@
 
 #######3D Plotting routine for EFFDIS #############
 
-three.d.effort.by.year.r <- function(tdata = task2.lf, what.gear = 'LL', what.year = 2005, gridx=5,gridy=5,effort.type='NO.HOOKS', 
+three.d.effort.by.year <- function(tdata = task2.lf, what.gear = 'LL', what.year = 2005, gridx=5,gridy=5,effort.type='NO.HOOKS', 
                                      what.flag = 'All',scaling.f=1000000)
 {
   

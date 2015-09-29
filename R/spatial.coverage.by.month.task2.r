@@ -1,6 +1,6 @@
 
 
-spatial.coverage.by.month.task2.r <- function(tdata=t2ce,which.gear = 'LL', which.region = 'AT',which.year=2005,which.flag='EU.Portugal')
+spatial.coverage.by.month.task2 <- function(tdata=t2ce,which.gear = 'LL', which.region = 'AT',which.year=2005,which.flag='EU.Portugal')
 {
   
   fdata <- tdata[tdata$flagname == which.flag & tdata$geargrpcode == which.gear & tdata$region == which.region & tdata$timeperiodid < 13 & tdata$yearc == which.year,]

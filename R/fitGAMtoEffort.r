@@ -1,5 +1,5 @@
 
-fitGAMtoEffort.r <- function(input = lllf, which.flag='Japan',which.effort='NO.HOOKS',start.year=1950,end.year=2010,kk=6)
+fitGAMtoEffort <- function(input = lllf, which.flag='Japan',which.effort='NO.HOOKS',start.year=1950,end.year=2010,kk=6)
 {
   
 #input <- pslf; which.flag='EU.España'; which.effort='FISH.HOUR'; start.year=1970; end.year=2010

@@ -1,5 +1,5 @@
 
-add.covariates.r <- function(input = t2ce_lf_ll,what.dsn = 'effdis-tuna-cc1')
+add.covariates <- function(input = t2ce_lf_ll,what.dsn = 'effdis-tuna-cc1')
 {
   
   # Function adds depth, sst, chlorophyll a, ph and primary production estimates to the data which I thought might be handy.

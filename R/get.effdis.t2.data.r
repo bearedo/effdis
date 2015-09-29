@@ -1,4 +1,4 @@
-get.effdis.t2.data.r <- function(which.dsn="effdis-tuna-cc1",which.gear='LL',which.region='AT',which.flag='All',
+get.effdis.t2.data <- function(which.dsn="effdis-tuna-cc1",which.gear='LL',which.region='AT',which.flag='All',
                                  which.dsettype='-w')
 {
 

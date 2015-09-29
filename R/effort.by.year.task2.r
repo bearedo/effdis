@@ -1,5 +1,5 @@
 
-effort.by.year.task2.r <- function(tdata = t2ce, which.gear = 'LL', which.flag = 'Japan'){
+effort.by.year.task2 <- function(tdata = t2ce, which.gear = 'LL', which.flag = 'Japan'){
 
   #tdata <- t2ce
   #which.region <- 'AT'

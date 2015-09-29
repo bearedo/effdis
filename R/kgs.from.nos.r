@@ -1,4 +1,4 @@
-kgs.from.nos.r <- function(input=pslf)
+kgs.from.nos <- function(input=pslf)
 {
   # Use linear model from model.nos.kgs.r to estimate kgs from numbers
   

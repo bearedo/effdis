@@ -1,6 +1,5 @@
-predict.effdis.t2.data.r <- function (cmod=mods, effmod=emod,grid.res=5,start.year=1995,end.year=2010,which.flag='All',which.gear='LL')
-  
-{
+predict.effdis.t2.data <- function (cmod=mods, effmod=emod,grid.res=5,start.year=1995,end.year=2010,which.flag='All',which.gear='LL')
+  {
   
   #cmod  <- alb.ps;effmod <- emod;grid.res <-1;start.year <- 1990; end.year <- 2010;which.flag ='EU.España';which.gear='PS'
   
@@ -114,7 +113,7 @@ predict.effdis.t2.data.r <- function (cmod=mods, effmod=emod,grid.res=5,start.ye
   
   #print(summary(model.data$catch[ngrd$observation == T]/1000))
   
-  filename <- paste('model-data-',which.species,'-',which.flag,'-',which.gear,'.csv',sep='')
+  filename <- paste('model-data-',which.species,'-',which.flag,'-',which.gear,'-',start.year,'-',end.year,'.csv',sep='')
   
   #print(filename)
   

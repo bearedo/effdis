@@ -1,4 +1,4 @@
-prepare.effdis.data.r <- function(input=data)
+prepare.effdis.data <- function(input=data)
   {
   #input <-ps
   #Prepare and format data extracted using get.effdis.data.r#

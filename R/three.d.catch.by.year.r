@@ -1,5 +1,5 @@
 
-three.d.catch.by.year.r <- function(tdata = task2.lf, what.gear = 'LL', what.year = 2005, gridx=5,gridy=5,what.species='alb', what.flag = 'All',catchunit='kg', scaling.f=1000000)
+three.d.catch.by.year <- function(tdata = task2.lf, what.gear = 'LL', what.year = 2005, gridx=5,gridy=5,what.species='alb', what.flag = 'All',catchunit='kg', scaling.f=1000000)
   
     {
     

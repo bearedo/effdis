@@ -35,22 +35,22 @@ source('plot.mods.r')
 source('prepare.effdis.data.r')
 source('model.nos.kgs.r')
 source('kgs.from.nos.r')
-<<<<<<< HEAD
 source('convert2long.format.t2.r')
 source('predict.effdis.t2.data.r')
 source('find.ocean.r')
+source('aggt2data.r')
 
 #########################
 ## Purse-seine example ##
 #########################
-=======
-#source('predict.effdis.t2.data.r')
+
+source('predict.effdis.t2.data.r')
 source('three.d.catch.by.year.r')
 source('find.ocean.r')
 
 
 # Purse-seine example #
->>>>>>> 59aae5a5b7d5ae841ae8da64ed24c25804c56f24
+
 
 # Get data for each dsettype
 
@@ -218,9 +218,9 @@ ll1 <- rbind(lln,llnw,llw)
 
 ll1<-find.ocean.r(ll1)
 ll1 <- ll1[ll1$which.ocean == 'atl',]
-ll1<-prepare.effdis.data.r(input=ll1)
-
 lllf <- convert2long.format.t2.r(input =ll1)
+lllf<-prepare.effdis.data.r(input=lllf)
+
 bm <- model.nos.kgs.r(input=lllf,which.gear='LL')
 
 lllf <- kgs.from.nos.r(lllf) # for those fleets that supply only number
@@ -241,34 +241,11 @@ table(lllf$eff1type)
 
 lllf <- lllf[lllf$eff1type=='NO.HOOKS',]
 
-w0 <- (1:length(lllf$year))[lllf$catchunit == 'kg' & lllf$year == 1990]
+w0 <- (1:length(lllf$year))[lllf$catchunit == 'kg' & lllf$year >= 1990]
 
 round(tapply(lllf$measured_catch[w0],list(lllf$flagname[w0],lllf$species[w0]),sum,na.rm=T))/1000
 
-#                                  alb      bft       bet   skj      yft       swo      bum     sai     whm
-# Belize                            NA       NA        NA    NA       NA        NA       NA      NA      NA
-# Brasil                       312.900    0.200   366.700 0.000   91.800   657.300   32.800  10.800 114.800
-# China P.R.                        NA       NA        NA    NA       NA        NA       NA      NA      NA
-# Chinese Taipei             20626.300    0.000  7382.400 0.000 4790.700  1376.100  842.900   0.000 382.900
-# Cuba                          18.614    0.000   119.952 0.000  720.171   659.487   94.863   0.000   0.000
-# EU.España                      0.000    0.000     0.000 0.000    0.000 11499.900    0.000   0.000   0.000
-# EU.Portugal                    0.000    0.000    15.800 0.000    0.000     5.700    0.000   0.000   0.000
-# Japan                       2786.086 1773.345 28676.396 3.286 6845.953  6891.250 1018.155 206.046 150.495
-# Korea Rep.                    25.300    0.000  1038.800 0.000  336.900   155.800   45.000   5.100  10.900
-# Maroc                             NA       NA        NA    NA       NA        NA       NA      NA      NA
-# Mexico                            NA       NA        NA    NA       NA        NA       NA      NA      NA
-# Namibia                           NA       NA        NA    NA       NA        NA       NA      NA      NA
-# Other                             NA       NA        NA    NA       NA        NA       NA      NA      NA
-# Panama                            NA       NA        NA    NA       NA        NA       NA      NA      NA
-# Philippines                       NA       NA        NA    NA       NA        NA       NA      NA      NA
-# South Africa                      NA       NA        NA    NA       NA        NA       NA      NA      NA
-# St. Vincent and Grenadines        NA       NA        NA    NA       NA        NA       NA      NA      NA
-# Trinidad and Tobago               NA       NA        NA    NA       NA        NA       NA      NA      NA
-# Uruguay                        0.000    0.000    37.148 0.000    0.000   271.758    0.000   0.000   0.000
-# U.S.A.                       427.526   73.961  1350.313 0.000 3315.303 10648.827    9.271   2.941   2.532
-# U.S.S.R.                       0.000    0.000    95.000 0.000  190.000     0.000    0.000   0.000   0.000
-# Vanuatu                           NA       NA        NA    NA       NA        NA       NA      NA      NA
-# Venezuela                         NA       NA        NA    NA       NA        NA       NA      NA      NA
+setwd('/home/doug/effdis/effort-estimates')
 
 alb <- fit2stageGAMtoCatch.r(input=lllf,which.flag='Japan',which.species='alb',start.year=1970,end.year=2010)
 bft <- fit2stageGAMtoCatch.r(input=lllf,which.flag='Japan',which.species='bft',start.year=1970,end.year=2010)
@@ -279,6 +256,15 @@ swo <- fit2stageGAMtoCatch.r(input=lllf,which.flag='Japan',which.species='swo',s
 bum <- fit2stageGAMtoCatch.r(input=lllf,which.flag='Japan',which.species='bum',start.year=1970,end.year=2010)
 sai <- fit2stageGAMtoCatch.r(input=lllf,which.flag='Japan',which.species='sai',start.year=1970,end.year=2010)
 whm <- fit2stageGAMtoCatch.r(input=lllf,which.flag='Japan',which.species='whm',start.year=1970,end.year=2010)
+
+
+#Try calculating effort directly from the raw data instead
+
+big <- aggt2data.r()
+big$catch <-big$measured_catch
+
+
+
 
 # Do we just assume here that once we've modeled NO.HOOKS as a function of time we can use that sensibly ?
 
@@ -407,7 +393,7 @@ points(alb$pmod.data$longitude,alb$pmod.data$latitude,col='red')
 
 #Get Task 1 data
 
-ll.t1 <- get.effdis.t1.data.r(which.dsn='effdis-local',which.gear = 'LL',which.region='AT',which.flag='Japan')
+ll.t1 <- get.effdis.t1.data.r(which.dsn='effdis-tuna-cc1',which.gear = 'LL',which.region='AT',which.flag='Japan')
 #ll.t1 <- get.effdis.t1.data.r(which.dsn='effdis-local',which.gear = 'LL',which.region='AT',which.flag='All')
 
 w1 <- (1:length(ll.t1[,1]))[ll.t1$yearc == 1990]

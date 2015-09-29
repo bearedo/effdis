@@ -1,7 +1,7 @@
 
 
 
-fit2stageGAMtoCatch.r <- function (input = pslf,which.species ='bft',start.year=1950, end.year=2015,which.flag='Japan',kk=6)
+fit2stageGAMtoCatch <- function (input = pslf,which.species ='bft',start.year=1950, end.year=2015,which.flag='Japan',kk=6)
 
    # Function to fit GAMs to Effdis catch data. 
    # b1 is the probability of catching a fish as a function of location and time.

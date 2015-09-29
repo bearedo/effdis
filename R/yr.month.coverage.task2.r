@@ -1,6 +1,6 @@
    
 
-yr.month.coverage.task2.r<-function(tdata=t2ce,start.year=1950,end.year=2010,which.gear='LL',which.region ='AT', which.flag='EU.Portugal'){
+yr.month.coverage.task2<-function(tdata=t2ce,start.year=1950,end.year=2010,which.gear='LL',which.region ='AT', which.flag='EU.Portugal'){
   
   #3D plot to explore temporal confounding
   #tdata <- out; which.flag   <- 'Japan'; which.gear <- 'LL'
