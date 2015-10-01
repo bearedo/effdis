@@ -20,33 +20,31 @@ library(mgcv)
 
 # Load scripts #
 
-setwd("/home/doug/effdis/R")
-source("yr.month.coverage.task2.r")
-source("trend.r")
-source("spatial.coverage.by.year.task2.r")
-source("three.d.effort.by.year.r")
-source("three.d.catch.by.year.r")
-source('fitGAMtoEffort.r')
-source('convert2long.format.t2.r')
-source('fit2stageGAMtoCatch.r')
-source('get.effdis.t2.data.r')
-source('get.effdis.t1.data.r')
-source('plot.mods.r')
-source('prepare.effdis.data.r')
-source('model.nos.kgs.r')
-source('kgs.from.nos.r')
-source('convert2long.format.t2.r')
-source('predict.effdis.t2.data.r')
-source('find.ocean.r')
-source('aggt2data.r')
+setwd("/home/doug/effdis/effdisR/effdisR/R")
+source("yr.month.coverage.task2.R")
+source("trend.R")
+source("spatial.coverage.by.year.task2.R")
+source("three.d.effort.by.year.R")
+source("three.d.catch.by.year.R")
+source('fitGAMtoEffort.R')
+source('convert2long.format.t2.R')
+source('fit2stageGAMtoCatch.R')
+source('get.effdis.t2.data.R')
+source('get.effdis.t1.data.R')
+source('plot.mods.R')
+source('prepare.effdis.data.R')
+source('model.nos.kgs.R')
+source('kgs.from.nos.R')
+source('convert2long.format.t2.R')
+source('predict.effdis.t2.data.R')
+source('find.ocean.R')
+source('aggt2data.R')
+source('add.covariates.R')
 
 #########################
 ## Purse-seine example ##
 #########################
 
-source('predict.effdis.t2.data.r')
-source('three.d.catch.by.year.r')
-source('find.ocean.r')
 
 
 # Purse-seine example #
