@@ -1,0 +1,10 @@
+Package: effdisR
+Type: Package
+Title: Analysis, visualisation and effort estimate using the fishing effort databases maintained by ICCAT (International Commission for the Conservation of Atlantic Tunas).
+Version: 1.0
+Date: 2015-09-29
+Author: Doug Beare
+Maintainer: Doug Beare, doug.beare@gmail.com
+Description: The International Commission for the Conservation of Atlantic Tunas (ICCAT) (www.iccat.int) maintains a database of fishing effort and catches distributed by time-area strata which is known as 'EFFDIS'. A  total of 27 different fishing nations submit catch and effort data to ICCAT for the main gears they use for targeting tuna and tuna-like species within the ICCAT convention area. EFFDIS data are available in two main groups termed, 'Task 1' and 'Task 2'. Task 1 data are annual totals for catch (eg. tons bluefin tuna caught in 1999 by Japan) by gear in the various relevant 'regions' (Atlantic & Mediterranean) and are believed to be totally comprehensive. Task 2 data, on the other hand, are much more detailed, available at greater spatial (e.g. 5ºx5º degree square grid) and temporal (e.g. month and year) resolution. The negative side is that they tend to be only partially complete. Comprehensive estimates of fishing effort can, therefore, potentilly be made by 'raising' the Task 2 estimates by those from Task 1.  The EFFDIS database thus represents a rich and valuable source of information on fishing activity in the Atlantic and Mediterranean since 1950. It has the potential to reveal both seasonal and long-term changes in the distributions of the fisheries, and their target species in addition to exposing the vulnerability of various by-catch taxa such as turtles and seabirds.   
+ICCAT contracted Doug Beare (Globefish Consultancy Services, GCS) to develop a modeling approach to estimating overall Atlantic fishing effort exploiting the spatio-temporal information available in the EFFDIS data and the result is the effdisR package. 
+License: GPL
