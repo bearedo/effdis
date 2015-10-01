@@ -13,7 +13,7 @@
 The DESCRIPTION file:
 \packageDESCRIPTION{effdisR}
 \packageIndices{effdisR}
-~~ An overview of how to use the package, including the most important functions ~~
+An overview of how to use the package, including the most important functions
 }
 \author{
 \packageAuthor{effdisR}
@@ -30,5 +30,5 @@ Maintainer: \packageMaintainer{effdisR}
 ~~ \code{\link[<pkg>:<pkg>-package]{<pkg>}} ~~
 }
 \examples{
-~~ simple examples of the most important functions ~~
+ simple examples of the most important functions 
 }

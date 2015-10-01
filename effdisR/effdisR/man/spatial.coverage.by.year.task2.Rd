@@ -1,8 +1,7 @@
 \name{spatial.coverage.by.year.task2}
 \alias{spatial.coverage.by.year.task2}
 %- Also NEED an '\alias' for EACH other topic documented here.
-\title{
-%%  ~~function to do ... ~~
+\title{ Function to plot the spatial distribution of EFFDIS data each year
 }
 \description{
 %%  ~~ A concise (1-5 lines) description of what the function does. ~~

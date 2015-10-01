@@ -2,7 +2,7 @@
 \alias{kgs.from.nos}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-%%  ~~function to do ... ~~
+Function to estimate weight caught for countries that only record numbers.
 }
 \description{
 %%  ~~ A concise (1-5 lines) description of what the function does. ~~

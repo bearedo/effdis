@@ -1,9 +1,7 @@
 \name{aggt2data}
 \alias{aggt2data}
 %- Also NEED an '\alias' for EACH other topic documented here.
-\title{
-%%  ~~function to do ... ~~
-}
+\title{Function to aggregate Task II data as an alternative to modeling}
 \description{
 %%  ~~ A concise (1-5 lines) description of what the function does. ~~
 }

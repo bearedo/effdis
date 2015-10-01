@@ -2,7 +2,7 @@
 \alias{fit2stageGAMtoCatch}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-%%  ~~function to do ... ~~
+Function to fit generalised additive models to the EFFDIS catch data in 2 stages. The first is a Bernoulli model the second is a Gamma model fitted to the positive part of the data.
 }
 \description{
 %%  ~~ A concise (1-5 lines) description of what the function does. ~~

@@ -2,7 +2,7 @@ predict.effdis.t2.data <-
 function (cmod=mods, effmod=emod,grid.res=5,start.year=1995,end.year=2010,which.flag='All',which.gear='LL')
   {
   
-  #cmod  <- alb.ps;effmod <- emod;grid.res <-1;start.year <- 1990; end.year <- 2010;which.flag ='EU.España';which.gear='PS'
+  #cmod  <- alb;effmod <- emod;grid.res <-5;start.year <- 1970; end.year <- 2010;which.flag ='Japan';which.gear='LL'
   
   ## Use the GAM models fitted in the previous step to predict over a relevant-sized grid
   
@@ -26,7 +26,7 @@ function (cmod=mods, effmod=emod,grid.res=5,start.year=1995,end.year=2010,which.
   la <- length(lattie)
   
   grd <-data.frame(expand.grid(longitude=lonnie,latitude=lattie))
-  grd <- find.ocean.r(input=grd[,c(1,2)])
+  grd <- find.ocean(input=grd[,c(1,2)])
   
   #plot(grd$longitude[grd$which.ocean=='atl'],grd$latitude[grd$which.ocean=='atl'],pch='.')
   
@@ -48,7 +48,7 @@ function (cmod=mods, effmod=emod,grid.res=5,start.year=1995,end.year=2010,which.
                      month = rep(rep(1:12,rep(lo*la,12)),lyrs)
                      )
   
-  ngrd$trend <- trend.r(ngrd$year,ngrd$month,start.year=1950)
+  ngrd$trend <- trend(ngrd$year,ngrd$month,start.year=1950)
   ngrd$flagname <- which.flag
   ngrd$geargrp <- which.gear
   

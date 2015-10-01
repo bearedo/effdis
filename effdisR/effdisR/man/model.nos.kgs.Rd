@@ -2,6 +2,7 @@
 \alias{model.nos.kgs}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
+Function to fit linear model (kgs as a function of numbers) for those flags that send both.
 %%  ~~function to do ... ~~
 }
 \description{

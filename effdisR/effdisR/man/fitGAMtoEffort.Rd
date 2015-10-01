@@ -2,7 +2,7 @@
 \alias{fitGAMtoEffort}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-%%  ~~function to do ... ~~
+Function to fit generalised additive model from the quasipoisson family to the effort data
 }
 \description{
 %%  ~~ A concise (1-5 lines) description of what the function does. ~~

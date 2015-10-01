@@ -1,8 +1,7 @@
 \name{convert2long.format.t2}
 \alias{convert2long.format.t2}
 %- Also NEED an '\alias' for EACH other topic documented here.
-\title{
-%%  ~~function to do ... ~~
+\title{Function to convert short format to long format which is useful for regression modeling
 }
 \description{
 %%  ~~ A concise (1-5 lines) description of what the function does. ~~

@@ -42,7 +42,7 @@ function(tdata=t2ce,start.year=1950,end.year=2010,which.gear='LL',which.region =
         xlim=c(start.year,end.year),ylim=range(fdata$month,na.rm=T))
   contour(1950:2015,1:12,fmat,add=T)
   
-  axis(side=1,at=start.year:end.year,label=as.character(start.year:end.year))
+  axis(side=1,at=start.year:end.year,labels=as.character(start.year:end.year))
   ms <- range(fdata$month,na.rm=T)
   axis(side=2,at=ms[1]:ms[2],label=month.abb[ms[1]:ms[2]])
   title(paste(which.flag,which.gear, sep= ' - '))

@@ -1,8 +1,7 @@
 \name{find.ocean}
 \alias{find.ocean}
 %- Also NEED an '\alias' for EACH other topic documented here.
-\title{
-%%  ~~function to do ... ~~
+\title{Function to determine which Ocean an observation is in
 }
 \description{
 %%  ~~ A concise (1-5 lines) description of what the function does. ~~

@@ -2,7 +2,7 @@
 \alias{get.effdis.t2.data}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-%%  ~~function to do ... ~~
+Function to get the Task II data from the postgreSQL database on the ICCAT cloud server
 }
 \description{
 %%  ~~ A concise (1-5 lines) description of what the function does. ~~

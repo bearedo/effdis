@@ -23,10 +23,10 @@ pp0_kg_nr <- merge(pp0_kg[,-4],pp0_nr[,-4])
 
 # Plot the relationship between nrs and kgs for different species, flag combinations
 
-library(lattice)
-xyplot(log(measured_catch_kg)~log(measured_catch_nr),groups=flagname,data=pp0_kg_nr[pp0_kg_nr$species=='bft',])
+#library(lattice)
+#xyplot(log(measured_catch_kg)~log(measured_catch_nr),groups=flagname,data=pp0_kg_nr[pp0_kg_nr$species=='bft',])
 
-xyplot(log(measured_catch_kg)~log(measured_catch_nr)|species,auto.key=TRUE,groups=flagname,data=pp0_kg_nr)
+#xyplot(log(measured_catch_kg)~log(measured_catch_nr)|species,auto.key=TRUE,groups=flagname,data=pp0_kg_nr)
 
 #head(pp0_kg_nr)
 
