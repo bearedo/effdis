@@ -40,7 +40,7 @@ function(input=grd)
   
   # Make SpatialPointsDataFrame
   
-  input.spdf      <- SpatialPointsDataFrame(cbind(x=an(ac(input$longitude)),y=an(ac(input$latitude))),data=input)
+  input.spdf      <- SpatialPointsDataFrame(cbind(x=as.numeric(as.character(input$longitude)),y=as.numeric(as.character(input$latitude))),data=input)
   geogWGS84 <- CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs") # Make sure proj is what we think it is.
   input.spdf@proj4string <- geogWGS84
   
