@@ -2,7 +2,7 @@ predict.effdis.t2.data <-
 function (cmod=mods, effmod=emod,grid.res=5,start.year=1995,end.year=2010,which.flag='All',which.gear='LL')
   {
   
-  #cmod  <- alb;effmod <- emod;grid.res <-5;start.year <- 1970; end.year <- 2010;which.flag ='Japan';which.gear='LL'
+  cmod  <- alb;effmod <- emod;grid.res <-5;start.year <- 2000; end.year <- 2010;which.flag ='Japan';which.gear='LL'
   
   ## Use the GAM models fitted in the previous step to predict over a relevant-sized grid
   
@@ -73,11 +73,11 @@ function (cmod=mods, effmod=emod,grid.res=5,start.year=1995,end.year=2010,which.
   
   # Do the predictions over the grid #
   
-  prob <- predict(cmod$pmod,ngrd,type="response")
-  measured_catch <- predict(cmod$gmod,ngrd,type="response")
-  eff <- predict(effmod$emod,ngrd,type="response")
+  prob <- predict(cmod$pmod,ngrd,type="response",se=T)
+  measured_catch <- predict(cmod$gmod,ngrd,type="response",se=T)
+  eff <- predict(effmod$emod,ngrd,type="response",se=T)
   
-  # Block out the land #
+  # Block out the land and unwanted oceans#
   
   prob[ngrd$which.ocean %in% c('land','med','pac')] <- NA
   measured_catch[ngrd$which.ocean %in% c('land','med','pac')] <- NA
@@ -85,9 +85,12 @@ function (cmod=mods, effmod=emod,grid.res=5,start.year=1995,end.year=2010,which.
   
    # Convert to vectors
   
-  ngrd$prob <- round(as.vector(prob),3)
-  ngrd$measured_catch <- round(as.vector(measured_catch),3)
-  ngrd$eff <- round(as.vector(eff),3)
+  ngrd$prob <- round(as.vector(prob$fit),3)
+  ngrd$prob.se.fit <- round(as.vector(prob$se.fit))
+  ngrd$measured_catch <- round(as.vector(measured_catch$fit),3)
+  ngrd$measured_catch.se.fit <- round(as.vector(measured_catch$se.fit),3)
+  ngrd$eff <- round(as.vector(eff$fit),3)
+  ngrd$eff.se.fit <- round(as.vector(eff$se.fit),3)
   
   #print(head(ngrd),20)
   
