@@ -23,7 +23,7 @@ function(tdata = task2.lf, what.gear = 'LL', what.year = 2005, gridx=5,gridy=5,w
     
     else{
       
-      coords      <- SpatialPointsDataFrame(cbind(x=an(ac(tdata1$longitude)),y=an(ac(tdata1$latitude))),data=tdata1[,c(4,5)])
+      coords      <- SpatialPointsDataFrame(cbind(x=as.numeric(as.character(tdata1$longitude)),y=as.numeric(as.character(tdata1$latitude))),data=tdata1[,c(4,5)])
       
       geogWGS84 <- CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs") # Make sure proj is what we think it is.
       
@@ -93,7 +93,7 @@ function(tdata = task2.lf, what.gear = 'LL', what.year = 2005, gridx=5,gridy=5,w
         lonLat2SpatialPolygons(lst=lapply(as.list(1:nrow(coordGrd)),function(x){data.frame(SI_LONG=c(coordGrd[x,"s1"]-resx/2,rep(coordGrd[x,"s1"]+resx/2,2),coordGrd[x,"s1"]-resx/2),
                                                                                            SI_LATI=c(rep(coordGrd[x,"s2"]-resy/2,2),rep(coordGrd[x,"s2"]+resy/2,2)))}))
       
-      cols<- c("white",colintens)[cut(grd@data[an(names(table(idx))),1]/valdiv,breaks=cutbreaksval$ALL)]
+      cols<- c("white",colintens)[cut(grd@data[as.numeric(names(table(idx))),1]/valdiv,breaks=cutbreaksval$ALL)]
       plot(grdPols,col=cols,add=T,border='transparent')
       #plot(atl.countries,add=T,col=colland)
       map("world",resolution=1,add=T,fill=TRUE,col=colland);map.axes();#box()
@@ -111,7 +111,7 @@ function(tdata = task2.lf, what.gear = 'LL', what.year = 2005, gridx=5,gridy=5,w
       
       
       grdPolsDF              <- as(grdPols,"SpatialPolygonsDataFrame")
-      grdPolsDF@data         <- data.frame(value=grd@data[an(names(table(idx))),1],color=cols)
+      grdPolsDF@data         <- data.frame(value=grd@data[as.numeric(names(table(idx))),1],color=cols)
       proj4string(grdPolsDF) <- CRS("+proj=longlat +ellps=WGS84")
       #dir.create("/home/doug/effdis/shp_files/")
       #setwd("/home/doug/effdis/shp_files/")
