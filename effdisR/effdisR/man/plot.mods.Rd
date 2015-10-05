@@ -5,47 +5,43 @@
 Function to plot output of fitted GAMs
 }
 \description{
-%%  ~~ A concise (1-5 lines) description of what the function does. ~~
+The function uses the predicted numbers from predict.effdis.t2.data and plots them on a map. The user can select to plot at locations for which there are data, plot.samples.only = T or interpolate over the entire area for which data have ever been available.
 }
 \usage{
-plot.mods(input = bft.aa, cmod = bft, what.year = 1995, what.month = 1, grid.res = 5, what.value = "prob", what.gear = "PS", plot.samples.only = TRUE)
+plot.mods(input = bft.aa, cmod = bft, which.year = 1995, which.month = 1, grid.res = 5, which.value = "prob", which.gear = "PS", plot.samples.only = TRUE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{input}{
-%%     ~~Describe \code{input} here~~
+Predicted object output by predict.effdis.t2.data.
 }
   \item{cmod}{
-%%     ~~Describe \code{cmod} here~~
+GAM model object from fit2stageGAMtoCatch.
 }
-  \item{what.year}{
-%%     ~~Describe \code{what.year} here~~
+  \item{which.year}{
+Select year to plot
 }
-  \item{what.month}{
-%%     ~~Describe \code{what.month} here~~
+  \item{which.month}{
+Select month to plot
 }
   \item{grid.res}{
-%%     ~~Describe \code{grid.res} here~~
+Select grid resolution.
 }
-  \item{what.value}{
-%%     ~~Describe \code{what.value} here~~
+  \item{which.value}{
+Select value to plot, ie. probability, measured_catch or cpue.
 }
-  \item{what.gear}{
-%%     ~~Describe \code{what.gear} here~~
+  \item{which.gear}{
+Select gear to plot
 }
   \item{plot.samples.only}{
-%%     ~~Describe \code{plot.samples.only} here~~
+Select fully interpolated data or only locations where data were actually recorded.
 }
 }
 \details{
 %%  ~~ If necessary, more details than the description above ~~
 }
 \value{
-%%  ~Describe the value returned
-%%  If it is a LIST, use
-%%  \item{comp1 }{Description of 'comp1'}
-%%  \item{comp2 }{Description of 'comp2'}
-%% ...
+Only a plot is returned
 }
 \references{
 %% ~put references to the literature/web site here ~
@@ -68,51 +64,51 @@ plot.mods(input = bft.aa, cmod = bft, what.year = 1995, what.month = 1, grid.res
 ##--	or do  help(data=index)  for the standard data sets.
 
 ## The function is currently defined as
-function (input = bft.aa, cmod = bft, what.year = 1995, what.month = 1, 
-    grid.res = 5, what.value = "prob", what.gear = "PS", plot.samples.only = TRUE) 
+function (input = bft.aa, cmod = bft, which.year = 1995, which.month = 1, 
+    grid.res = 5, which.value = "prob", which.gear = "PS", plot.samples.only = TRUE) 
 {
     min.lat <- min(cmod$pmod.data$latitude)
     max.lat <- max(cmod$pmod.data$latitude)
     min.lon <- min(cmod$pmod.data$longitude)
     max.lon <- max(cmod$pmod.data$longitude)
-    what.species <- as.character(input$species[1])
+    which.species <- as.character(input$species[1])
     lonnie <- seq(min.lon, max.lon, by = grid.res)
     lattie <- seq(min.lat, max.lat, by = grid.res)
     lo <- length(lonnie)
     la <- length(lattie)
-    if (what.value == "prob") {
+    if (which.value == "prob") {
         if (plot.samples.only == TRUE) {
-            input[, what.value][input$observation == F] <- NA
+            input[, which.value][input$observation == F] <- NA
         }
-        image(lonnie, lattie, matrix(input[, what.value][input$year == 
-            what.year & input$month == what.month], lo, la), 
+        image(lonnie, lattie, matrix(input[, which.value][input$year == 
+            which.year & input$month == which.month], lo, la), 
             col = topo.colors(100))
-        contour(lonnie, lattie, matrix(input[, what.value][input$year == 
-            what.year & input$month == what.month], lo, la), 
+        contour(lonnie, lattie, matrix(input[, which.value][input$year == 
+            which.year & input$month == which.month], lo, la), 
             add = T)
         map("worldHires", add = T, fill = T)
-        title(paste(toupper(what.species), "-", what.value, month.abb[what.month], 
-            what.year, what.gear))
+        title(paste(toupper(which.species), "-", which.value, month.abb[which.month], 
+            which.year, which.gear))
         w0 <- (1:length(cmod$pmod.data[, 1]))[cmod$pmod.data$year == 
-            what.year & cmod$pmod.data$month == what.month]
+            which.year & cmod$pmod.data$month == which.month]
         points(cmod$pmod.data$longitude[w0], cmod$pmod.data$latitude[w0], 
             pch = ".")
     }
     else {
         if (plot.samples.only == TRUE) {
-            input[, what.value][input$observation == F] <- NA
+            input[, which.value][input$observation == F] <- NA
         }
-        image(lonnie, lattie, matrix(log(input[, what.value])[input$year == 
-            what.year & input$month == what.month], lo, la), 
+        image(lonnie, lattie, matrix(log(input[, which.value])[input$year == 
+            which.year & input$month == which.month], lo, la), 
             col = topo.colors(100))
-        contour(lonnie, lattie, matrix(log(input[, what.value])[input$year == 
-            what.year & input$month == what.month], lo, la), 
+        contour(lonnie, lattie, matrix(log(input[, which.value])[input$year == 
+            which.year & input$month == which.month], lo, la), 
             add = T)
         map("worldHires", add = T, fill = T)
-        title(paste(toupper(what.species), "-", what.value, month.abb[what.month], 
-            what.year, what.gear))
+        title(paste(toupper(which.species), "-", which.value, month.abb[which.month], 
+            which.year, which.gear))
         w0 <- (1:length(cmod$pmod.data$longitude))[cmod$pmod.data$year == 
-            what.year & cmod$pmod.data$month == what.month]
+            which.year & cmod$pmod.data$month == which.month]
         points(cmod$pmod.data$longitude[w0], cmod$pmod.data$latitude[w0], 
             pch = ".")
     }

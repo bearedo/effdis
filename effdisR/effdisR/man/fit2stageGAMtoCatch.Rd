@@ -2,10 +2,12 @@
 \alias{fit2stageGAMtoCatch}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-Function to fit generalised additive models to the EFFDIS catch data in 2 stages. The first is a Bernoulli model the second is a Gamma model fitted to the positive part of the data.
+Function to fit generalised additive models to the EFFDIS catch data in 2 stages. The first is a Bernoulli model the second is a Gamma model fitted to the positive part of the data
 }
 \description{
-%%  ~~ A concise (1-5 lines) description of what the function does. ~~
+The function extracts a relevant subset of the Task II data. For the first model a binary variable is constructed where zero catch = 0 and positive catch = 1 which is modeled as a function of longitude, latitude, trend and season using a GAM (mgcv library) from the quasibinomial family.  In the second model the catches that = 0 are removed and the positive component is modeled using a GAM (mgcv library) from the Gamma family. In the call se
+
+The seasonal component is estimated using harmonics.
 }
 \usage{
 fit2stageGAMtoCatch(input = pslf, which.species = "bft", start.year = 1950, end.year = 2015, which.flag = "Japan", kk = 6)
@@ -13,39 +15,40 @@ fit2stageGAMtoCatch(input = pslf, which.species = "bft", start.year = 1950, end.
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{input}{
-%%     ~~Describe \code{input} here~~
+Task II data in the long format
 }
   \item{which.species}{
-%%     ~~Describe \code{which.species} here~~
+Select which species to model, e.g. alb or skj
 }
   \item{start.year}{
-%%     ~~Describe \code{start.year} here~~
+Select from which year you want to start
 }
   \item{end.year}{
-%%     ~~Describe \code{end.year} here~~
+Select from which year you want to end
 }
   \item{which.flag}{
-%%     ~~Describe \code{which.flag} here~~
+Select which flag state, e.g. Japan
 }
   \item{kk}{
-%%     ~~Describe \code{kk} here~~
+Select smoothing parameter. Default is 6. 
 }
 }
 \details{
-%%  ~~ If necessary, more details than the description above ~~
+
 }
 \value{
-%%  ~Describe the value returned
-%%  If it is a LIST, use
-%%  \item{comp1 }{Description of 'comp1'}
-%%  \item{comp2 }{Description of 'comp2'}
-%% ...
+
+  \item{pmod}{Model object from the binary GAM}
+ \item{pmod.data }{Data used in the binary GAM fit}
+\item{gmod}{Model object from the Gamma GAM fitted to positive data}
+\item{gmod.data}{Data used in the Gamma GAM fitted to positive data}
+
 }
 \references{
-%% ~put references to the literature/web site here ~
+https://cran.r-project.org/web/packages/mgcv/index.html
 }
 \author{
-%%  ~~who you are~~
+Doug Beare
 }
 \note{
 %%  ~~further notes~~
@@ -57,9 +60,9 @@ fit2stageGAMtoCatch(input = pslf, which.species = "bft", start.year = 1950, end.
 %% ~~objects to See Also as \code{\link{help}}, ~~~
 }
 \examples{
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--	or do  help(data=index)  for the standard data sets.
+
+#alb <- fit2stageGAMtoCatch(input=lllf,which.flag='Japan',which.species='alb',start.year=1995,end.year=2010)
+
 
 ## The function is currently defined as
 function (input = pslf, which.species = "bft", start.year = 1950, 

@@ -19,7 +19,7 @@ function(input = t2ce_lf_ll,what.dsn = 'effdis-tuna-cc1')
   # rs <-  dbSendQuery(con,q)
   # df <-  fetch(rs,n=-1)
   
-  tdlc     <- SpatialPointsDataFrame(cbind(x=an(ac(t2ce_distinct_locations_covariates$longitude)),y=an(ac(t2ce_distinct_locations_covariates$lat))),data=t2ce_distinct_locations_covariates)
+  tdlc     <- SpatialPointsDataFrame(cbind(x=as.numeric(as.character(t2ce_distinct_locations_covariates$longitude)),y=as.numeric(as.character(t2ce_distinct_locations_covariates$lat))),data=t2ce_distinct_locations_covariates)
   geogWGS84 <- CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs") # Make sure proj is what we think it is.
   tdlc@proj4string <- geogWGS84
   

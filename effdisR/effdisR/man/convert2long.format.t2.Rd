@@ -4,7 +4,7 @@
 \title{Function to convert short format to long format which is useful for regression modeling
 }
 \description{
-%%  ~~ A concise (1-5 lines) description of what the function does. ~~
+Takes the task II data in the form t2ce, selects the most useful columns and converts them to the long-format. Instead of nine columns for each species there is now a single column for 'species'
 }
 \usage{
 convert2long.format.t2(input = t2ce)
@@ -12,13 +12,14 @@ convert2long.format.t2(input = t2ce)
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{input}{
-%%     ~~Describe \code{input} here~~
+Data frame of task II data in the short format, ie. t2ce from the PostgreSQL database
 }
 }
 \details{
-%%  ~~ If necessary, more details than the description above ~~
+This is based on melt from reshape 2 and is simply handy for regression modeling and often it's easier to write SQL queries with data in the long-format
 }
 \value{
+Returns a new data frame in the long format with column names as per input but all the species columns are named,'species' and the catches are named, 'measured_catch'
 %%  ~Describe the value returned
 %%  If it is a LIST, use
 %%  \item{comp1 }{Description of 'comp1'}
@@ -29,7 +30,7 @@ convert2long.format.t2(input = t2ce)
 %% ~put references to the literature/web site here ~
 }
 \author{
-%%  ~~who you are~~
+Doug Beare
 }
 \note{
 %%  ~~further notes~~
@@ -41,9 +42,9 @@ convert2long.format.t2(input = t2ce)
 %% ~~objects to See Also as \code{\link{help}}, ~~~
 }
 \examples{
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--	or do  help(data=index)  for the standard data sets.
+
+
+#lllf <- convert2long.format.t2(input =ll1) # Convert longline data in the short format to long format.
 
 ## The function is currently defined as
 function (input = t2ce) 

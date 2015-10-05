@@ -1,5 +1,5 @@
 model.nos.kgs <-
-function(input=pslf,which.dsn='effdis-local',which.gear='LL')
+function(input=pslf,which.gear='LL')
 {
   #Function finds the data in the task2 db (long-format) which is available for both weights (kgs) and numbers. 
   #It then models kgs as a function of nos plus some other relevant covariates.

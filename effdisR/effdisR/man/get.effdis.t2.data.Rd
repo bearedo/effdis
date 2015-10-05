@@ -5,7 +5,7 @@
 Function to get the Task II data from the postgreSQL database on the ICCAT cloud server
 }
 \description{
-%%  ~~ A concise (1-5 lines) description of what the function does. ~~
+Extracts Task I data from the PostgreSQL database (effdis) on the ICCAT cloud server
 }
 \usage{
 get.effdis.t2.data(which.dsn = "effdis-tuna-cc1", which.gear = "LL", which.region = "AT", which.flag = "All", which.dsettype = "-w")
@@ -13,36 +13,45 @@ get.effdis.t2.data(which.dsn = "effdis-tuna-cc1", which.gear = "LL", which.regio
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{which.dsn}{
-%%     ~~Describe \code{which.dsn} here~~
+Data source name, see details.
 }
   \item{which.gear}{
-%%     ~~Describe \code{which.gear} here~~
+Select gear type, e.g. PS=Purse seine
 }
   \item{which.region}{
-%%     ~~Describe \code{which.region} here~~
+Select region, e.g. AT = Atantic
 }
   \item{which.flag}{
-%%     ~~Describe \code{which.flag} here~~
+Select flag naton, e.g. Japan
 }
   \item{which.dsettype}{
-%%     ~~Describe \code{which.dsettype} here~~
+Select dsettype. 'n-' = numbers, '-w' = weight in kgs, 'nw'= both numbers and weights collected.
 }
 }
 \details{
-%%  ~~ If necessary, more details than the description above ~~
+which.dsn is a text string string telling R which datbase to connect to. You need to have the PostgreSQL drivers installed and the simplest way to do this is install PostgreSQL. In linux you will then need to edit the 
+etc/odbc.ini file, see example odbc.ini below. Hence which.dsn = 'effdis-tuna-cc1'  
+[ODBC Data Sources]  
+effdis = effdis-tuna-cc1  
+[effdis-tuna-cc1]  
+Driver = /usr/lib/x86_64-linux-gnu/odbc/psqlodbcw.so  
+Database = effdis  
+Servername = 134.213.29.249  
+Username = postgres  
+Password = Postgres1  
+Protocol = 8.2.5  
+ReadOnly = 0  
+[ODBC]  
+InstallDir = /usr/lib  
 }
 \value{
-%%  ~Describe the value returned
-%%  If it is a LIST, use
-%%  \item{comp1 }{Description of 'comp1'}
-%%  \item{comp2 }{Description of 'comp2'}
-%% ...
+Data frame of the Task II data extracted from the database.
 }
 \references{
-%% ~put references to the literature/web site here ~
+http://www.r-bloggers.com/getting-started-with-postgresql-in-r/
 }
 \author{
-%%  ~~who you are~~
+Doug Beare
 }
 \note{
 %%  ~~further notes~~
@@ -54,31 +63,7 @@ get.effdis.t2.data(which.dsn = "effdis-tuna-cc1", which.gear = "LL", which.regio
 %% ~~objects to See Also as \code{\link{help}}, ~~~
 }
 \examples{
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--	or do  help(data=index)  for the standard data sets.
-
-## The function is currently defined as
-function (which.dsn = "effdis-tuna-cc1", which.gear = "LL", which.region = "AT", 
-    which.flag = "All", which.dsettype = "-w") 
-{
-    chan <- odbcConnect(which.dsn, case = "postgresql", believeNRows = FALSE)
-    if (which.flag == "All") {
-        query <- paste0("SELECT yearc AS year, trend, timeperiodid AS month, flagname, fleetcode,region, squaretypecode,\ngeargrpcode,longitude,latitude, catchunit, dsettype, eff1, eff1type,\nalb,bft,bet,skj,yft,swo,bum,sai,whm,totsp9\nFROM t2ce\nWHERE region =", 
-            "'", which.region, "'", "AND timeperiodid < 13 AND geargrpcode=", 
-            "'", which.gear, "'", "AND dsettype=", "'", which.dsettype, 
-            "'")
-    }
-    else {
-        query <- paste0("SELECT yearc AS year, trend, timeperiodid AS month, flagname, fleetcode,region,squaretypecode,\ngeargrpcode,longitude,latitude, catchunit, dsettype, eff1, eff1type,\nalb,bft,bet,skj,yft,swo,bum,sai,whm,totsp9\n\nFROM t2ce\nWHERE region =", 
-            "'", which.region, "'", "AND timeperiodid < 13 AND geargrpcode=", 
-            "'", which.gear, "'", "AND flagname=", "'", which.flag, 
-            "'", "AND dsettype=", "'", which.dsettype, "'")
-    }
-    out <- sqlQuery(chan, query)
-    odbcClose(chan)
-    out
-  }
+#llnw <- get.effdis.t2.data(which.dsn='effdis-tuna-cc1',which.gear='LL',which.flag='All',which.dsettype = 'nw')
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

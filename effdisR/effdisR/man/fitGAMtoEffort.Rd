@@ -5,47 +5,47 @@
 Function to fit generalised additive model from the quasipoisson family to the effort data
 }
 \description{
-%%  ~~ A concise (1-5 lines) description of what the function does. ~~
+The function extracts a relevant subset of the Task II data and models the effort data selected (e.g. NO.HOOKS) as a function of location (longitude and latitude) and time (trend and season). Seasonality is modeled using harmonics. 
 }
 \usage{
 fitGAMtoEffort(input = lllf, which.flag = "Japan", which.effort = "NO.HOOKS", start.year = 1950, end.year = 2010, kk = 6)
 }
-%- maybe also 'usage' for other objects documented here.
+
 \arguments{
   \item{input}{
-%%     ~~Describe \code{input} here~~
+  Task II data in the long format
 }
   \item{which.flag}{
-%%     ~~Describe \code{which.flag} here~~
+  Select which flag state, e.g. Japan
 }
   \item{which.effort}{
-%%     ~~Describe \code{which.effort} here~~
+Select effort type, e.g. NO.HOOKS
 }
   \item{start.year}{
-%%     ~~Describe \code{start.year} here~~
+Select from which year you want to start
 }
   \item{end.year}{
-%%     ~~Describe \code{end.year} here~~
+  Select from which year you want to end
 }
   \item{kk}{
-%%     ~~Describe \code{kk} here~~
+Select smoothing parameter. Default is 6. 
 }
 }
 \details{
+The harmonic regression is set up according to methods described in Introductory Time Series with R, 
+http://www.springer.com/us/book/9780387886978
 %%  ~~ If necessary, more details than the description above ~~
 }
 \value{
-%%  ~Describe the value returned
-%%  If it is a LIST, use
-%%  \item{comp1 }{Description of 'comp1'}
-%%  \item{comp2 }{Description of 'comp2'}
-%% ...
+
+\item{emod}{Model object from the quasipoisson GAM}
+ \item{pmod.data }{Data used in the quasipoisson GAM}
 }
 \references{
-%% ~put references to the literature/web site here ~
+https://cran.r-project.org/web/packages/mgcv/index.html
 }
 \author{
-%%  ~~who you are~~
+Doug Beare
 }
 \note{
 %%  ~~further notes~~
@@ -57,9 +57,10 @@ fitGAMtoEffort(input = lllf, which.flag = "Japan", which.effort = "NO.HOOKS", st
 %% ~~objects to See Also as \code{\link{help}}, ~~~
 }
 \examples{
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--	or do  help(data=index)  for the standard data sets.
+
+emod <- fitGAMtoEffort(input=lllf,which.flag='Japan',which.effort='NO.HOOKS',start.year=1970,end.year=2010,which.gam='gam')
+
+
 
 ## The function is currently defined as
 function (input = lllf, which.flag = "Japan", which.effort = "NO.HOOKS", 

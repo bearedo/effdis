@@ -4,7 +4,7 @@
 \title{Function to determine which Ocean an observation is in
 }
 \description{
-%%  ~~ A concise (1-5 lines) description of what the function does. ~~
+Adds an index/flag to the input data frame denoting whether an observation is in the Pacific, Atlantic, Mediterranean or on land
 }
 \usage{
 find.ocean(input = grd)
@@ -12,24 +12,24 @@ find.ocean(input = grd)
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{input}{
-%%     ~~Describe \code{input} here~~
+A data frame containing a column of longitudes and latitudes.
 }
 }
 \details{
+
+The shape file dataset (World_Seas) used by this function represents the boundaries of the major oceans and seas of the world. The source for the boundaries is the publication 'Limits of Oceans & Seas, Special Publication No. 23' published by the IHO in 1953. The dataset was composed by the Flanders Marine Data and Information Centre and are available for download here, http://www.marineregions.org/ . The definitions of 'Atlantic' used by ICCAT are rather crude. Thus function tries to mimic ICCAT definitions and 'Atlantic' for example includes the Gulf of St Lawrence, the Caribbean Sea, The Celtic Sea, The Gulf of Guinea, The Gulf of Mexico and The Irish Sea. Obviously this is flexible and can easily be changed
+
+
 %%  ~~ If necessary, more details than the description above ~~
 }
 \value{
-%%  ~Describe the value returned
-%%  If it is a LIST, use
-%%  \item{comp1 }{Description of 'comp1'}
-%%  \item{comp2 }{Description of 'comp2'}
-%% ...
+Data frame with column called 'which.ocean' which contains strings: 'atl', 'pac', 'med' and 'land'
 }
 \references{
-%% ~put references to the literature/web site here ~
+http://www.marineregions.org/
 }
 \author{
-%%  ~~who you are~~
+Doug Beare
 }
 \note{
 %%  ~~further notes~~
@@ -41,9 +41,10 @@ find.ocean(input = grd)
 %% ~~objects to See Also as \code{\link{help}}, ~~~
 }
 \examples{
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--	or do  help(data=index)  for the standard data sets.
+
+#llnw <- get.effdis.t2.data(which.dsn='effdis-tuna-cc1',which.gear='LL',which.flag='All',which.dsettype = 'nw') # Get data from PostgreSQL
+#llnw <- find.ocean(input=llnw) # Add which.ocean variable
+
 
 ## The function is currently defined as
 function (input = grd) 

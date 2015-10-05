@@ -3,7 +3,7 @@
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{Function to aggregate Task II data as an alternative to modeling}
 \description{
-%%  ~~ A concise (1-5 lines) description of what the function does. ~~
+The effdisR library allows user to model (statistically) the catch and effort data as functions of location and time. This function, however, allows the user to simply calculate the effort metrics directly from the raw data. To that end this function simply sums the Task II data over variables of location and time and the result can then be merged with Task I in exacly the same way as the  model output works
 }
 \usage{
 aggt2data(input = lllf, what.flag = "Japan", what.effort = "NO.HOOKS")
@@ -11,13 +11,13 @@ aggt2data(input = lllf, what.flag = "Japan", what.effort = "NO.HOOKS")
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{input}{
-%%     ~~Describe \code{input} here~~
+Task II data in the long format
 }
   \item{what.flag}{
-%%     ~~Describe \code{what.flag} here~~
+Select flag country, e.g. Japan
 }
   \item{what.effort}{
-%%     ~~Describe \code{what.effort} here~~
+  Select type of effort, e.g. NO.HOOKS
 }
 }
 \details{
@@ -34,7 +34,7 @@ aggt2data(input = lllf, what.flag = "Japan", what.effort = "NO.HOOKS")
 %% ~put references to the literature/web site here ~
 }
 \author{
-%%  ~~who you are~~
+Doug Beare
 }
 \note{
 %%  ~~further notes~~
@@ -46,9 +46,9 @@ aggt2data(input = lllf, what.flag = "Japan", what.effort = "NO.HOOKS")
 %% ~~objects to See Also as \code{\link{help}}, ~~~
 }
 \examples{
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--	or do  help(data=index)  for the standard data sets.
+
+#totals <- agg2data(input=lllf,what.flag="Chinese Taipei", what.effort = "NO.HOOKS") # Total catches by location, year, month and species for selected flag country
+
 
 ## The function is currently defined as
 function (input = lllf, what.flag = "Japan", what.effort = "NO.HOOKS") 

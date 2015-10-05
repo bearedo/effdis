@@ -4,6 +4,9 @@
 \title{Function to add depth, sst, chlorophyll a and primary production to a data frame }
 
 \description{
+
+This was set up to investigate whether it was worth using coveriates (other than latitude, longitude, trend, and month) such as bottom depth, sea-surface temperature etc. These covariates are climatological means from NOAA's websites.
+
 %%  ~~ A concise (1-5 lines) description of what the function does. ~~
 }
 \usage{
@@ -12,16 +15,18 @@ add.covariates(input = t2ce_lf_ll, what.dsn = "effdis-tuna-cc1")
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{input}{
-%%     ~~Describe \code{input} here~~
+  Task II data frame in the long format.
 }
   \item{what.dsn}{
-%%     ~~Describe \code{what.dsn} here~~
+DSN for database.
 }
 }
 \details{
-%%  ~~ If necessary, more details than the description above ~~
+In linux the DSN is set up in the file etc/odbc.ini, in Windows you need to install the PostgreSQL drivers first and set up the DSN from the Control Panel -> Administrative Tools. See functions get.effdis.t2.data and get.effdis.t1.data for more details.
+
 }
 \value{
+Output is a new data frame with columns added for depth, sea surface temperature, primary production and chlorophyll a concentration.
 %%  ~Describe the value returned
 %%  If it is a LIST, use
 %%  \item{comp1 }{Description of 'comp1'}
@@ -32,7 +37,7 @@ add.covariates(input = t2ce_lf_ll, what.dsn = "effdis-tuna-cc1")
 %% ~put references to the literature/web site here ~
 }
 \author{
-%%  ~~who you are~~
+Doug Beare
 }
 \note{
 %%  ~~further notes~~
@@ -44,9 +49,13 @@ add.covariates(input = t2ce_lf_ll, what.dsn = "effdis-tuna-cc1")
 %% ~~objects to See Also as \code{\link{help}}, ~~~
 }
 \examples{
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--	or do  help(data=index)  for the standard data sets.
+require(RODBC)
+#lln  <- get.effdis.t2.data(which.dsn='effdis-tuna-cc1',which.gear='LL',which.flag='Brasil',which.dsettype = 'n-') # Get data from cloud server
+#require(reshape2)
+#llnlf <- convert.to.long.format.t2(input = lln) # Convert to long format
+#llnlf <- add.covariates(input=llnlf) # Add on covariates
+
+
 
 ## The function is currently defined as
 function (input = t2ce_lf_ll, what.dsn = "effdis-tuna-cc1") 

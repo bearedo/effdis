@@ -44,7 +44,7 @@ function(tdata = task2.lf, what.gear = 'LL', what.year = 2005, gridx=5,gridy=5,e
   }
   else{
     
-  coords      <- SpatialPointsDataFrame(cbind(x=an(ac(tdata2$longitude)),y=an(ac(tdata2$latitude))),data=tdata2[,c(4,5)])
+  coords      <- SpatialPointsDataFrame(cbind(x=as.numeric(as.character(tdata2$longitude)),y=as.numeric(as.character(tdata2$latitude))),data=tdata2[,c(4,5)])
   
   geogWGS84 <- CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs") # Make sure proj is what we think it is.
   

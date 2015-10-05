@@ -44,7 +44,7 @@ function(tdata=t2ce,start.year=1950,end.year=2010,which.gear='LL',which.region =
   
   axis(side=1,at=start.year:end.year,labels=as.character(start.year:end.year))
   ms <- range(fdata$month,na.rm=T)
-  axis(side=2,at=ms[1]:ms[2],label=month.abb[ms[1]:ms[2]])
+  axis(side=2,at=ms[1]:ms[2],labels=month.abb[ms[1]:ms[2]])
   title(paste(which.flag,which.gear, sep= ' - '))
   }
 }

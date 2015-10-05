@@ -2,10 +2,10 @@
 \alias{kgs.from.nos}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-Function to estimate weight caught for countries that only record numbers.
+Function to estimate weight caught for countries that only record numbers
 }
 \description{
-%%  ~~ A concise (1-5 lines) description of what the function does. ~~
+The function first takes out the data where only numbers have been recorded. It then uses the linear model estimates from the function model.nos.kgs which are estimated using those data for which both numbers and weights are recorded to predict weights for situations where numbers only exist. It then puts the data back together giving a data frame of catches in weights only
 }
 \usage{
 kgs.from.nos(input = pslf)
@@ -13,24 +13,20 @@ kgs.from.nos(input = pslf)
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{input}{
-%%     ~~Describe \code{input} here~~
+  Task II data in the long format
 }
 }
 \details{
-%%  ~~ If necessary, more details than the description above ~~
+Obviously there are caveats which should be taken into consideration. We are using data from countries which send catches recorded in both numbers and weights to make assumptions about countries that send in only numbers. 
 }
 \value{
-%%  ~Describe the value returned
-%%  If it is a LIST, use
-%%  \item{comp1 }{Description of 'comp1'}
-%%  \item{comp2 }{Description of 'comp2'}
-%% ...
+Output is a data.frame containing catch data in weights inferred from flag nations that send in catches in both weights and numbers.
 }
 \references{
 %% ~put references to the literature/web site here ~
 }
 \author{
-%%  ~~who you are~~
+Doug Beare
 }
 \note{
 %%  ~~further notes~~
@@ -42,35 +38,11 @@ kgs.from.nos(input = pslf)
 %% ~~objects to See Also as \code{\link{help}}, ~~~
 }
 \examples{
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--	or do  help(data=index)  for the standard data sets.
 
-## The function is currently defined as
-function (input = pslf) 
-{
-    t2ce_lf_kg <- input[input$dsettype \%in\% c("-w", "nw"), ]
-    t2ce_lf_kg <- t2ce_lf_kg[t2ce_lf_kg$catchunit != "--", ]
-    t2ce_lf_nr <- input[input$dsettype == "n-", ]
-    t2ce_lf_nr$measured_catch_nr <- t2ce_lf_nr$measured_catch
-    dd <- dim(t2ce_lf_nr)
-    if (dd[1] > 0) {
-        t2ce_lf_nr$lnr <- log(t2ce_lf_nr$measured_catch_nr)
-        aa <- exp(predict(bm, t2ce_lf_nr, type = "response"))
-        ww <- (1:length(t2ce_lf_nr[, 1]))[t2ce_lf_nr$measured_catch == 
-            0]
-        aa[ww] <- 0
-        t2ce_lf_nr$measured_catch <- aa
-        t2ce_lf_nr$dsettype <- "-w"
-        t2ce_lf_nr$catchunit <- "kg"
-        t2ce_lf_nr <- t2ce_lf_nr[, -c(16, 17)]
-        t2ce_lf <- rbind(t2ce_lf_kg, t2ce_lf_nr)
-        t2ce_lf
-    }
-    else {
-        print("All data are in kgs")
-    }
-  }
+#bm <- model.nos.kgs(input=lllf,which.gear='LL')
+
+#lllf <- kgs.from.nos(lllf) # for those fleets that supply only number
+
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

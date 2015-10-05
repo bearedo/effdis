@@ -57,7 +57,7 @@ function (cmod=mods, effmod=emod,grid.res=5,start.year=1995,end.year=2010,which.
   
   dat0 <- ngrd # input data is dat0
   
-  ss = cc = matrix(NA,nr=length(dat0[,1]), nc=6)
+  ss = cc = matrix(NA,nrow=length(dat0[,1]), ncol =6)
   
   for (i in 1:6)
   { cc[,i] <- cos(2*pi*i*dat0$trend/12)                                                              
@@ -119,7 +119,6 @@ function (cmod=mods, effmod=emod,grid.res=5,start.year=1995,end.year=2010,which.
   #print(filename)
   
   write.table(model.data[model.data$observation == TRUE,],file=filename,sep=',',row.names=F,col.names=F)
-  
   
   model.data
   

@@ -9,7 +9,6 @@
 \packageDescription{effdisR}
 }
 \details{
-
 The DESCRIPTION file:
 \packageDESCRIPTION{effdisR}
 \packageIndices{effdisR}
