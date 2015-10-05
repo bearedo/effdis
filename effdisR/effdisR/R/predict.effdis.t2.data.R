@@ -118,7 +118,10 @@ function (cmod=mods, effmod=emod,grid.res=5,start.year=1995,end.year=2010,which.
   mm <- ifelse(is.na(mm),F,T)
   ngrd$observation <- mm 
   
-  model.data <- ngrd
+  model.data <- ngrd[,-c(9:19)]# Don't bother writing out all the harmonix
+  for(i in c(1,2,9:14,16,17))
+  {model.data[,i] <- round(model.data[,i],1)} # Mke data smaller.
+  
   
   #print(summary(model.data$catch[ngrd$observation == T]/1000))
   
