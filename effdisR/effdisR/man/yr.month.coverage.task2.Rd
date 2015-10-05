@@ -13,22 +13,22 @@ yr.month.coverage.task2(tdata = t2ce, start.year = 1950, end.year = 2010, which.
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{tdata}{
-%%     ~~Describe \code{tdata} here~~
+Task II data in the short format
 }
   \item{start.year}{
-%%     ~~Describe \code{start.year} here~~
+Select start year from which to plot
 }
   \item{end.year}{
-%%     ~~Describe \code{end.year} here~~
+Select end year
 }
   \item{which.gear}{
-%%     ~~Describe \code{which.gear} here~~
+Select gear type to plot
 }
   \item{which.region}{
-%%     ~~Describe \code{which.region} here~~
+Select region to plot,e.g. 'AT' = Atlantic
 }
   \item{which.flag}{
-%%     ~~Describe \code{which.flag} here~~
+Select flag nation to plot
 }
 }
 \details{
@@ -45,7 +45,7 @@ yr.month.coverage.task2(tdata = t2ce, start.year = 1950, end.year = 2010, which.
 %% ~put references to the literature/web site here ~
 }
 \author{
-%%  ~~who you are~~
+Doug Beare
 }
 \note{
 %%  ~~further notes~~
@@ -57,45 +57,14 @@ yr.month.coverage.task2(tdata = t2ce, start.year = 1950, end.year = 2010, which.
 %% ~~objects to See Also as \code{\link{help}}, ~~~
 }
 \examples{
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--	or do  help(data=index)  for the standard data sets.
-
-## The function is currently defined as
-function (tdata = t2ce, start.year = 1950, end.year = 2010, which.gear = "LL", 
-    which.region = "AT", which.flag = "EU.Portugal") 
-{
-    n0 <- tdata[tdata$dsettype == "n-", ]
-    nw <- tdata[tdata$dsettype == "nw", ]
-    mm <- duplicated(nw[, -9])
-    nw <- nw[mm == TRUE, ]
-    w0 <- tdata[tdata$dsettype == "-w", ]
-    tdata1 <- rbind(n0, nw, w0)
-    tdata1 <- tdata[tdata$month < 13, ]
-    fdata <- tdata1[tdata1$flagname == which.flag & tdata1$geargrpcode == 
-        which.gear & tdata1$region == which.region, ]
-    dd <- dim(fdata)
-    if (dd[1] == 0) {
-    }
-    else {
-        fmat <- matrix(NA, length(1950:2015), 12)
-        dimnames(fmat) <- list(c(1950:2015), 1:12)
-        ymc <- table(fdata$year, fdata$month)
-        dimnames(ymc)[[1]] <- sort(unique(fdata$year))
-        dimnames(ymc)[[2]] <- month.abb
-        mm <- match(dimnames(ymc)[[1]], dimnames(fmat)[[1]])
-        fmat[mm, ] <- ymc
-        image(1950:2015, 1:12, fmat, xaxt = "n", yaxt = "n", 
-            xlab = "", ylab = "", col = terrain.colors(100), 
-            xlim = c(start.year, end.year), ylim = range(fdata$month, 
-                na.rm = T))
-        contour(1950:2015, 1:12, fmat, add = T)
-        axis(side = 1, at = start.year:end.year, label = as.character(start.year:end.year))
-        ms <- range(fdata$month, na.rm = T)
-        axis(side = 2, at = ms[1]:ms[2], label = month.abb[ms[1]:ms[2]])
-        title(paste(which.flag, which.gear, sep = " - "))
-    }
-  }
+#yr.month.coverage.task2(tdata=ll,which.gear='LL',
+#              start.year=1960,end.year=2010,which.flag='Japan')
+#yr.month.coverage.task2(tdata=ll,which.gear='LL',
+#              start.year=1960,end.year=2010,which.flag='Chinese Taipei')
+#yr.month.coverage.task2(tdata=ll,which.gear='LL',
+ #             start.year=1960,end.year=2010,which.flag='Brasil')
+#yr.month.coverage.task2(tdata=ll,which.gear='LL',
+ #             start.year=1960,end.year=2010,which.flag='U.S.A.')
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

@@ -1,10 +1,10 @@
 \name{spatial.coverage.by.year.task2}
 \alias{spatial.coverage.by.year.task2}
 %- Also NEED an '\alias' for EACH other topic documented here.
-\title{ Function to plot the spatial distribution of EFFDIS data each year
+\title{ Function to plot the spatial distribution of EFFDIS Task II data each year
 }
 \description{
-%%  ~~ A concise (1-5 lines) description of what the function does. ~~
+Plots Task II data on map
 }
 \usage{
 spatial.coverage.by.year.task2(tdata = t2ce, start.year = 1950, end.year = 2010, which.region = "AT", which.gear = "LL", which.flag = "EU.Portugal")
@@ -12,39 +12,35 @@ spatial.coverage.by.year.task2(tdata = t2ce, start.year = 1950, end.year = 2010,
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{tdata}{
-%%     ~~Describe \code{tdata} here~~
+EFFDIS Task II data in the short format
 }
   \item{start.year}{
-%%     ~~Describe \code{start.year} here~~
+Select start year to plot
 }
   \item{end.year}{
-%%     ~~Describe \code{end.year} here~~
+Select end year to plot
 }
   \item{which.region}{
-%%     ~~Describe \code{which.region} here~~
+Select region to plot, e.g. 'AT' = Atlantic
 }
   \item{which.gear}{
-%%     ~~Describe \code{which.gear} here~~
+Select gear to plot, e.g. 'PS' = Purse seine
 }
   \item{which.flag}{
-%%     ~~Describe \code{which.flag} here~~
+Select flag nation to plot, e.g. China.P.R.
 }
 }
 \details{
 %%  ~~ If necessary, more details than the description above ~~
 }
 \value{
-%%  ~Describe the value returned
-%%  If it is a LIST, use
-%%  \item{comp1 }{Description of 'comp1'}
-%%  \item{comp2 }{Description of 'comp2'}
-%% ...
+Output is a plot
 }
 \references{
 %% ~put references to the literature/web site here ~
 }
 \author{
-%%  ~~who you are~~
+Doug Beare
 }
 \note{
 %%  ~~further notes~~
@@ -56,40 +52,9 @@ spatial.coverage.by.year.task2(tdata = t2ce, start.year = 1950, end.year = 2010,
 %% ~~objects to See Also as \code{\link{help}}, ~~~
 }
 \examples{
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--	or do  help(data=index)  for the standard data sets.
 
-## The function is currently defined as
-function (tdata = t2ce, start.year = 1950, end.year = 2010, which.region = "AT", 
-    which.gear = "LL", which.flag = "EU.Portugal") 
-{
-    fdata <- tdata[tdata$flagname == which.flag & tdata$geargrpcode == 
-        which.gear & tdata$region == which.region, ]
-    cl <- 1.5
-    ys <- start.year:end.year
-    ly <- length(ys)
-    for (i in min(ys, na.rm = T):max(ys, na.rm = T)) {
-        dat <- fdata[fdata$year == i, ]
-        if (length(dat[, 1]) == 0) {
-            plot(fdata$longitude, fdata$latitude, type = "n", 
-                xaxt = "n", yaxt = "n", ylim = range(tdata$latitude, 
-                  na.rm = T), xlim = range(tdata$longitude, na.rm = T))
-            map("world", col = "green", fill = T, add = T)
-            title(i, cex.main = cl)
-        }
-        else {
-            plot(dat$longitude, dat$latitude, type = "n", xaxt = "n", 
-                yaxt = "n", ylim = range(tdata$latitude, na.rm = T), 
-                xlim = range(tdata$longitude, na.rm = T))
-            points(dat$longitude, dat$latitude, pch = ".", col = "red")
-            map("world", add = T, col = "green", fill = T)
-            title(i, cex.main = cl)
-        }
-        mtext(side = 3, outer = T, paste(which.flag, which.gear, 
-            sep = " - "))
-    }
-  }
+#spatial.coverage.by.year.task2(tdata=t2ce,start.year=1960, end.year=1970, which.region = 'AT', which.gear='LL',which.flag='EU.Portugal')
+
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
