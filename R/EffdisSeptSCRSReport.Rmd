@@ -151,13 +151,13 @@ AND catchunit != '--' ;")
 
 ```{r temporal confounding Japan and Chinese Taipei,include=TRUE,echo=TRUE,fig.height=5}
 par(mfrow=c(2,2),mar=c(2,2,2,2),oma=c(1,1,1,1))
-yr.month.coverage.task2.r(tdata=ll,which.gear='LL',
+yr.month.coverage.task2(tdata=ll,which.gear='LL',
               start.year=1960,end.year=2010,which.flag='Japan')
-yr.month.coverage.task2.r(tdata=ll,which.gear='LL',
+yr.month.coverage.task2(tdata=ll,which.gear='LL',
               start.year=1960,end.year=2010,which.flag='Chinese Taipei')
-yr.month.coverage.task2.r(tdata=ll,which.gear='LL',
+yr.month.coverage.task2(tdata=ll,which.gear='LL',
               start.year=1960,end.year=2010,which.flag='Brasil')
-yr.month.coverage.task2.r(tdata=ll,which.gear='LL',
+yr.month.coverage.task2(tdata=ll,which.gear='LL',
               start.year=1960,end.year=2010,which.flag='U.S.A.')
 ```
 
@@ -168,7 +168,7 @@ The distribution of data/samples in space is similarly important. The function *
 
 ```{r spatial confounding Brasil,include=TRUE,echo=TRUE}
 par(mfrow=c(4,4),mar=c(0,0,1,0))
-spatial.coverage.by.year.task2.r(tdata=ll,
+spatial.coverage.by.year.task2(tdata=ll,
         start.year=1975,end.year=1990,which.gear='LL',which.flag='Brasil')
 ```
 
@@ -178,7 +178,7 @@ The extent of Brazilian longlining activity has, for example, spread out from th
 
 ```{r spatial confounding Japan, include=TRUE,echo=TRUE}
 par(mfrow=c(4,4),mar=c(0,0,1,0))
-spatial.coverage.by.year.task2.r(tdata=ll,
+spatial.coverage.by.year.task2(tdata=ll,
         start.year=1985,end.year=2000,which.gear='LL',which.flag='Japan')
 ```
 
@@ -196,7 +196,7 @@ AND catchunit != '--' ;")
 
 ```{r plot distribution of spanish purse-seine data,include=TRUE,echo=TRUE,fig.height=5}
 par(mfrow=c(2,3),mar=c(1,1,2,1),oma=c(3,3,3,3))
-spatial.coverage.by.year.task2.r(tdata=ps,start.year=2005,end.year=2010,
+spatial.coverage.by.year.task2(tdata=ps,start.year=2005,end.year=2010,
                                  which.gear='PS',which.flag='EU.España')
 ```
 
@@ -211,14 +211,14 @@ Given that we can now determine the timing and location of fishing activities (F
 In 2006, for example, longlining effort by Japan focused on the North and Eastern Atlantic (Fig. 6). Chinese Taipei flagged long-liners, on the other hand also worked in the North Atlantic but their effort appears greater in the South Atlantic (Fig. 7). Purse-seining data are submitted to ICCAT at a higher spatial resolution (1x1 grid) and examples for Spain and Panama in 2009 are plotted in Figures 8 and 9. Both fleets focus their activity along the West Coast of Africa but the Panamanian fleet tends not to venture as far inshore as the Spanish fleet (Figs 8 & 9).
 
 ```{r no of hooks shot by Japan in 2006 from task 2,include=TRUE,echo=TRUE,message = FALSE, error=FALSE, warnings=FALSE}
-three.d.effort.by.year.r(tdata=ll,what.year=2006,
+three.d.effort.by.year(tdata=ll,what.year=2006,
                          what.flag='Japan',scaling.f=10000,effort.type='NO.HOOKS')  
 ```
 
 **Figure 6.** *Total number of hooks set by Japanese fleet (Task II only) in 2006*
 
 ```{r no of hooks shot by Chinese Taipei in 2006 from task 2,include=TRUE,echo=TRUE,message = FALSE, error=FALSE, warnings=FALSE}
-three.d.effort.by.year.r(tdata=ll,what.year=2006,
+three.d.effort.by.year(tdata=ll,what.year=2006,
                          what.flag="Chinese Taipei",scaling.f=10000,gridx=5,gridy=5,
                          effort.type='NO.HOOKS',what.gear='LL')  
 ```
@@ -226,7 +226,7 @@ three.d.effort.by.year.r(tdata=ll,what.year=2006,
 **Figure 7.** *Total number of hooks set by Chinese Taipei (Task II only) in 2006*
 
 ```{r no of fishing hours by Spain in 2009 from task 2,include=TRUE,echo=TRUE,message = FALSE, error=FALSE, warnings=FALSE}
-three.d.effort.by.year.r(tdata=ps,what.year=2009,
+three.d.effort.by.year(tdata=ps,what.year=2009,
                          what.flag='EU.España',gridx=1,gridy=1,
                          scaling.f=2,effort.type='FISH.HOUR',what.gear='PS')  
 ```
@@ -234,7 +234,7 @@ three.d.effort.by.year.r(tdata=ps,what.year=2009,
 **Figure 8.** *Total fishing hours reported by Spanish purse-seiners (Task II only)  in 2009*
 
 ```{r no of fishing hours by Other in 2009 from task 2,include=TRUE,echo=TRUE,message = FALSE, error=FALSE, warnings=FALSE}
-three.d.effort.by.year.r(tdata=ps,what.year=2009,
+three.d.effort.by.year(tdata=ps,what.year=2009,
                          what.flag='Panama',
                          gridx=1,gridy=1,scaling.f=1,effort.type='FISH.HOUR',what.gear='PS')  
 ```
@@ -260,13 +260,13 @@ alb$species <- 'alb'
 
 ```{r weight of albacore caught by location in 2006 from task 2,include=TRUE,echo=TRUE,message = FALSE, error=FALSE, warnings=FALSE}
 par(mfrow=c(2,2),mar=c(2,1,2,1))
-three.d.catch.by.year.r(tdata=alb,what.year=2006,
+three.d.catch.by.year(tdata=alb,what.year=2006,
                         what.gear='LL',what.species='alb',what.flag='Japan',scaling.f=10,catchunit='nr')  
-three.d.catch.by.year.r(tdata=alb,what.year=2009,
+three.d.catch.by.year(tdata=alb,what.year=2009,
                         what.gear='LL',what.species='alb',what.flag='Japan',scaling.f=10,catchunit='nr')
-three.d.catch.by.year.r(tdata=alb,what.year=1992,
+three.d.catch.by.year(tdata=alb,what.year=1992,
                         what.gear='PS',what.species='alb',gridx=1,gridy=1,what.flag='EU.España',scaling.f=25,catchunit='kg')  
-three.d.catch.by.year.r(tdata=alb,what.year=1995,
+three.d.catch.by.year(tdata=alb,what.year=1995,
                         what.gear='PS',what.species='alb',gridx=1,gridy=1,what.flag='EU.España',scaling.f=25,catchunit='kg')
 ```
 
@@ -278,11 +278,11 @@ three.d.catch.by.year.r(tdata=alb,what.year=1995,
 Get Task II data from the database for each dsettype using *get.effdis.t2.data.r* and then combine them using rbind. The which.dsn argument here is accessing a locally installed copy of the postgres database and this should be edited when using the ICCAT cloud server.
 
 ```{r get japanese task 2 longline data,eval=FALSE,include=TRUE,echo=TRUE,message = FALSE, error=FALSE, warnings=FALSE}
-ll_n  <- get.effdis.t2.data.r(which.dsn='effdis-local',
+ll_n  <- get.effdis.t2.data(which.dsn='effdis-local',
                               which.gear='LL',which.flag='All',which.dsettype = 'n-')
-ll_nw <- get.effdis.t2.data.r(which.dsn='effdis-local',
+ll_nw <- get.effdis.t2.data(which.dsn='effdis-local',
                               which.gear='LL',which.flag='All',which.dsettype = 'nw')
-ll_w  <- get.effdis.t2.data.r(which.dsn='effdis-local',
+ll_w  <- get.effdis.t2.data(which.dsn='effdis-local',
                               which.gear='LL',which.flag='All',which.dsettype = '-w')
 long_line <- rbind(ll_n,ll_nw,ll_w)
 ```
@@ -291,7 +291,7 @@ long_line <- rbind(ll_n,ll_nw,ll_w)
 Find and extract those EFFDIS data that are in the Atlantic using *find.ocean.r*. This function imports a shapefile and in addition to the polygons for the Atlantic Ocean proper also includes the Caribbean Sea, The Gulf of St. Lawrence, the Gulf of Guinea, and the Gulf of Mexico. This aspect, however, is entirely flexible and can easily be changed. Data for land, the Mediterranean and Pacific can be extracted using the strings, 'land', 'med', and 'pac' respectively in the place of 'atl' below. 
 
 ```{r identify data in Atlantic,eval=FALSE,include=TRUE,echo=TRUE,message = FALSE, error=FALSE, warnings=FALSE}
-long_line<-find.ocean.r(long_line)
+long_line<-find.ocean(long_line)
 long_line <- long_line[long_line$which.ocean == 'atl',]
 ```
 
@@ -299,22 +299,22 @@ long_line <- long_line[long_line$which.ocean == 'atl',]
 Make sure the data are 'clean' using *prepare.effdis.data.r* as follows. Sometimes downloading from a database creates 'factor' objects in R which can cause problems. This function converts them to character strings.
 
 ```{r get Japanese task 2 longline data,eval=FALSE,include=TRUE,echo=TRUE,message = FALSE, error=FALSE, warnings=FALSE}
-long_line<-prepare.effdis.data.r(input=long_line)
+long_line<-prepare.effdis.data(input=long_line)
 ```
 
 ##Step 4
 Convert data from 'short format' to 'long format' using *convert2long.format.t2.r*. We do this because the long format is required for subsequent regression modeling.
 
 ```{r Convert data to long format,eval=FALSE,include=TRUE,echo=TRUE,message = FALSE, error=FALSE, warnings=FALSE}
-long_line_lf <- convert2long.format.t2.r(input =long_line)
+long_line_lf <- convert2long.format.t2(input =long_line)
 ```
 
 ##Step 5
 Estimate catch weights from numbers where none are supplied using the functions *model.nos.kgs.r* (fits the model) and *kgs.from.nos.r* which imputes weights for countries that supply only numbers caught. Note that some countries report catches by total weight, some by total numbers and some by both. For the purposes of the effort estimations we are attempting to make here, it is essential that the catch data are available in the same unit of measurement.  The data for countries that have reported both weights and numbers were, therefore, extracted and examined together. The relationships betweem them are highly linear (see Interim Report) and we decided to model the weight caught as a (linear) function of number caught plus other useful, predictive covariates (e.g. flag, species, and trend). A stepwise model selection procedure selects the 'best' model (bm) which is then used to impute catch weights in kgs for Task II in cases where total numbers only were supplied, e.g. U.S.A. The model below (bm) fits the data well and explains most of the variance ($R^2$ = 83%).  This part of the procedure/model is included in the error variance estimation. 
 
 ```{r model weights as a function of numbers,eval=FALSE,include=TRUE,echo=TRUE,message = FALSE, error=FALSE, warnings=FALSE}
-bm <- model.nos.kgs.r(input=long_line_lf,which.gear='LL')
-long_line_lf <- kgs.from.nos.r(long_line_lf) 
+bm <- model.nos.kgs(input=long_line_lf,which.gear='LL')
+long_line_lf <- kgs.from.nos(long_line_lf) 
 ```
 
 ```{r load best.mode ,eval=TRUE,include=FALSE,echo=FALSE,message = FALSE, error=FALSE, warnings=FALSE}
@@ -345,9 +345,9 @@ And finally the fishing effort (number of hooks) is modeled using a GAM from the
 In all 3 models, $x$,$y$,$t$, and $m$ are longitude, latitude, trend, and month respectively and $s$ are spline smooth functions fitted by generalised-cross-validation using the MGCV R-library, see https://cran.r-project.org/web/packages/mgcv/mgcv.pdf. $\epsilon$ is different, as appropriate, for each model. 
 
 ```{r model catches as a function of space and time,eval=FALSE, include=TRUE,echo=TRUE,message = FALSE, error=FALSE, warnings=FALSE}
-j_bft_ll <- fit2stageGAMtoCatch.r(input=long_line_lf,
+j_bft_ll <- fit2stageGAMtoCatch(input=long_line_lf,
                                   which.flag='Japan',which.species='bft',start.year=1990,end.year=2010)
-j_emod_ll <- fitGAMtoEffort.r(input=long_line_lf,
+j_emod_ll <- fitGAMtoEffort(input=long_line_lf,
                               which.flag='Japan',which.effort='NO.HOOKS',start.year=1990,end.year=2010)
 ```
 
@@ -355,7 +355,7 @@ j_emod_ll <- fitGAMtoEffort.r(input=long_line_lf,
 Use the models to predict values over a grid of 'new data'.  Currently this takes the range of locations *ever* recorded in the data, constructs a grid for each time-step (1950 to present by month) and makes the predictions with the model. The function *predict.effdis.t2.data.r* also identifies and flags up those points in space and time where data were actually collected.
 
 ```{r predict catches over grid,eval=FALSE,include=TRUE,echo=TRUE,message = FALSE, error=FALSE, warnings=FALSE}
-j_bft.ll.pred <- predict.effdis.t2.data.r(cmod=j_bft_ll,
+j_bft.ll.pred <- predict.effdis.t2.data(cmod=j_bft_ll,
                                           effmod=j_emod_ll,grid.res=5,
                                           start.year=1990,end.year=2010,which.flag='Japan')
 ```
@@ -369,9 +369,9 @@ load('/home/doug/effdis/data/j_bft.ll.pred.RData')
 
 ```{r plot P over grid,eval=TRUE, include=TRUE,echo=TRUE,message = FALSE, error=FALSE, warnings=FALSE}
 par(mfrow=c(1,2))
-plot.mods.r(input=j_bft.ll.pred,cmod=j_bft_ll,
+plot.mods(input=j_bft.ll.pred,cmod=j_bft_ll,
             what.year = 1995,what.month=1,what.value = 'prob',grid.res=5,what.gear='LL')
-plot.mods.r(input=j_bft.ll.pred,cmod=j_bft_ll,
+plot.mods(input=j_bft.ll.pred,cmod=j_bft_ll,
             what.year = 1995,what.month=1,what.value = 'prob',grid.res=5,what.gear='LL',
             plot.samples.only = FALSE)
 ```
@@ -384,7 +384,7 @@ Figure 11 shows predictions for bluefin tuna from the binary (Bernouilli) model 
 Obtain (and aggregate for later use) Task I long-line data from the database using *get.effdis.t1.data.r*. Note that Task 1 are annual catch totals which are thought to be comprehensive.
 
 ```{r get task 1 data,eval=FALSE, include=TRUE,echo=TRUE,message = FALSE, error=FALSE, warnings=FALSE}
-long_line.t1 <- get.effdis.t1.data.r(which.dsn='effdis-local',
+long_line.t1 <- get.effdis.t1.data(which.dsn='effdis-local',
                                      which.gear = 'LL',which.region='AT',which.flag='Japan')
 long_line.sum.t1 <- aggregate(list(qty_t=long_line.t1$qty_t),
                               list(year=long_line.t1$yearc),sum,na.rm=T)

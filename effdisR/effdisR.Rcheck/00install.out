@@ -1,0 +1,9 @@
+* installing *source* package ‘effdisR’ ...
+** R
+** preparing package for lazy loading
+** help
+Warning: /home/doug/effdis/effdisR/effdisR/man/effdisR-package.Rd:25: All text must be in a section
+*** installing help indices
+** building package indices
+** testing if installed package can be loaded
+* DONE (effdisR)

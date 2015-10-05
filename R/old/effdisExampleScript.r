@@ -207,23 +207,23 @@ plot(big2$year,big2$new.effort/1000000,xlim=c(1970,2010),type='l')
 
 # Get data for each dsettype
 
-lln  <- get.effdis.t2.data(which.dsn='effdis-tuna-cc1',which.gear='LL',which.flag='All',which.dsettype = 'n-')
-llnw <- get.effdis.t2.data(which.dsn='effdis-tuna-cc1',which.gear='LL',which.flag='All',which.dsettype = 'nw')
-llw  <- get.effdis.t2.data(which.dsn='effdis-tuna-cc1',which.gear='LL',which.flag='All',which.dsettype = '-w')
+lln  <- get.effdis.t2.data.r(which.dsn='effdis-tuna-cc1',which.gear='LL',which.flag='All',which.dsettype = 'n-')
+llnw <- get.effdis.t2.data.r(which.dsn='effdis-tuna-cc1',which.gear='LL',which.flag='All',which.dsettype = 'nw')
+llw  <- get.effdis.t2.data.r(which.dsn='effdis-tuna-cc1',which.gear='LL',which.flag='All',which.dsettype = '-w')
 ll1 <- rbind(lln,llnw,llw)
 
 #t2 <- tapply(ll1$totsp9,list(ll1$flagname,ll1$year),sum,na.rm=T)
 
-ll1<-find.ocean(ll1)
+ll1<-find.ocean.r(ll1)
 ll1 <- ll1[ll1$which.ocean == 'atl',]
-lllf <- convert2long.format.t2(input =ll1)
-lllf<-prepare.effdis.data(input=lllf)
+lllf <- convert2long.format.t2.r(input =ll1)
+lllf<-prepare.effdis.data.r(input=lllf)
 
-bm <- model.nos.kgs(input=lllf,which.gear='LL')
+bm <- model.nos.kgs.r(input=lllf,which.gear='LL')
 
-lllf <- kgs.from.nos(lllf) # for those fleets that supply only number
+lllf <- kgs.from.nos.r(lllf) # for those fleets that supply only number
 
-three.d.catch.by.year(tdata=lllf,scaling.f=100)
+three.d.catch.by.year.r(tdata=lllf,scaling.f=100)
 
 # t2 <- aggregate(list(measured_catch=lllf$measured_catch),
 #                 list(species=lllf$species,catchunit=lllf$catchunit,flagname=lllf$flagname,year=lllf$year),sum,na.rm=T)
@@ -245,20 +245,20 @@ round(tapply(lllf$measured_catch[w0],list(lllf$flagname[w0],lllf$species[w0]),su
 
 setwd('/home/doug/effdis/effort-estimates')
 
-alb <- fit2stageGAMtoCatch(input=lllf,which.flag='Japan',which.species='alb',start.year=1995,end.year=2010)
-bft <- fit2stageGAMtoCatch(input=lllf,which.flag='Japan',which.species='bft',start.year=1970,end.year=2010)
-bet <- fit2stageGAMtoCatch(input=lllf,which.flag='Japan',which.species='bet',start.year=1970,end.year=2010)
-skj <- fit2stageGAMtoCatch(input=lllf,which.flag='Japan',which.species='skj',start.year=1970,end.year=2010)
-yft <- fit2stageGAMtoCatch.input=lllf,which.flag='Japan',which.species='yft',start.year=1970,end.year=2010)
-swo <- fit2stageGAMtoCatch(input=lllf,which.flag='Japan',which.species='swo',start.year=1970,end.year=2010)
-bum <- fit2stageGAMtoCatch(input=lllf,which.flag='Japan',which.species='bum',start.year=1970,end.year=2010)
-sai <- fit2stageGAMtoCatch(input=lllf,which.flag='Japan',which.species='sai',start.year=1970,end.year=2010)
-whm <- fit2stageGAMtoCatch(input=lllf,which.flag='Japan',which.species='whm',start.year=1970,end.year=2010)
+alb <- fit2stageGAMtoCatch.r(input=lllf,which.flag='Japan',which.species='alb',start.year=1970,end.year=2010)
+bft <- fit2stageGAMtoCatch.r(input=lllf,which.flag='Japan',which.species='bft',start.year=1970,end.year=2010)
+bet <- fit2stageGAMtoCatch.r(input=lllf,which.flag='Japan',which.species='bet',start.year=1970,end.year=2010)
+skj <- fit2stageGAMtoCatch.r(input=lllf,which.flag='Japan',which.species='skj',start.year=1970,end.year=2010)
+yft <- fit2stageGAMtoCatch.r(input=lllf,which.flag='Japan',which.species='yft',start.year=1970,end.year=2010)
+swo <- fit2stageGAMtoCatch.r(input=lllf,which.flag='Japan',which.species='swo',start.year=1970,end.year=2010)
+bum <- fit2stageGAMtoCatch.r(input=lllf,which.flag='Japan',which.species='bum',start.year=1970,end.year=2010)
+sai <- fit2stageGAMtoCatch.r(input=lllf,which.flag='Japan',which.species='sai',start.year=1970,end.year=2010)
+whm <- fit2stageGAMtoCatch.r(input=lllf,which.flag='Japan',which.species='whm',start.year=1970,end.year=2010)
 
 
 #Try calculating effort directly from the raw data instead
 
-big <- aggt2data()
+big <- aggt2data.r()
 big$catch <-big$measured_catch
 
 
@@ -266,16 +266,16 @@ big$catch <-big$measured_catch
 
 # Do we just assume here that once we've modeled NO.HOOKS as a function of time we can use that sensibly ?
 
-emod <- fitGAMtoEffort(input=lllf,which.flag='Japan',which.effort='NO.HOOKS',start.year=1970,end.year=2010,which.gam='gam')
+emod <- fitGAMtoEffort.r(input=lllf,which.flag='Japan',which.effort='NO.HOOKS',start.year=1970,end.year=2010)
 
 # Create grids and predict over them ###
 
-alb.aa <- predict.effdis.t2.data(cmod=alb, effmod=emod,grid.res=5,start.year=1970,end.year=2010,which.flag='Japan')
-bft.aa <- predict.effdis.t2.data(cmod=bft, effmod=emod,grid.res=5,start.year=1970,end.year=2010,which.flag='Japan')
-bet.aa <- predict.effdis.t2.data(cmod=bet, effmod=emod,grid.res=5,start.year=1970,end.year=2010,which.flag='Japan')
-skj.aa <- predict.effdis.t2.data(cmod=skj, effmod=emod,grid.res=5,start.year=1970,end.year=2010,which.flag='Japan')
-yft.aa <- predict.effdis.t2.data(cmod=yft, effmod=emod,grid.res=5,start.year=1970,end.year=2010,which.flag='Japan')
-swo.aa <- predict.effdis.t2.data(cmod=swo, effmod=emod,grid.res=5,start.year=1970,end.year=2010,which.flag='Japan')
+alb.aa <- predict.effdis.t2.data.r(cmod=alb, effmod=emod,grid.res=5,start.year=1970,end.year=2010,which.flag='Japan')
+bft.aa <- predict.effdis.t2.data.r(cmod=bft, effmod=emod,grid.res=5,start.year=1970,end.year=2010,which.flag='Japan')
+bet.aa <- predict.effdis.t2.data.r(cmod=bet, effmod=emod,grid.res=5,start.year=1970,end.year=2010,which.flag='Japan')
+skj.aa <- predict.effdis.t2.data.r(cmod=skj, effmod=emod,grid.res=5,start.year=1970,end.year=2010,which.flag='Japan')
+yft.aa <- predict.effdis.t2.data.r(cmod=yft, effmod=emod,grid.res=5,start.year=1970,end.year=2010,which.flag='Japan')
+swo.aa <- predict.effdis.t2.data.r(cmod=swo, effmod=emod,grid.res=5,start.year=1970,end.year=2010,which.flag='Japan')
 bum.aa <- predict.effdis.t2.data.r(cmod=bum, effmod=emod,grid.res=5,start.year=1970,end.year=2010,which.flag='Japan')
 sai.aa <- predict.effdis.t2.data.r(cmod=sai, effmod=emod,grid.res=5,start.year=1970,end.year=2010,which.flag='Japan')
 whm.aa <- predict.effdis.t2.data.r(cmod=whm, effmod=emod,grid.res=5,start.year=1970,end.year=2010,which.flag='Japan')

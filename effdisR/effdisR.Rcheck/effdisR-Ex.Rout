@@ -1,0 +1,214 @@
+
+R version 3.2.1 (2015-06-18) -- "World-Famous Astronaut"
+Copyright (C) 2015 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> pkgname <- "effdisR"
+> source(file.path(R.home("share"), "R", "examples-header.R"))
+> options(warn = 1)
+> library('effdisR')
+> 
+> base::assign(".oldSearch", base::search(), pos = 'CheckExEnv')
+> cleanEx()
+> nameEx("add.covariates")
+> ### * add.covariates
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: add.covariates
+> ### Title: Function to add depth, sst, chlorophyll a and primary production
+> ###   to a data frame
+> ### Aliases: add.covariates
+> ### Keywords: ~kwd1 ~kwd2
+> 
+> ### ** Examples
+> 
+> require(RODBC)
+Loading required package: RODBC
+> #lln  <- get.effdis.t2.data(which.dsn='effdis-tuna-cc1',which.gear='LL',which.flag='Brasil',which.dsettype = 'n-') # Get data from cloud server
+> #require(reshape2)
+> #llnlf <- convert.to.long.format.t2(input = lln) # Convert to long format
+> #llnlf <- add.covariates(input=llnlf) # Add on covariates
+> 
+> 
+> 
+> ## The function is currently defined as
+> function (input = t2ce_lf_ll, what.dsn = "effdis-tuna-cc1") 
++ {
++     chan <- odbcConnect(what.dsn, case = "postgresql", believeNRows = FALSE)
++     t2ce_distinct_locations_covariates <- sqlQuery(chan, "SELECT *, ST_AsText(the_geom_4326) AS the_point from t2ce_distinct_locations_covariates;")
++     tdlc <- SpatialPointsDataFrame(cbind(x = an(ac(t2ce_distinct_locations_covariates$longitude)), 
++         y = an(ac(t2ce_distinct_locations_covariates$lat))), 
++         data = t2ce_distinct_locations_covariates)
++     geogWGS84 <- CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs")
++     tdlc@proj4string <- geogWGS84
++     input$depth_m <- tdlc@data$depth_m[match(paste(input$longitude, 
++         input$latitude), paste(tdlc@data$longitude, tdlc@data$latitude))]
++     input$m_ann_sst <- tdlc@data$m_ann_sst[match(paste(input$longitude, 
++         input$latitude), paste(tdlc@data$longitude, tdlc@data$latitude))]
++     input$aq_prim_pro <- tdlc@data$aq_prim_pro[match(paste(input$longitude, 
++         input$latitude), paste(tdlc@data$longitude, tdlc@data$latitude))]
++     input$m_ann_chla <- tdlc@data$m_ann_chla[match(paste(input$longitude, 
++         input$latitude), paste(tdlc@data$longitude, tdlc@data$latitude))]
++     out <- input
++     out
++   }
+function (input = t2ce_lf_ll, what.dsn = "effdis-tuna-cc1") 
+{
+    chan <- odbcConnect(what.dsn, case = "postgresql", believeNRows = FALSE)
+    t2ce_distinct_locations_covariates <- sqlQuery(chan, "SELECT *, ST_AsText(the_geom_4326) AS the_point from t2ce_distinct_locations_covariates;")
+    tdlc <- SpatialPointsDataFrame(cbind(x = an(ac(t2ce_distinct_locations_covariates$longitude)), 
+        y = an(ac(t2ce_distinct_locations_covariates$lat))), 
+        data = t2ce_distinct_locations_covariates)
+    geogWGS84 <- CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs")
+    tdlc@proj4string <- geogWGS84
+    input$depth_m <- tdlc@data$depth_m[match(paste(input$longitude, 
+        input$latitude), paste(tdlc@data$longitude, tdlc@data$latitude))]
+    input$m_ann_sst <- tdlc@data$m_ann_sst[match(paste(input$longitude, 
+        input$latitude), paste(tdlc@data$longitude, tdlc@data$latitude))]
+    input$aq_prim_pro <- tdlc@data$aq_prim_pro[match(paste(input$longitude, 
+        input$latitude), paste(tdlc@data$longitude, tdlc@data$latitude))]
+    input$m_ann_chla <- tdlc@data$m_ann_chla[match(paste(input$longitude, 
+        input$latitude), paste(tdlc@data$longitude, tdlc@data$latitude))]
+    out <- input
+    out
+}
+> 
+> 
+> 
+> cleanEx()
+
+detaching ‘package:RODBC’
+
+> nameEx("aggt2data")
+> ### * aggt2data
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: aggt2data
+> ### Title: Function to aggregate Task II data as an alternative to modeling
+> ### Aliases: aggt2data
+> ### Keywords: ~kwd1 ~kwd2
+> 
+> ### ** Examples
+> 
+> 
+> #totals <- agg2data(input=lllf,what.flag="Chinese Taipei", what.effort = "NO.HOOKS") # Total catches by location, year, month and species for selected flag country
+> 
+> 
+> ## The function is currently defined as
+> function (input = lllf, what.flag = "Japan", what.effort = "NO.HOOKS") 
++ {
++     input_kgs <- input[input$catchunit == "kg" & input$eff1type == 
++         what.effort & lllf$flagname == what.flag, ]
++     allt2 <- aggregate(list(eff = input_kgs$eff1, measured_catch = input_kgs$measured_catch), 
++         by = list(year = input_kgs$year, month = input_kgs$month, 
++             longitude = input_kgs$longitude, latitude = input_kgs$latitude, 
++             species = input_kgs$species, flagname = input_kgs$flagname), 
++         sum, na.rm = T)
++     allt2
++   }
+function (input = lllf, what.flag = "Japan", what.effort = "NO.HOOKS") 
+{
+    input_kgs <- input[input$catchunit == "kg" & input$eff1type == 
+        what.effort & lllf$flagname == what.flag, ]
+    allt2 <- aggregate(list(eff = input_kgs$eff1, measured_catch = input_kgs$measured_catch), 
+        by = list(year = input_kgs$year, month = input_kgs$month, 
+            longitude = input_kgs$longitude, latitude = input_kgs$latitude, 
+            species = input_kgs$species, flagname = input_kgs$flagname), 
+        sum, na.rm = T)
+    allt2
+}
+> 
+> 
+> 
+> cleanEx()
+> nameEx("convert2long.format.t2")
+> ### * convert2long.format.t2
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: convert2long.format.t2
+> ### Title: Function to convert short format to long format which is useful
+> ###   for regression modeling
+> ### Aliases: convert2long.format.t2
+> ### Keywords: ~kwd1 ~kwd2
+> 
+> ### ** Examples
+> 
+> 
+> 
+> #lllf <- convert2long.format.t2(input =ll1) # Convert longline data in the short format to long format.
+> 
+> ## The function is currently defined as
+> function (input = t2ce) 
++ {
++     tdata <- input
++     task2.simple <- data.frame(year = tdata$year, trend = tdata$trend, 
++         month = tdata$month, region = tdata$region, flagname = tdata$flagname, 
++         fleetcode = tdata$fleetcode, geargrpcode = tdata$geargrpcode, 
++         longitude = tdata$longitude, latitude = tdata$latitude, 
++         eff1 = tdata$eff1, eff1type = tdata$eff1type, dsettype = tdata$dsettype, 
++         catchunit = tdata$catchunit, alb = tdata$alb, bft = tdata$bft, 
++         bet = tdata$bet, skj = tdata$skj, yft = tdata$yft, swo = tdata$swo, 
++         bum = tdata$bum, sai = tdata$sai, whm = tdata$whm, tot9sp = tdata$totsp9)
++     task2.lf <- melt(task2.simple[, -23], id = c("year", "trend", 
++         "month", "region", "flagname", "fleetcode", "geargrpcode", 
++         "longitude", "latitude", "eff1", "eff1type", "dsettype", 
++         "catchunit"))
++     dimnames(task2.lf)[[2]][14:15] <- c("species", "measured_catch")
++     task2.lf
++   }
+function (input = t2ce) 
+{
+    tdata <- input
+    task2.simple <- data.frame(year = tdata$year, trend = tdata$trend, 
+        month = tdata$month, region = tdata$region, flagname = tdata$flagname, 
+        fleetcode = tdata$fleetcode, geargrpcode = tdata$geargrpcode, 
+        longitude = tdata$longitude, latitude = tdata$latitude, 
+        eff1 = tdata$eff1, eff1type = tdata$eff1type, dsettype = tdata$dsettype, 
+        catchunit = tdata$catchunit, alb = tdata$alb, bft = tdata$bft, 
+        bet = tdata$bet, skj = tdata$skj, yft = tdata$yft, swo = tdata$swo, 
+        bum = tdata$bum, sai = tdata$sai, whm = tdata$whm, tot9sp = tdata$totsp9)
+    task2.lf <- melt(task2.simple[, -23], id = c("year", "trend", 
+        "month", "region", "flagname", "fleetcode", "geargrpcode", 
+        "longitude", "latitude", "eff1", "eff1type", "dsettype", 
+        "catchunit"))
+    dimnames(task2.lf)[[2]][14:15] <- c("species", "measured_catch")
+    task2.lf
+}
+> 
+> 
+> 
+> cleanEx()
+> nameEx("effdisR-package")
+> ### * effdisR-package
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: effdisR-package
+> ### Title: Analysis, visualisation and effort estimate using the fishing
+> ###   effort databases maintained by ICCAT (International Commission for
+> ###   the Conservation of Atlantic Tunas)
+> ### Aliases: effdisR-package effdisR
+> ### Keywords: package
+> 
+> ### ** Examples
+> 
+>  simple examples of the most important functions 
+Error: unexpected symbol in " simple examples"
+Execution halted

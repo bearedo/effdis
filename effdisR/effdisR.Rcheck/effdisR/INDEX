@@ -1,0 +1,45 @@
+add.covariates          Function to add depth, sst, chlorophyll a and
+                        primary production to a data frame
+aggt2data               Function to aggregate Task II data as an
+                        alternative to modeling
+convert2long.format.t2
+                        Function to convert short format to long format
+                        which is useful for regression modeling
+effdisR-package         Analysis, visualisation and effort estimate
+                        using the fishing effort databases maintained
+                        by ICCAT (International Commission for the
+                        Conservation of Atlantic Tunas)
+find.ocean              Function to determine which Ocean an
+                        observation is in
+fit2stageGAMtoCatch     Function to fit generalised additive models to
+                        the EFFDIS catch data in 2 stages. The first is
+                        a Bernoulli model the second is a Gamma model
+                        fitted to the positive part of the data
+fitGAMtoEffort          Function to fit generalised additive model from
+                        the quasipoisson family to the effort data
+get.effdis.t1.data      Function to get the Task I data from the
+                        PostgreSQL database on the ICCAT cloud server
+get.effdis.t2.data      Function to get the Task II data from the
+                        postgreSQL database on the ICCAT cloud server
+kgs.from.nos            Function to estimate weight caught for
+                        countries that only record numbers
+model.nos.kgs           Function to fit linear model (kgs as a function
+                        of numbers) for those flags that send both
+plot.mods               Function to plot output of fitted GAMs
+predict.effdis.t2.data
+                        Function to create comprehensive space-time
+                        grid and predict data from the GAMs
+prepare.effdis.data     Clean up the EFFDIS data
+spatial.coverage.by.year.task2
+                        Function to plot the spatial distribution of
+                        EFFDIS data each year
+three.d.catch.by.year   Function to plot spatial distribution of EFFDIS
+                        catch data
+three.d.effort.by.year
+                        Function to plot spatial distribution of EFFDIS
+                        catch data
+trend                   Function to calculate absolute time from month
+                        and year
+yr.month.coverage.task2
+                        Function to plot data distribution as a
+                        function of year and month

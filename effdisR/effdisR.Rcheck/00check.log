@@ -1,0 +1,305 @@
+* using log directory ‘/home/doug/effdis/effdisR/effdisR.Rcheck’
+* using R version 3.2.1 (2015-06-18)
+* using platform: x86_64-pc-linux-gnu (64-bit)
+* using session charset: UTF-8
+* checking for file ‘effdisR/DESCRIPTION’ ... OK
+* checking extension type ... Package
+* this is package ‘effdisR’ version ‘1.0’
+* checking package namespace information ... OK
+* checking package dependencies ... OK
+* checking if this is a source package ... OK
+* checking if there is a namespace ... OK
+* checking for executable files ... OK
+* checking for hidden files and directories ... NOTE
+Found the following hidden files and directories:
+  .Rd2pdf12357
+These were most likely included in error. See section ‘Package
+structure’ in the ‘Writing R Extensions’ manual.
+* checking for portable file names ... OK
+* checking for sufficient/correct file permissions ... OK
+* checking whether package ‘effdisR’ can be installed ... WARNING
+Found the following significant warnings:
+  Warning: /home/doug/effdis/effdisR/effdisR/man/effdisR-package.Rd:25: All text must be in a section
+See ‘/home/doug/effdis/effdisR/effdisR.Rcheck/00install.out’ for details.
+* checking installed package size ... OK
+* checking package directory ... OK
+* checking DESCRIPTION meta-information ... NOTE
+Malformed Description field: should contain one or more complete sentences.
+* checking top-level files ... OK
+* checking for left-over files ... OK
+* checking index information ... OK
+* checking package subdirectories ... WARNING
+Found the following directory with the name of a Rd2pdf directory:
+  ./.Rd2pdf12357
+Most likely, these were included erroneously.
+* checking R files for non-ASCII characters ... OK
+* checking R files for syntax errors ... OK
+* checking whether the package can be loaded ... OK
+* checking whether the package can be loaded with stated dependencies ... OK
+* checking whether the package can be unloaded cleanly ... OK
+* checking whether the namespace can be loaded with stated dependencies ... OK
+* checking whether the namespace can be unloaded cleanly ... OK
+* checking loading without being on the library search path ... OK
+* checking dependencies in R code ... OK
+* checking S3 generic/method consistency ... WARNING
+plot:
+  function(x, ...)
+plot.mods:
+  function(input, cmod, which.year, which.month, grid.res, which.value,
+           which.gear, plot.samples.only)
+
+predict:
+  function(object, ...)
+predict.effdis.t2.data:
+  function(cmod, effmod, grid.res, start.year, end.year, which.flag,
+           which.gear)
+
+See section ‘Generic functions and methods’ in the ‘Writing R
+Extensions’ manual.
+* checking replacement functions ... OK
+* checking foreign function calls ... OK
+* checking R code for possible problems ... NOTE
+predict.effdis.t2.data: warning in matrix(NA, nrow = length(dat0[, 1]),
+  nc = 6): partial argument match of 'nc' to 'ncol'
+add.covariates: no visible binding for global variable ‘t2ce_lf_ll’
+add.covariates: no visible global function definition for ‘odbcConnect’
+add.covariates: no visible global function definition for ‘sqlQuery’
+add.covariates: no visible global function definition for
+  ‘SpatialPointsDataFrame’
+add.covariates: no visible global function definition for ‘CRS’
+aggt2data: no visible binding for global variable ‘lllf’
+convert2long.format.t2: no visible binding for global variable ‘t2ce’
+convert2long.format.t2: no visible global function definition for
+  ‘melt’
+find.ocean: no visible binding for global variable ‘grd’
+find.ocean: no visible global function definition for ‘readOGR’
+find.ocean: no visible global function definition for ‘CRS’
+find.ocean: no visible global function definition for
+  ‘SpatialPointsDataFrame’
+find.ocean: no visible global function definition for ‘over’
+fit2stageGAMtoCatch: no visible binding for global variable ‘pslf’
+fit2stageGAMtoCatch: no visible global function definition for
+  ‘registerDoMC’
+fit2stageGAMtoCatch: no visible global function definition for ‘gam’
+fitGAMtoEffort: no visible binding for global variable ‘lllf’
+fitGAMtoEffort: no visible global function definition for ‘gam’
+get.effdis.t1.data: no visible global function definition for
+  ‘odbcConnect’
+get.effdis.t1.data: no visible global function definition for
+  ‘sqlQuery’
+get.effdis.t1.data: no visible global function definition for
+  ‘odbcClose’
+get.effdis.t2.data: no visible global function definition for
+  ‘odbcConnect’
+get.effdis.t2.data: no visible global function definition for
+  ‘sqlQuery’
+get.effdis.t2.data: no visible global function definition for
+  ‘odbcClose’
+kgs.from.nos: no visible binding for global variable ‘pslf’
+kgs.from.nos: no visible binding for global variable ‘bm’
+model.nos.kgs: no visible binding for global variable ‘pslf’
+plot.mods: no visible binding for global variable ‘bft.aa’
+plot.mods: no visible binding for global variable ‘bft’
+plot.mods: no visible global function definition for ‘map’
+predict.effdis.t2.data: no visible binding for global variable ‘mods’
+predict.effdis.t2.data: no visible binding for global variable ‘emod’
+spatial.coverage.by.year.task2: no visible binding for global variable
+  ‘t2ce’
+spatial.coverage.by.year.task2: no visible global function definition
+  for ‘map’
+three.d.catch.by.year: no visible binding for global variable
+  ‘task2.lf’
+three.d.catch.by.year: no visible global function definition for
+  ‘SpatialPointsDataFrame’
+three.d.catch.by.year: no visible global function definition for ‘an’
+three.d.catch.by.year: no visible global function definition for ‘ac’
+three.d.catch.by.year: no visible global function definition for ‘CRS’
+three.d.catch.by.year: no visible global function definition for
+  ‘brewer.pal’
+three.d.catch.by.year: no visible global function definition for
+  ‘createGrid’
+three.d.catch.by.year: no visible global function definition for ‘over’
+three.d.catch.by.year: no visible global function definition for
+  ‘lonLatRatio’
+three.d.catch.by.year: no visible global function definition for
+  ‘coordinates’
+three.d.catch.by.year: no visible global function definition for
+  ‘lonLat2SpatialPolygons’
+three.d.catch.by.year: no visible global function definition for ‘map’
+three.d.catch.by.year: no visible global function definition for
+  ‘map.axes’
+three.d.catch.by.year: no visible global function definition for
+  ‘proj4string<-’
+three.d.effort.by.year: no visible binding for global variable
+  ‘task2.lf’
+three.d.effort.by.year: no visible global function definition for
+  ‘SpatialPointsDataFrame’
+three.d.effort.by.year: no visible global function definition for ‘CRS’
+three.d.effort.by.year: no visible global function definition for
+  ‘brewer.pal’
+three.d.effort.by.year: no visible global function definition for
+  ‘createGrid’
+three.d.effort.by.year: no visible global function definition for
+  ‘over’
+three.d.effort.by.year: no visible global function definition for ‘an’
+three.d.effort.by.year: no visible global function definition for
+  ‘lonLatRatio’
+three.d.effort.by.year: no visible global function definition for
+  ‘coordinates’
+three.d.effort.by.year: no visible global function definition for
+  ‘lonLat2SpatialPolygons’
+three.d.effort.by.year: no visible global function definition for ‘map’
+three.d.effort.by.year: no visible global function definition for
+  ‘map.axes’
+three.d.effort.by.year: no visible global function definition for
+  ‘proj4string<-’
+yr.month.coverage.task2: no visible binding for global variable ‘t2ce’
+* checking Rd files ... WARNING
+prepare_Rd: add.covariates.Rd:42-44: Dropping empty section \note
+prepare_Rd: add.covariates.Rd:36-38: Dropping empty section \references
+prepare_Rd: add.covariates.Rd:48-50: Dropping empty section \seealso
+prepare_Rd: aggt2data.Rd:23-25: Dropping empty section \details
+prepare_Rd: aggt2data.Rd:26-32: Dropping empty section \value
+prepare_Rd: aggt2data.Rd:39-41: Dropping empty section \note
+prepare_Rd: aggt2data.Rd:33-35: Dropping empty section \references
+prepare_Rd: aggt2data.Rd:45-47: Dropping empty section \seealso
+prepare_Rd: convert2long.format.t2.Rd:35-37: Dropping empty section \note
+prepare_Rd: convert2long.format.t2.Rd:29-31: Dropping empty section \references
+prepare_Rd: convert2long.format.t2.Rd:41-43: Dropping empty section \seealso
+prepare_Rd: effdisR-package.Rd:25: All text must be in a section
+prepare_Rd: find.ocean.Rd:34-36: Dropping empty section \note
+prepare_Rd: find.ocean.Rd:40-42: Dropping empty section \seealso
+prepare_Rd: fit2stageGAMtoCatch.Rd:36-38: Dropping empty section \details
+prepare_Rd: fit2stageGAMtoCatch.Rd:53-55: Dropping empty section \note
+prepare_Rd: fit2stageGAMtoCatch.Rd:59-61: Dropping empty section \seealso
+prepare_Rd: fitGAMtoEffort.Rd:50-52: Dropping empty section \note
+prepare_Rd: fitGAMtoEffort.Rd:56-58: Dropping empty section \seealso
+prepare_Rd: get.effdis.t1.data.Rd:60-62: Dropping empty section \note
+prepare_Rd: get.effdis.t1.data.Rd:66-68: Dropping empty section \seealso
+prepare_Rd: get.effdis.t2.data.Rd:60-62: Dropping empty section \note
+prepare_Rd: get.effdis.t2.data.Rd:66-68: Dropping empty section \seealso
+prepare_Rd: kgs.from.nos.Rd:7-9: Dropping empty section \description
+prepare_Rd: kgs.from.nos.Rd:19-21: Dropping empty section \details
+prepare_Rd: kgs.from.nos.Rd:22-28: Dropping empty section \value
+prepare_Rd: kgs.from.nos.Rd:35-37: Dropping empty section \note
+prepare_Rd: kgs.from.nos.Rd:32-34: Dropping empty section \author
+prepare_Rd: kgs.from.nos.Rd:29-31: Dropping empty section \references
+prepare_Rd: kgs.from.nos.Rd:41-43: Dropping empty section \seealso
+checkRd: (5) kgs.from.nos.Rd:0-79: Must have a \description
+prepare_Rd: model.nos.kgs.Rd:8-10: Dropping empty section \description
+prepare_Rd: model.nos.kgs.Rd:26-28: Dropping empty section \details
+prepare_Rd: model.nos.kgs.Rd:29-35: Dropping empty section \value
+prepare_Rd: model.nos.kgs.Rd:42-44: Dropping empty section \note
+prepare_Rd: model.nos.kgs.Rd:39-41: Dropping empty section \author
+prepare_Rd: model.nos.kgs.Rd:36-38: Dropping empty section \references
+prepare_Rd: model.nos.kgs.Rd:48-50: Dropping empty section \seealso
+checkRd: (5) model.nos.kgs.Rd:0-89: Must have a \description
+prepare_Rd: plot.mods.Rd:7-9: Dropping empty section \description
+prepare_Rd: plot.mods.Rd:40-42: Dropping empty section \details
+prepare_Rd: plot.mods.Rd:43-49: Dropping empty section \value
+prepare_Rd: plot.mods.Rd:56-58: Dropping empty section \note
+prepare_Rd: plot.mods.Rd:53-55: Dropping empty section \author
+prepare_Rd: plot.mods.Rd:50-52: Dropping empty section \references
+prepare_Rd: plot.mods.Rd:62-64: Dropping empty section \seealso
+checkRd: (5) plot.mods.Rd:0-125: Must have a \description
+prepare_Rd: predict.effdis.t2.data.Rd:7-9: Dropping empty section \description
+prepare_Rd: predict.effdis.t2.data.Rd:37-39: Dropping empty section \details
+prepare_Rd: predict.effdis.t2.data.Rd:40-46: Dropping empty section \value
+prepare_Rd: predict.effdis.t2.data.Rd:53-55: Dropping empty section \note
+prepare_Rd: predict.effdis.t2.data.Rd:50-52: Dropping empty section \author
+prepare_Rd: predict.effdis.t2.data.Rd:47-49: Dropping empty section \references
+prepare_Rd: predict.effdis.t2.data.Rd:59-61: Dropping empty section \seealso
+checkRd: (5) predict.effdis.t2.data.Rd:0-141: Must have a \description
+prepare_Rd: prepare.effdis.data.Rd:7-9: Dropping empty section \description
+prepare_Rd: prepare.effdis.data.Rd:19-21: Dropping empty section \details
+prepare_Rd: prepare.effdis.data.Rd:22-28: Dropping empty section \value
+prepare_Rd: prepare.effdis.data.Rd:35-37: Dropping empty section \note
+prepare_Rd: prepare.effdis.data.Rd:32-34: Dropping empty section \author
+prepare_Rd: prepare.effdis.data.Rd:29-31: Dropping empty section \references
+prepare_Rd: prepare.effdis.data.Rd:41-43: Dropping empty section \seealso
+checkRd: (5) prepare.effdis.data.Rd:0-69: Must have a \description
+prepare_Rd: spatial.coverage.by.year.task2.Rd:6-8: Dropping empty section \description
+prepare_Rd: spatial.coverage.by.year.task2.Rd:33-35: Dropping empty section \details
+prepare_Rd: spatial.coverage.by.year.task2.Rd:36-42: Dropping empty section \value
+prepare_Rd: spatial.coverage.by.year.task2.Rd:49-51: Dropping empty section \note
+prepare_Rd: spatial.coverage.by.year.task2.Rd:46-48: Dropping empty section \author
+prepare_Rd: spatial.coverage.by.year.task2.Rd:43-45: Dropping empty section \references
+prepare_Rd: spatial.coverage.by.year.task2.Rd:55-57: Dropping empty section \seealso
+checkRd: (5) spatial.coverage.by.year.task2.Rd:0-98: Must have a \description
+prepare_Rd: three.d.catch.by.year.Rd:7-9: Dropping empty section \description
+prepare_Rd: three.d.catch.by.year.Rd:43-45: Dropping empty section \details
+prepare_Rd: three.d.catch.by.year.Rd:46-52: Dropping empty section \value
+prepare_Rd: three.d.catch.by.year.Rd:59-61: Dropping empty section \note
+prepare_Rd: three.d.catch.by.year.Rd:56-58: Dropping empty section \author
+prepare_Rd: three.d.catch.by.year.Rd:53-55: Dropping empty section \references
+prepare_Rd: three.d.catch.by.year.Rd:65-67: Dropping empty section \seealso
+checkRd: (5) three.d.catch.by.year.Rd:0-168: Must have a \description
+prepare_Rd: three.d.effort.by.year.Rd:7-9: Dropping empty section \description
+prepare_Rd: three.d.effort.by.year.Rd:40-42: Dropping empty section \details
+prepare_Rd: three.d.effort.by.year.Rd:43-49: Dropping empty section \value
+prepare_Rd: three.d.effort.by.year.Rd:56-58: Dropping empty section \note
+prepare_Rd: three.d.effort.by.year.Rd:53-55: Dropping empty section \author
+prepare_Rd: three.d.effort.by.year.Rd:50-52: Dropping empty section \references
+prepare_Rd: three.d.effort.by.year.Rd:62-64: Dropping empty section \seealso
+checkRd: (5) three.d.effort.by.year.Rd:0-170: Must have a \description
+prepare_Rd: trend.Rd:7-9: Dropping empty section \description
+prepare_Rd: trend.Rd:25-27: Dropping empty section \details
+prepare_Rd: trend.Rd:28-34: Dropping empty section \value
+prepare_Rd: trend.Rd:41-43: Dropping empty section \note
+prepare_Rd: trend.Rd:38-40: Dropping empty section \author
+prepare_Rd: trend.Rd:35-37: Dropping empty section \references
+prepare_Rd: trend.Rd:47-49: Dropping empty section \seealso
+checkRd: (5) trend.Rd:0-67: Must have a \description
+prepare_Rd: yr.month.coverage.task2.Rd:7-9: Dropping empty section \description
+prepare_Rd: yr.month.coverage.task2.Rd:34-36: Dropping empty section \details
+prepare_Rd: yr.month.coverage.task2.Rd:37-43: Dropping empty section \value
+prepare_Rd: yr.month.coverage.task2.Rd:50-52: Dropping empty section \note
+prepare_Rd: yr.month.coverage.task2.Rd:47-49: Dropping empty section \author
+prepare_Rd: yr.month.coverage.task2.Rd:44-46: Dropping empty section \references
+prepare_Rd: yr.month.coverage.task2.Rd:56-58: Dropping empty section \seealso
+checkRd: (5) yr.month.coverage.task2.Rd:0-104: Must have a \description
+* checking Rd metadata ... OK
+* checking Rd cross-references ... WARNING
+Unknown package ‘<pkg>’ in Rd xrefs
+* checking for missing documentation entries ... OK
+* checking for code/documentation mismatches ... OK
+* checking Rd \usage sections ... NOTE
+S3 methods shown with full name in documentation object 'plot.mods':
+  ‘plot.mods’
+
+S3 methods shown with full name in documentation object 'predict.effdis.t2.data':
+  ‘predict.effdis.t2.data’
+
+The \usage entries for S3 methods should use the \method markup and not
+their full name.
+See chapter ‘Writing R documentation files’ in the ‘Writing R
+Extensions’ manual.
+* checking Rd contents ... OK
+* checking for unstated dependencies in examples ... WARNING
+Warning: parse error in file 'effdisR-Ex.R':
+140:9: unexpected symbol
+139: 
+140:  simple examples
+             ^
+* checking examples ... ERROR
+Running examples in ‘effdisR-Ex.R’ failed
+The error most likely occurred in:
+
+> ### Name: effdisR-package
+> ### Title: Analysis, visualisation and effort estimate using the fishing
+> ###   effort databases maintained by ICCAT (International Commission for
+> ###   the Conservation of Atlantic Tunas)
+> ### Aliases: effdisR-package effdisR
+> ### Keywords: package
+> 
+> ### ** Examples
+> 
+>  simple examples of the most important functions 
+Error: unexpected symbol in " simple examples"
+Execution halted
+* checking PDF version of manual ... WARNING
+LaTeX errors when creating PDF version.
+This typically indicates Rd problems.
+* checking PDF version of manual without hyperrefs or index ... OK
+* DONE
+Status: 1 ERROR, 7 WARNINGs, 4 NOTEs
