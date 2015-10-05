@@ -1,6 +1,14 @@
 .Rproj.user
 .Rhistory
 .RData
+*.RData
 t2ce_long_format.gz
 *~
+*csv
+*doc
+*pdf
+*html
+*docx
+*xls
+*xlsx
 
