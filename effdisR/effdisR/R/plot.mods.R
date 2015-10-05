@@ -44,11 +44,6 @@ function(input=bft.aa,cmod=bft,which.year=1995,which.month=1,grid.res=5,which.va
     title(paste(toupper(which.species),'-', which.value ,month.abb[which.month],which.year,which.gear))
     w0 <- (1:length(cmod$pmod.data$longitude))[cmod$pmod.data$year== which.year & cmod$pmod.data$month == which.month]
     points(cmod$pmod.data$longitude[w0],cmod$pmod.data$latitude[w0],pch='.')
+    }
     
-    
-  }
-    
-    
-  
-  
 }
