@@ -1,11 +1,6 @@
 
-
-
-
-
-
 ---
-title: Using effdisR to Estimate Overall Atlantic Fishing Effort By Time-area strata (The EFFDIS Database)
+title: Using effdisR to Estimate Overall Atlantic Fishing Effort By Time-area strata.
 author: "Doug Beare"
 date: "4 October 2015"
 output: pdf_document
@@ -44,10 +39,9 @@ The *effdis-tuna-cc1* server also hosts an online geographic information system 
 #EFFDIS data exploration and effort estimation
 ##Install required r libraries
 
-The first step is to install (use, e.g. install.packages("rio") and then 'attach' the R-libraries required by *effdisR*, see below. *rgdal*, for example, is used for converting between standard spatial formats while RODBC is necessary for connecting to the PostgreSQL database. 
+The first step is to install, e.g. install.packages("spatial") and then 'attach' the R-libraries required by *effdisR*, see below. *rgdal*, for example, is used for converting between standard spatial formats while RODBC is necessary for connecting to the PostgreSQL database. 
 
 ```{r attach libraries, include =TRUE, echo=T, message=FALSE,error=FALSE,warning=FALSE}
-library(rio)
 library(spatial)
 library(sp)
 library(doBy)
@@ -68,19 +62,18 @@ library(doMC)
 ```
 
 ##Install *effdisR*
-Next you will need to install and load the R-scripts and data contained in the (*effdisR*) R-package. The tarball can be obtained here, https://github.com/bearedo/effdis/blob/master/effdisR/effdisR\_1.0.tar.gz and can be installed in R as follows:
+Next you will need to install and load the R-scripts and data contained in the (*effdisR*) R-package. The tarball can be obtained here, https://github.com/bearedo/effdis/blob/master/effdisR/effdisR\_1.0.tar.gz.  It can be installed in R as follows:
 
 ```{r install effdis R library functions linux,include=FALSE,echo=TRUE}
 install.packages('/path/to/package', repos = NULL, type="source")
 library(effdisR)
 ```
 
-
 ##Connecting R to the PostgreSQL database
 
-As described above a PostgreSQL server has been set up on a 'virtual' linux server (IP address = 134.213.29.249) in the cloud. *effdisR* connects to this database, using the ODBC protocol, to ensure that any user is always using the most up-to-date data.
+As described above a PostgreSQL server has been set up on a 'virtual' linux server (IP address = 134.213.29.249) in the cloud. *effdisR* connects to this database using the ODBC protocol.  This ensures that any user is always using the most up-to-date data.
 
-Once the RODBC library is installed in R, PostgreSQL the relevant drivers must be installed, and a DSN (Data Source Name) that can recognised by R must be set up. In Linux this is done by inserting the following into the /etc/odbc.ini file:
+Once the RODBC library is installed in R the relevant PostgreSQL drivers must be installed, and a DSN (Data Source Name) that can be recognised by R must be set up. In Linux the DSN is set up by inserting the following into the /etc/odbc.ini file:
 
 [ODBC Data Sources]
 effdis = effdis-tuna-cc1
@@ -96,8 +89,7 @@ ReadOnly = 0
 [ODBC]
 InstallDir = /usr/lib
 
-
-In Windows you will neeed to open the **Control Panel**, and then choose **Adminstrative Tools** and **Data Sources (ODBC)**. Clicking the 'Add' button in the 'User DSN' tab will let you chose the relevant PostgreSQL driver, after when you will need to insert the database parameters above, see http://brazenly.blogspot.co.uk/2014/05/r-how-to-connect-r-to-database-sql.html. Note: The PostgreSQL drivers can be obtained here http://www.postgresql.org/ftp/odbc/versions/ it is probably easier to simply install the entire PostgreSQL package on your machine, http://www.postgresql.org/download/). Once this is all done you can connect from R, making sure the RODBC library is installed at attached, by typing:
+In Windows you will neeed to open the **Control Panel**, and then choose **Adminstrative Tools** and **Data Sources (ODBC)**. Clicking the 'Add' button in the 'User DSN' tab will let you chose the relevant PostgreSQL driver, after when you will need to insert the database parameters above, see http://brazenly.blogspot.co.uk/2014/05/r-how-to-connect-r-to-database-sql.html. Note: The PostgreSQL drivers can be obtained here, http://www.postgresql.org/ftp/odbc/versions/ but it is probably easier to simply install the entire PostgreSQL package on your machine, http://www.postgresql.org/download/. Once this is all done you can connect from R by typing:
 
 
 ```{r connect to db,include=TRUE,echo=TRUE}
@@ -105,7 +97,6 @@ chan <- odbcConnect("effdis-tuna-cc1", case="postgresql", believeNRows=FALSE)
 ```
 
 'chan' is then stored in R and allows you to 'talk' to the remote database, download data etc.
-
 
 ##Exploratory data analysis
 
@@ -493,6 +484,16 @@ The method being developed is modular in nature so it could easily be altered to
 The contractor was urged to remember the original purpose of the work. The main interest in the spatio-temporally resolved effort estimates is driven by the need to identify effort distribution by areas and time of year. This information is needed to estimate fishing impact on target and by-catch species.  The Group discussed that, because fishing strategies are different among fleets, the estimation of EFFDIS by fleet is the preferable approach. It was also suggested that Task II data on their own would be enough for this and that the 'raising' to Task II might be unnecessary as an intermediate step. The contractor was also asked to consider the inclusion of artisanal fisheries which are important but it remains unclear where the data for this would come from and their likely quality.
 
 In summary the contractor agreed to explore the effect of fleet/flag in more detail and make an effort to better understand the needs of the potential users for these data. The contractor is also extending the analysis too far south and the ICCAT secretariat agreed to provide more realistic boundaries within which interpolation would take place. 
+
+
+
+
+
+
+
+
+
+
 
 
 
