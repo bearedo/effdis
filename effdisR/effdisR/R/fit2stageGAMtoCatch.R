@@ -64,7 +64,7 @@ ninput <- dat1
   
 #   #print(dat1[1,])
 #   Fit the gam using Hastie and Tibshirani's original code
-   print('Fitting Hastie and Tibshirani GAM to binary data')
+#   print('Fitting Hastie and Tibshirani GAM to binary data')
 #   library(gam)
 # 
 #   b1 <- gam(bin~lo(longitude,latitude)+lo(trend)+sin1+cos1+sin2+cos2+sin3+cos3+sin4+cos4,family=binomial(link="logit"),data=ninput)
@@ -79,7 +79,7 @@ ninput <- dat1
 # else
 #     {
 #     #Fit the GAM using Simon Wood's Generalized Cross-validation
-#     print('fitting MGCV to binary data')
+     print('fitting MGCV to binary data')
      registerDoMC(core=2)
    b1 <- gam(bin~te(longitude,latitude,k=6,bs=bbs)+te(trend,k=6,bs=bbs)+sin1+cos1+sin2+cos2+sin3+cos3+sin4+cos4+sin5+cos5+cos6,data=ninput,
              family=quasibinomial(link="logit"),method="REML",select=TRUE)
