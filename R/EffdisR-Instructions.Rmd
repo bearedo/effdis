@@ -359,7 +359,7 @@ j_emod_ll <- fitGAMtoEffort(input=long_line_lf,
 ```
 
 ##Step 7
-Use the models to predict values over a grid of 'new data'.  Currently this takes the range of locations *ever* recorded in the data, constructs a grid for each time-step (1950 to present by month) and makes the predictions with the model. The function *predict.effdis.t2.data.r* also identifies and flags up those points in space and time where data were actually collected.
+Use the models to predict values over a grid of 'new data'.  Currently this takes the range of locations **ever** recorded in the data, constructs a grid for each time-step (1950 to present by month) and makes the predictions with the model. The function *predict.effdis.t2.data* also identifies and flags up those points in space and time where data were actually collected.
 
 ```{r predict catches over grid,eval=FALSE,include=TRUE,echo=TRUE,message = FALSE, error=FALSE, warnings=FALSE}
 j_bft.ll.pred <- predict.effdis.t2.data(cmod=j_bft_ll,
@@ -367,7 +367,7 @@ j_bft.ll.pred <- predict.effdis.t2.data(cmod=j_bft_ll,
                                           start.year=1990,end.year=2010,which.flag='Japan')
 ```
 
-Once assessed for adequacy of fit the model parameters are used to 'predict' values of catch, effort and catch-per-unit-effort as functions on a grid of all combinations of the selected covariates, together with error or variance if required using the function *predict.effdis.t2.data.r*.  Note that total Task II catch is calculated by multiplying the fits from Models 1 and 2, ie. 'given that fish were caught, how many/much', in a 'two-stage process'.  The function *plot.mods.r* can be used to plot excerpts from the model output. The 'probability of catching a blue fin tuna in January 1995 is, for example, created using the following code:
+Once assessed for adequacy of fit the model parameters are used to 'predict' values of catch, effort and catch-per-unit-effort as functions on a grid of all combinations of the selected covariates, together with error or variance if required using the function *predict.effdis.t2.data*.  Note that total Task II catch is calculated by multiplying the fits from Models 1 and 2, ie. 'given that fish were caught, how many/much', in a 'two-stage process'.  The function *plot.mods* can be used to plot selected subsets of the model output. A map of the 'probability of the Japanese long-line fleet catching a blue fin tuna in January 1995 can, for example, be created using the following code:
 
 ```{r load predictions for Japanese bluefin long-line,eval=TRUE,include=FALSE,echo=FALSE,message = FALSE, error=FALSE, warnings=FALSE}
 load('/home/doug/effdis/data/j_bft_ll.RData')
@@ -377,9 +377,9 @@ load('/home/doug/effdis/data/j_bft.ll.pred.RData')
 ```{r plot P over grid,eval=TRUE, include=TRUE,echo=TRUE,message = FALSE, error=FALSE, warnings=FALSE}
 par(mfrow=c(1,2))
 plot.mods(input=j_bft.ll.pred,cmod=j_bft_ll,
-            what.year = 1995,what.month=1,what.value = 'prob',grid.res=5,what.gear='LL')
+            which.year = 1995,which.month=1,which.value = 'prob',grid.res=5,which.gear='LL')
 plot.mods(input=j_bft.ll.pred,cmod=j_bft_ll,
-            what.year = 1995,what.month=1,what.value = 'prob',grid.res=5,what.gear='LL',
+            which.year = 1995,which.month=1,which.value = 'prob',grid.res=5,which.gear='LL',
             plot.samples.only = FALSE)
 ```
 
@@ -388,10 +388,10 @@ plot.mods(input=j_bft.ll.pred,cmod=j_bft_ll,
 Figure 11 shows predictions for bluefin tuna from the binary (Bernouilli) model for January 1995. The probability of catching one is highest in the Caribbean, Gulf of Mexico and North Atlantic.  The left-hand plot shows the model output for grid cells where a real observation exists, while the right-hand plot is the interpolation based on the area of the entire dataset.
 
 ## Step 8
-Obtain (and aggregate for later use) Task I long-line data from the database using *get.effdis.t1.data.r*. Note that Task 1 are annual catch totals which are thought to be comprehensive.
+Obtain (and aggregate for later use) Task I long-line data from the database using *get.effdis.t1.data*. Note that Task 1 are annual catch totals which are thought to be comprehensive.
 
 ```{r get task 1 data,eval=FALSE, include=TRUE,echo=TRUE,message = FALSE, error=FALSE, warnings=FALSE}
-long_line.t1 <- get.effdis.t1.data(which.dsn='effdis-local',
+long_line.t1 <- get.effdis.t1.data(which.dsn='effdis-tuna-cc1',
                                      which.gear = 'LL',which.region='AT',which.flag='Japan')
 long_line.sum.t1 <- aggregate(list(qty_t=long_line.t1$qty_t),
                               list(year=long_line.t1$yearc),sum,na.rm=T)
