@@ -217,6 +217,7 @@ Given that we can now determine the timing and location of fishing activities (F
 In 2006, for example, longlining effort by Japan focused on the North and Eastern Atlantic (Fig. 6). Chinese Taipei flagged long-liners, on the other hand also worked in the North Atlantic but their effort appears greater in the South Atlantic (Fig. 7). Purse-seining data are submitted to ICCAT at a higher spatial resolution (1x1 grid) and examples for Spain and Panama in 2009 are plotted in Figures 8 and 9. Both fleets focus their activity along the West Coast of Africa but the Panamanian fleet tends not to venture as far inshore as the Spanish fleet (Figs 8 & 9).
 
 ```{r no of hooks shot by Japan in 2006 from task 2,include=TRUE,echo=TRUE,message = FALSE, error=FALSE, warnings=FALSE}
+par(mfrow=c(1,1))
 three.d.effort.by.year(tdata=ll,what.year=2006,
                          what.flag='Japan',scaling.f=10000,effort.type='NO.HOOKS')  
 ```
@@ -281,20 +282,20 @@ three.d.catch.by.year(tdata=alb,what.year=1995,
 # EFFDIS effort estimation with *effdisR*: worked example (Japanese longline)
 
 ##Step 1 
-Get Task II data from the database for each dsettype using *get.effdis.t2.data.r* and then combine them using rbind. The which.dsn argument here is accessing a locally installed copy of the postgres database and this should be edited when using the ICCAT cloud server.
+Get Task II data from the database for each dsettype using *get.effdis.t2.data* and then combine them using rbind. 
 
 ```{r get japanese task 2 longline data,eval=FALSE,include=TRUE,echo=TRUE,message = FALSE, error=FALSE, warnings=FALSE}
-ll_n  <- get.effdis.t2.data(which.dsn='effdis-local',
+ll_n  <- get.effdis.t2.data(which.dsn='effdis-tuna-cc1',
                               which.gear='LL',which.flag='All',which.dsettype = 'n-')
-ll_nw <- get.effdis.t2.data(which.dsn='effdis-local',
+ll_nw <- get.effdis.t2.data(which.dsn='effdis-tuna-cc1',
                               which.gear='LL',which.flag='All',which.dsettype = 'nw')
-ll_w  <- get.effdis.t2.data(which.dsn='effdis-local',
+ll_w  <- get.effdis.t2.data(which.dsn='effdis-tuna-cc1',
                               which.gear='LL',which.flag='All',which.dsettype = '-w')
 long_line <- rbind(ll_n,ll_nw,ll_w)
 ```
 
 ##Step 2
-Find and extract those EFFDIS data that are in the Atlantic using *find.ocean.r*. This function imports a shapefile and in addition to the polygons for the Atlantic Ocean proper also includes the Caribbean Sea, The Gulf of St. Lawrence, the Gulf of Guinea, and the Gulf of Mexico. This aspect, however, is entirely flexible and can easily be changed. Data for land, the Mediterranean and Pacific can be extracted using the strings, 'land', 'med', and 'pac' respectively in the place of 'atl' below. 
+Find and extract those EFFDIS data that are in the Atlantic using *find.ocean*. This function uses a shapefile which is included in *effdisR*, and can be examined by typing *data("seas")* and then *plot(seas)*.  The definitions of 'Atlantic' used by ICCAT are rather crude. Thus function tries to mimic ICCAT definitions and 'Atlantic', for example, includes the Gulf of St Lawrence, the Caribbean Sea, The Celtic Sea, The Gulf of Guinea, The Gulf of Mexico and The Irish Sea. Obviously this is flexible and can easily be changed.  Data for land, the Mediterranean and Pacific can be extracted using the strings, 'land', 'med', and 'pac' respectively in the place of 'atl' below. 
 
 ```{r identify data in Atlantic,eval=FALSE,include=TRUE,echo=TRUE,message = FALSE, error=FALSE, warnings=FALSE}
 long_line<-find.ocean(long_line)
@@ -302,28 +303,28 @@ long_line <- long_line[long_line$which.ocean == 'atl',]
 ```
 
 ##Step 3
-Make sure the data are 'clean' using *prepare.effdis.data.r* as follows. Sometimes downloading from a database creates 'factor' objects in R which can cause problems. This function converts them to character strings.
+Make sure the data are 'clean' using *prepare.effdis.data* as follows. Sometimes downloading from a database creates 'factor' objects in R which can cause problems. This function converts them to character strings.
 
 ```{r get Japanese task 2 longline data,eval=FALSE,include=TRUE,echo=TRUE,message = FALSE, error=FALSE, warnings=FALSE}
 long_line<-prepare.effdis.data(input=long_line)
 ```
 
 ##Step 4
-Convert data from 'short format' to 'long format' using *convert2long.format.t2.r*. We do this because the long format is required for subsequent regression modeling.
+Convert data from 'short format' to 'long format' using *convert2long.format.t2*. We do this because the long format is required for subsequent regression modeling.
 
 ```{r Convert data to long format,eval=FALSE,include=TRUE,echo=TRUE,message = FALSE, error=FALSE, warnings=FALSE}
 long_line_lf <- convert2long.format.t2(input =long_line)
 ```
 
 ##Step 5
-Estimate catch weights from numbers where none are supplied using the functions *model.nos.kgs.r* (fits the model) and *kgs.from.nos.r* which imputes weights for countries that supply only numbers caught. Note that some countries report catches by total weight, some by total numbers and some by both. For the purposes of the effort estimations we are attempting to make here, it is essential that the catch data are available in the same unit of measurement.  The data for countries that have reported both weights and numbers were, therefore, extracted and examined together. The relationships betweem them are highly linear (see Interim Report) and we decided to model the weight caught as a (linear) function of number caught plus other useful, predictive covariates (e.g. flag, species, and trend). A stepwise model selection procedure selects the 'best' model (bm) which is then used to impute catch weights in kgs for Task II in cases where total numbers only were supplied, e.g. U.S.A. The model below (bm) fits the data well and explains most of the variance ($R^2$ = 83%).  This part of the procedure/model is included in the error variance estimation. 
+Estimate catch weights from numbers where none are supplied using the functions *model.nos.kgs* (fits the model) and *kgs.from.nos* which imputes weights for countries that supply only numbers caught. Note that some countries report catches by total weight, some by total numbers and some by both. For the purposes of the effort estimations we are attempting to make here, it is essential that the catch data are available in the same unit of measurement.  The data for countries that have reported both weights and numbers were, therefore, extracted and examined together. The relationships betweem them are highly linear (see Interim Report) and we decided to model the weight caught as a (linear) function of number caught plus other useful, predictive covariates (e.g. flag, species, and trend). A stepwise model selection procedure selects the 'best' model (bm) which is then used to impute catch weights in kgs for Task II in cases where total numbers only were supplied, e.g. U.S.A. The model below (bm) fits the data well and explains most of the variance ($R^2$ = 83%).  This part of the procedure/model is included in the error variance estimation. 
 
 ```{r model weights as a function of numbers,eval=FALSE,include=TRUE,echo=TRUE,message = FALSE, error=FALSE, warnings=FALSE}
 bm <- model.nos.kgs(input=long_line_lf,which.gear='LL')
 long_line_lf <- kgs.from.nos(long_line_lf) 
 ```
 
-```{r load best.mode ,eval=TRUE,include=FALSE,echo=FALSE,message = FALSE, error=FALSE, warnings=FALSE}
+```{r load best.model ,eval=TRUE,include=FALSE,echo=FALSE,message = FALSE, error=FALSE, warnings=FALSE}
 load('/home/doug/effdis/data/best.model.ll.RData')
 ```
 
@@ -334,7 +335,7 @@ pander(bm)
 ```
 
 ##Step 6
-Fit regression models to the Task II catch and effort data using *fit2stageGAMtoCatch.r* and *fitGAMtoEffort.r*. This step is illustrated here for speed and convenience with bluefin tuna only ('bft') and only between 1990 and 2000. The entire process takes too long to inclused as part of a markdown file. To get a global estimate of effort, however, you would, of course, need to do the same for all nine species although it would be straightforward to add any others.  The functions fit and test a suite of generalised additive models (GAMs) fitted to the Task II catch and effort data.  GAMs were selected because they are highly flexible, impose no particular functional form on the data, and they can deal with skew distributions and high prevalences of zeros.  The models take the relevant variables (eg. number of hooks set, weight of fish caught) and model them as smooth functions of various combinations of covariates of location (latitude, longitude, bottom depth) and time (year and month). 
+Fit regression models to the Task II catch and effort data using *fit2stageGAMtoCatch* and *fitGAMtoEffort*. This step is illustrated here for speed and convenience with bluefin tuna only ('bft') and only between 1990 and 2000. To get a global estimate of effort, however, you would, of course, need to do the same for all nine species but it would be straightforward to add any others if necessary.  The functions fit and test a suite of generalised additive models (GAMs) fitted to the Task II catch and effort data.  GAMs were selected because they are highly flexible, impose no particular functional form on the data, and they can deal with skew distributions and high prevalences of zeros.  The models take the relevant variables (eg. number of hooks set, weight of fish caught) and model them as smooth functions of various combinations of covariates of location (latitude, longitude, bottom depth) and time (year and month). 
 
 The first stage models the probability of recording a catch using a GAM from the Quasibinomial family (Model 1), where $P$ is the probability of catching a fish.
 
