@@ -1,11 +1,10 @@
-
 ---
-title: Using effdisR to Estimate Overall Atlantic Fishing Effort By Time-area strata.
+title: "Using effdisR to Estimate Overall Atlantic Fishing Effort By Time-area strata."
 author: "Doug Beare"
 date: "4 October 2015"
 output: pdf_document
 header-includes: \usepackage{tabularx}
-subtitle: Report to SCRS
+subtitle: Instruction Manual for *effdisR*
 Grmd::docx_document:
   fig_caption: yes
   force_captions: yes
@@ -64,8 +63,11 @@ library(doMC)
 ##Install *effdisR*
 Next you will need to install and load the R-scripts and data contained in the (*effdisR*) R-package. The tarball can be obtained here, https://github.com/bearedo/effdis/blob/master/effdisR/effdisR\_1.0.tar.gz.  It can be installed in R as follows:
 
-```{r install effdis R library functions linux,include=FALSE,echo=TRUE}
+```{r install effdis R library,eval=FALSE,include=FALSE,echo=TRUE}
 install.packages('/path/to/package', repos = NULL, type="source")
+```
+
+```{r load effdis R library,eval=TRUE,include=FALSE,echo=TRUE}
 library(effdisR)
 ```
 
@@ -456,7 +458,7 @@ title('Task 1 Catch / Task 2 CPUE for Japanese long-liners')
 
 #Conclusions
 
-The use of the code for raising Task 2 EFFDIS effort estimates by Task 1 totals has been demonstrated here for Japanese longliners. The code above also works for the purse-seiners and baitboats but obviously different input parameters need to be inserted into the functions. The estimate shown here for the Japanese long-line fleet is actually very similar to that calculated by de Bruyn et al (2014). To get global estimates the code above should be re-run for each fleet or flag and the estimates summed. 
+The use of the *effdisR* library for raising Task II EFFDIS effort estimates by Task I totals has been demonstrated here for Japanese longliners. The code above also works for other gears (purse-seiners, baitboats) but obviously different input parameters need to be inserted into the functions. The estimate shown here for the Japanese long-line fleet is very similar to that calculated by de Bruyn et al (2014). To get global estimates the code above should be re-run for each fleet or flag and the estimates summed. 
 
 
 
