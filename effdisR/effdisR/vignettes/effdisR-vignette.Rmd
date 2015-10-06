@@ -4,16 +4,19 @@ author: "Doug Beare"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteIndexEntry{effdisR User Guide}
   %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
   \usepackage[utf8]{inputenc}
+  %\VignetteEncoding{UTF-8}
 ---
+```{r global_options, include=FALSE}
+knitr::opts_chunk$set(fig.width=6, fig.height=6, fig.path='Figs/',
+                      echo=FALSE, warning=FALSE, message=FALSE)
+```
+
 
 International Commission for the Conservation of Atlantic Tunas(ICCAT) contracted Doug Beare (Globefish Consultancy Services, GCS) to develop a modeling approach to estimate overall Atlantic fishing effort exploiting the spatio-temporal information available in the data. The work culminated in the construction of an R-library (*effdisR*) for analysing and visualising EFFDIS data. This *vignette* demonstrates the use of *effdisR* on the Japanese long-line fleet.  
 
-
-#EFFDIS data exploration and effort estimation
 
 ##Install required r libraries
 
@@ -40,7 +43,7 @@ library(doMC)
 ```
 
 ##Install effdisR
-Next you will need to install and load the R-scripts and data contained in the (*effdisR*) R-package. The tarball can be obtained here, https://github.com/bearedo/effdis/blob/master/effdisR/effdisR\_1.0.tar.gz.  It can be installed in R as follows:
+Next you will need to install and load the R-scripts and data contained in the (*effdisR*) R-package. The tarball can be obtained here, https://github.com/bearedo/effdis/blob/master/effdisR/effdisR_1.0.tar.gz.  It can be installed in R as follows.
 
 ```{r install effdis R library,eval=FALSE,include=TRUE,echo=TRUE}
 install.packages('/path/to/package', repos = NULL, type="source")
@@ -54,7 +57,7 @@ library(effdisR)
 
 As described above a PostgreSQL server has been set up on a 'virtual' linux server (IP address = 134.213.29.249) in the cloud. *effdisR* connects to this database using the ODBC protocol.  This ensures that any user is always using the most up-to-date data.
 
-Once the RODBC library is installed in R the relevant PostgreSQL drivers must also be installed, and a DSN (Data Source Name) that can be recognised by R must be set up. In Linux the DSN is set up by inserting the following into the /etc/odbc.ini file:
+Once the RODBC library is installed in R the relevant PostgreSQL drivers must also be installed, and a DSN (Data Source Name) that can be recognised by R must be set up. In Linux the DSN is set up by inserting the following text into the /etc/odbc.ini file.
 
 [ODBC Data Sources]  
 effdis = effdis-tuna-cc1  
@@ -69,20 +72,20 @@ ReadOnly = 0
 [ODBC]  
 InstallDir = /usr/lib  
 
-In Windows you will neeed to open the **Control Panel**, and then choose **Adminstrative Tools** and **Data Sources (ODBC)**. Clicking the 'Add' button in the 'User DSN' tab will let you chose the relevant PostgreSQL driver, after when you will need to insert the database parameters above, see http://brazenly.blogspot.co.uk/2014/05/r-how-to-connect-r-to-database-sql.html. Note: The PostgreSQL drivers can be obtained here, http://www.postgresql.org/ftp/odbc/versions/ but it is probably easier to simply install the entire PostgreSQL package on your machine, http://www.postgresql.org/download/. Once this is all done you can connect from R by typing:
+In Windows you will neeed to open the **Control Panel**, and then choose **Adminstrative Tools** and **Data Sources (ODBC)**. Clicking the 'Add' button in the 'User DSN' tab will let you chose the relevant PostgreSQL driver, after when you will need to insert the database parameters above, see http://brazenly.blogspot.co.uk/2014/05/r-how-to-connect-r-to-database-sql.html. Note: The PostgreSQL drivers can be obtained here, http://www.postgresql.org/ftp/odbc/versions/ but it is probably easier to simply install the entire PostgreSQL package on your machine, http://www.postgresql.org/download/. Once this is all done you can connect from R by typing.
 
 ```{r connect to db,include=TRUE,echo=TRUE,eval=TRUE}
 chan <- odbcConnect("effdis-tuna-cc1", case="postgresql", believeNRows=FALSE)
 ```
 
-'chan' is then stored in R and allows you to 'talk' to the remote database, download data etc.
+The object *chan* is then stored in R and allows you to connect to the remote database, download data etc.
 
 ##Exploratory data analysis
 
 For any data analysis some initial exploration is a very useful first step and *effdisR* includes a suite of tools for plotting and examining the EFFDIS data which are described below.
 
+##Data coverage
 
-### Data coverage
 The function *yr.month.coverage.task2* available in *effdisR* counts the number of samples by year and month for any strata (gear, flag etc) and displays the results as a 3D plot. This type of plot reveals non-random sampling in time.  
 
 ```{r get ll data for five flags,include=TRUE,echo=TRUE,fig.height=5}
@@ -94,30 +97,31 @@ AND flagname IN ('Japan')
 AND catchunit != '--' ;")
 ```
 
-```{r temporal confounding Japan,include=TRUE,echo=TRUE,fig.height=5}
+```{r temporal confounding Japan,include=TRUE,echo=TRUE}
 par(mfrow=c(1,1),mar=c(2,2,2,2),oma=c(1,1,1,1))
 yr.month.coverage.task2(tdata=ll,which.gear='LL',
               start.year=1960,end.year=2010,which.flag='Japan')
 ```
 
-**Figure 2.** *Temporal (by year and month) sampling distribution of long-liners in Task II database by Japan*
+**Figure 1.** *Temporal (by year and month) sampling distribution of long-liners in Task II database by Japan*
 
-###Sampling in space by year - Japan
-The distribution of data/samples in space is similarly important. The function *spatial.coverage.by.year.task2* plots the distribution of Task II data by location for any combination of flag, gear etc. Output is illustrated for longliners for Japanese long-liners in Figure 3.
+##Sampling in space by year - Japan
+
+The distribution of data/samples in space is similarly important. The function *spatial.coverage.by.year.task2* plots the distribution of Task II data by location for any combination of flag, gear etc. Output is illustrated for longliners for Japanese long-liners in Figure 2.
 
 
 ```{r spatial confounding Japan, include=TRUE,echo=TRUE}
-par(mfrow=c(4,4),mar=c(0,0,1,0))
+par(mfrow=c(1,1),mar=c(2,2,2,2))
 spatial.coverage.by.year.task2(tdata=ll,
-        start.year=1985,end.year=2000,which.gear='LL',which.flag='Japan')
+        start.year=2000,end.year=2000,which.gear='LL',which.flag='Japan')
 ```
 
-**Figure 3.** *Spatial sampling by Japanese long-liners between 1985 and 2000*
+**Figure 2.** *Spatial sampling by Japanese long-liners in 2000*
 
 
-### Effort by year and location (raw data, no modeling)
+##Effort by year and location (raw data, no modeling)
 
-Given that we can now determine the timing and location of fishing activities we now need to know its intensity, ie. how many hooks were set or days fished at a particular location ? Task II effort data of any type can be plotted spatially using the R function *three.d.effort.by.year* and longlining effort in the Atlantic by Japan is shown in Figure 6. 
+Given that we can now determine the timing and location of fishing activities we now need to know its intensity, ie. how many hooks were set or days fished at a particular location ? Task II effort data of any type can be plotted spatially using the R function *three.d.effort.by.year* (Figure 3). 
 
 ```{r no of hooks shot by Japan in 2006 from task 2,include=TRUE,echo=TRUE,message = FALSE, error=FALSE, warnings=FALSE}
 par(mfrow=c(1,1))
@@ -125,19 +129,19 @@ three.d.effort.by.year(tdata=ll,what.year=2006,
                          what.flag='Japan',scaling.f=10000,effort.type='NO.HOOKS')  
 ```
 
-**Figure 4.** *Total number of hooks set by Japanese fleet (Task II only) in 2006*
+**Figure 3.** *Total number of hooks set by Japanese fleet (Task II only) in 2006*
 
-### Catch weights by year and location - Japanese longliners, and Spanish Purse-seiners
+##Catch weights by year and location - Japanese longliners, and Spanish Purse-seiners
 
-With *circa* 27 flags, multiple species, 12 months, 61 years, and different effort submissions (e.g. days at sea, number of hooks set) there is a large number of possible combinations for examining the catches.  In this example we plot albacore tuna caught by long-line.
+With *circa* 27 flags, multiple species, 12 months, 61 years, and different effort submissions (e.g. days at sea, number of hooks set) there is a large number of possible combinations for examining the catches.  In this example we plot albacore tuna caught by long-line (Figure 4).
 
 
-```{r extract kg tunas caught by Japan in 2006 from task 2,include=TRUE,echo=TRUE,message = FALSE, error=FALSE, warnings=FALSE}
+```{r extract kg tunas caught by Japan in 2009 from task 2,include=TRUE,echo=TRUE,message = FALSE, error=FALSE, warnings=FALSE}
 alb <- sqlQuery(chan,"SELECT yearc AS year, trend, 
 timeperiodid AS month, flagname, region, geargrpcode,longitude,latitude, 
 catchunit, dsettype, eff1, eff1type, alb as measured_catch
 FROM t2ce
-WHERE region ='AT' AND timeperiodid < 13 AND eff1type IN ('NO.HOOKS') AND 
+WHERE yearc = 2009 AND region ='AT' AND timeperiodid < 13 AND eff1type IN ('NO.HOOKS') AND 
 geargrpcode IN ('LL') AND flagname IN ('Japan') AND catchunit != '--' ;")
 alb$species <- 'alb'
 ```
@@ -147,11 +151,12 @@ alb$species <- 'alb'
 three.d.catch.by.year(tdata=alb,what.year=2009,what.gear='LL',what.species='alb',what.flag='Japan',scaling.f=10,catchunit='nr')
 ```                  
 
-**Figure 5.** *Weight of albacore tuna caught by longline by Japan (2006 & 2009)*
+**Figure 4.** *Weight of albacore tuna caught by longline by Japan (2006 & 2009)*
 
-# EFFDIS effort estimation with *effdisR*: worked example (Japanese longline)
+##EFFDIS effort estimation with *effdisR* worked example (Japanese longline)
 
-##Step 1 
+##Step 1
+
 Get Task II data from the database for each dsettype using *get.effdis.t2.data* and then combine them using rbind. Note: you need data for all flags here for fitting the linear model in step 5.
 
 ```{r get japanese task 2 longline data,eval=FALSE,include=TRUE,echo=TRUE,message = FALSE, error=FALSE, warnings=FALSE}
@@ -165,6 +170,7 @@ long_line <- rbind(ll_n,ll_nw,ll_w)
 ```
 
 ##Step 2
+
 Find and extract those EFFDIS data that are in the Atlantic using *find.ocean*. This function uses a shapefile which is included in *effdisR*, and can be examined by typing *data("seas")* and then *plot(seas)*. Data for land, the Mediterranean and Pacific can be extracted using the strings, 'land', 'med', and 'pac' respectively in the place of 'atl' below. 
 
 ```{r identify data in Atlantic,eval=FALSE,include=TRUE,echo=TRUE,message = FALSE, error=FALSE, warnings=FALSE}
@@ -173,6 +179,7 @@ long_line <- long_line[long_line$which.ocean == 'atl',]
 ```
 
 ##Step 3
+
 Make sure the data are 'clean' using *prepare.effdis.data* as follows. Sometimes downloading from a database creates 'factor' objects in R which can cause problems. This function converts them to character strings.
 
 ```{r get Japanese task 2 longline data,eval=FALSE,include=TRUE,echo=TRUE,message = FALSE, error=FALSE, warnings=FALSE}
@@ -180,6 +187,7 @@ long_line<-prepare.effdis.data(input=long_line)
 ```
 
 ##Step 4
+
 Convert data from 'short format' to 'long format' using *convert2long.format.t2*. We do this because the long format is required for subsequent regression modeling.
 
 ```{r Convert data to long format,eval=FALSE,include=TRUE,echo=TRUE,message = FALSE, error=FALSE, warnings=FALSE}
@@ -187,6 +195,7 @@ long_line_lf <- convert2long.format.t2(input =long_line)
 ```
 
 ##Step 5
+
 Estimate catch weights from numbers where none are supplied using the functions *model.nos.kgs* (fits the model) and *kgs.from.nos* which imputes weights for countries that supply only numbers caught. Note that some countries report catches by total weight, some by total numbers and some by both. 
 
 ```{r model weights as a function of numbers,eval=FALSE,include=TRUE,echo=TRUE,message = FALSE, error=FALSE, warnings=FALSE}
@@ -195,7 +204,8 @@ long_line_lf <- kgs.from.nos(long_line_lf)
 ```
 
 ##Step 6
-Fit regression models to the Task II catch and effort data using *fit2stageGAMtoCatch* and *fitGAMtoEffort*. This step is illustrated here for speed and convenience with bluefin tuna only ('bft') and only between 1990 and 2000. To get a global estimate of effort, however, you would, of course, need to do the same for all nine species but it would be straightforward to add any others if necessary.  The functions fit and test a suite of generalised additive models (GAMs) fitted to the Task II catch and effort data.  
+
+Fit GAM regression models to the Task II catch and effort data using *fit2stageGAMtoCatch* and *fitGAMtoEffort*. This step is illustrated here for speed and convenience with bluefin tuna only ('bft') and only between 1990 and 2000. To get a global estimate of effort, however, you would, of course, need to do the same for all nine species but it would be straightforward to add any others if necessary.
 
 ```{r model catches as a function of space and time,eval=FALSE, include=TRUE,echo=TRUE,message = FALSE, error=FALSE, warnings=FALSE}
 j_bft_ll <- fit2stageGAMtoCatch(input=long_line_lf,
@@ -205,6 +215,7 @@ j_emod_ll <- fitGAMtoEffort(input=long_line_lf,
 ```
 
 ##Step 7
+
 Use the models to predict values over a grid of 'new data'.  Currently this takes the range of locations **ever** recorded in the data, constructs a grid for each time-step and makes the predictions with the model. The function *predict.effdis.t2.data* also identifies and flags up those points in space and time where data were actually collected, see *plot.samples.only* argument in *plot.mods*.
 
 ```{r predict catches over grid,eval=FALSE,include=TRUE,echo=TRUE,message = FALSE, error=FALSE, warnings=FALSE}
@@ -221,20 +232,18 @@ load('/home/doug/effdis/data/j_bft.ll.pred.RData')
 ```
 
 ```{r plot P over grid,eval=TRUE, include=TRUE,echo=TRUE,message = FALSE, error=FALSE, warnings=FALSE}
-par(mfrow=c(1,2))
+par(mfrow=c(1,1))
 plot.mods(input=j_bft.ll.pred,cmod=j_bft_ll,
             which.year = 1995,which.month=1,which.value = 'prob',grid.res=5,which.gear='LL')
-plot.mods(input=j_bft.ll.pred,cmod=j_bft_ll,
-            which.year = 1995,which.month=1,which.value = 'prob',grid.res=5,which.gear='LL',
-            plot.samples.only = FALSE)
 ```
 
-**Figure 11.** *Probability of catching a bluefin tuna (Japanese longline fleet)*
+**Figure 5.** *Probability of catching a bluefin tuna (Japanese longline fleet)*
 
-Figure 11 shows predictions for bluefin tuna from the binary (Bernouilli) model for January 1995. The probability of catching one is highest in the Caribbean, Gulf of Mexico and North Atlantic.  The left-hand plot shows the model output for grid cells where a real observation exists, while the right-hand plot is the interpolation based on the area of the entire dataset.
+Figure 5 shows predictions for bluefin tuna from the binary (Bernouilli) model for January 1995.
 
-## Step 8
-Obtain (and aggregate for later use) Task I long-line data from the database using *get.effdis.t1.data*. Note that Task 1 are annual catch totals which are thought to be comprehensive.
+##Step 8
+
+Obtain (and aggregate for later use) Task I long-line data from the database using *get.effdis.t1.data*. Note: Task I are annual catch totals which are thought to be comprehensive.
 
 ```{r get task 1 data,eval=FALSE, include=TRUE,echo=TRUE,message = FALSE, error=FALSE, warnings=FALSE}
 long_line.t1 <- get.effdis.t1.data(which.dsn='effdis-tuna-cc1',
@@ -244,7 +253,8 @@ long_line.sum.t1 <- aggregate(list(qty_t=long_line.t1$qty_t),
 ```
 
 ##Step 9
-Collect model data together into a single database. In our method you bind up the model estimates for all 9 species as follows. Remember that you need to run Steps 6 and 7 for each species (code not shown here).
+
+Collect model data together into a single dataset. In our method you bind up the model estimates for all 9 species as follows. Remember that you need to run Steps 6 and 7 for each species (code not shown here).
 
 ```{r bind task 2 estimates ,eval=FALSE, include=TRUE,echo=TRUE,message = FALSE, error=FALSE, warnings=FALSE}
 model.data <- rbind(j_alb.ll.pred,j_bft.ll.pred,j_bet.ll.pred,
@@ -253,7 +263,8 @@ model.data <- rbind(j_alb.ll.pred,j_bft.ll.pred,j_bet.ll.pred,
 ```
 
 ##Step 10
-Block out places and times for which data were never collected. This is optional and if all the data are used (see Figure 11 above) the results are very similar.
+
+Block out places and times for which data were never collected. This is optional.
 
 ```{r block out unsampled grids ,eval=FALSE, include=TRUE,echo=TRUE,message = FALSE, error=FALSE, warnings=FALSE}
 model.data$catch[big$observation == FALSE] <- NA
@@ -263,6 +274,7 @@ model.data$eff[big$observation == FALSE]  <- NA
 ```
 
 ##Step 11
+
 Convert Task II catches from kgs to tonnes to match with the Task I data.
 
 ```{r convert task 2 to tonnes ,eval=FALSE, include=TRUE,echo=TRUE,message = FALSE, error=FALSE, warnings=FALSE}
@@ -270,6 +282,7 @@ model.data$catch <- model.data$catch/1000
 ```
 
 ##Step 12
+
 Sum Task II data (catch and effort) for all 9 species.
 
 ```{r sum modeled task 2 over year ,eval=FALSE, include=TRUE,echo=TRUE,message = FALSE, error=FALSE, warnings=FALSE}
@@ -278,7 +291,8 @@ model.data.totals <- aggregate(list(catch=model.data$catch,catch=model.data$catc
 ```
 
 ##Step 13
-Merge the Task 1 and modeled Task 2 totals, calculate a global, modeled Task II CPUE and raise by Task 1 CPUE to give raised effort.
+
+Merge the Task II and modeled Task II totals, calculate a global, modeled Task II CPUE and raise by Task 1 CPUE to give raised effort.
 
 ```{r merge task 1 and task 2 totals,eval=FALSE, include=TRUE,echo=TRUE,message = FALSE, error=FALSE, warnings=FALSE}
 t1.t2.merged <- merge(model.data.totals,long_line.sum.t1)
@@ -287,6 +301,7 @@ t1.t2.merged$raised.effort <- t1.t2.merged$qty_t/t1.t2.merged$cpue
 ```
 
 ##Step 14
+
 Plot the raised effort as a function of year.
 
 ```{r plot estimate for Japan 1990-2010,eval=TRUE, include=TRUE,echo=TRUE,message = FALSE, error=FALSE, warnings=FALSE}
@@ -297,12 +312,12 @@ abline(v=seq(1960,2010,by=5),lty=2,col='blue')
 title('Task 1 Catch / Task 2 CPUE for Japanese long-liners')
 ```
 
-**Figure 12.** *Estimate of total effort (no of hooks) calculated for Japanese long-liners according to $C_{task1}/U_{task2}$ where C=catch and U = catch-per-unit effort.*
+**Figure 6.** *Estimate of total effort (no of hooks) calculated for Japanese long-liners according to $C_{task1}/U_{task2}$ where C=catch and U = catch-per-unit effort.*
 
 
-#Conclusions
+##Conclusions
 
-The use of the *effdisR* library for raising Task II EFFDIS effort estimates by Task I totals has been demonstrated here for Japanese longliners. The code above also works for other gears (purse-seiners, baitboats) but obviously different input parameters need to be inserted into the functions. The estimate shown here for the Japanese long-line fleet is very similar to that calculated by de Bruyn et al (2014). To get global estimates of effort the code above should be re-run for each fleet or flag and the estimates summed. 
+The use of the *effdisR* library for raising Task II EFFDIS effort estimates by Task I totals has been demonstrated here for Japanese longliners. The code above can be adapted for other gears (purse-seiners, baitboats) but obviously different input parameters need to be inserted into the functions. The estimate shown here for the Japanese long-line fleet is very similar to that calculated by de Bruyn et al (2014). To get global estimates of effort the code above should be re-run for each fleet or flag and the estimates summed. 
 
 
 
