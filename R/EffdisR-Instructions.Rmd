@@ -266,8 +266,7 @@ alb$species <- 'alb'
 
 ```{r weight of albacore caught by location in 2006 from task 2,include=TRUE,echo=TRUE,message = FALSE, error=FALSE, warnings=FALSE}
 par(mfrow=c(2,2),mar=c(2,1,2,1))
-three.d.catch.by.year(tdata=alb,what.year=2006,
-                        what.gear='LL',what.species='alb',what.flag='Japan',scaling.f=10,catchunit='nr')  
+three.d.catch.by.year(tdata=alb,what.year=2006,what.gear='LL',what.species='alb',what.flag='Japan',scaling.f=10,catchunit='nr')  
 three.d.catch.by.year(tdata=alb,what.year=2009,
                         what.gear='LL',what.species='alb',what.flag='Japan',scaling.f=10,catchunit='nr')
 three.d.catch.by.year(tdata=alb,what.year=1992,
@@ -366,7 +365,7 @@ j_bft.ll.pred <- predict.effdis.t2.data(cmod=j_bft_ll,
                                           start.year=1990,end.year=2010,which.flag='Japan')
 ```
 
-Once assessed for adequacy of fit the model parameters are used to 'predict' values of catch, effort and catch-per-unit-effort as functions on a grid of all combinations of the selected covariates, together with error or variance if required using the function *predict.effdis.t2.data*.  Note that total Task II catch is calculated by multiplying the fits from Models 1 and 2, ie. 'given that fish were caught, how many/much', in a 'two-stage process'.  The function *plot.mods* can be used to plot selected subsets of the model output. A map of the 'probability of the Japanese long-line fleet catching a blue fin tuna in January 1995 can, for example, be created using the following code:
+The fitted model parameters are used to 'predict' values of catch, effort and catch-per-unit-effort on a grid of all combinations of the selected covariates, together with error or variance if required using the function *predict.effdis.t2.data*.  Note that total Task II catch is calculated by multiplying the predictions from Models 1 and 2, ie. 'given that fish were caught, how many/much?', in a 'two-stage process'.  The function *plot.mods* can be used to plot selected subsets of the model output. A map of the 'probability of the Japanese long-line fleet catching a blue fin tuna in January 1995 can, for example, be created using the following code:
 
 ```{r load predictions for Japanese bluefin long-line,eval=TRUE,include=FALSE,echo=FALSE,message = FALSE, error=FALSE, warnings=FALSE}
 load('/home/doug/effdis/data/j_bft_ll.RData')
