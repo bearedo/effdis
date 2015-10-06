@@ -41,13 +41,13 @@ Select fully interpolated data or only locations where data were actually record
 %%  ~~ If necessary, more details than the description above ~~
 }
 \value{
-Only a plot is returned
+A plot is returned
 }
 \references{
 %% ~put references to the literature/web site here ~
 }
 \author{
-%%  ~~who you are~~
+Doug Beare
 }
 \note{
 %%  ~~further notes~~
@@ -59,60 +59,10 @@ Only a plot is returned
 %% ~~objects to See Also as \code{\link{help}}, ~~~
 }
 \examples{
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--	or do  help(data=index)  for the standard data sets.
+#plot.mods(input=j_bft.ll.pred,cmod=j_bft_ll,
+            which.year = 1995,which.month=1,which.value = 'prob',grid.res=5,which.gear='LL')
 
-## The function is currently defined as
-function (input = bft.aa, cmod = bft, which.year = 1995, which.month = 1, 
-    grid.res = 5, which.value = "prob", which.gear = "PS", plot.samples.only = TRUE) 
-{
-    min.lat <- min(cmod$pmod.data$latitude)
-    max.lat <- max(cmod$pmod.data$latitude)
-    min.lon <- min(cmod$pmod.data$longitude)
-    max.lon <- max(cmod$pmod.data$longitude)
-    which.species <- as.character(input$species[1])
-    lonnie <- seq(min.lon, max.lon, by = grid.res)
-    lattie <- seq(min.lat, max.lat, by = grid.res)
-    lo <- length(lonnie)
-    la <- length(lattie)
-    if (which.value == "prob") {
-        if (plot.samples.only == TRUE) {
-            input[, which.value][input$observation == F] <- NA
-        }
-        image(lonnie, lattie, matrix(input[, which.value][input$year == 
-            which.year & input$month == which.month], lo, la), 
-            col = topo.colors(100))
-        contour(lonnie, lattie, matrix(input[, which.value][input$year == 
-            which.year & input$month == which.month], lo, la), 
-            add = T)
-        map("worldHires", add = T, fill = T)
-        title(paste(toupper(which.species), "-", which.value, month.abb[which.month], 
-            which.year, which.gear))
-        w0 <- (1:length(cmod$pmod.data[, 1]))[cmod$pmod.data$year == 
-            which.year & cmod$pmod.data$month == which.month]
-        points(cmod$pmod.data$longitude[w0], cmod$pmod.data$latitude[w0], 
-            pch = ".")
-    }
-    else {
-        if (plot.samples.only == TRUE) {
-            input[, which.value][input$observation == F] <- NA
-        }
-        image(lonnie, lattie, matrix(log(input[, which.value])[input$year == 
-            which.year & input$month == which.month], lo, la), 
-            col = topo.colors(100))
-        contour(lonnie, lattie, matrix(log(input[, which.value])[input$year == 
-            which.year & input$month == which.month], lo, la), 
-            add = T)
-        map("worldHires", add = T, fill = T)
-        title(paste(toupper(which.species), "-", which.value, month.abb[which.month], 
-            which.year, which.gear))
-        w0 <- (1:length(cmod$pmod.data$longitude))[cmod$pmod.data$year == 
-            which.year & cmod$pmod.data$month == which.month]
-        points(cmod$pmod.data$longitude[w0], cmod$pmod.data$latitude[w0], 
-            pch = ".")
-    }
-  }
+
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
