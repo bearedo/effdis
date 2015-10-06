@@ -25,7 +25,7 @@ The International Commission for the Conservation of Atlantic Tunas (ICCAT) (www
 Here we describe the development of a statistical modeling approach to estimating overall Atlantic long-line (LL), and purse seine (PS) effort by time-area strata for the EFFDIS database which is critical, especially with regard to by-catch evaluations. The software developed (*effdisR*) is written in R linked by SQL to a PostGreSQL database. Its use is described below using examples from a range of countries with particular focus on EU Spain for the purse-seine gear and Japan for the long-line.
 
 #Data, servers, and version control
-Note that an Ubuntu cloud server with a static IP address (134.213.29.249, effdis-tuna-cc1) was set up by the ICCAT Secretariat specifically for the current work.  A PostGIS-enabled PostgreSQL server has also been installed on this machine where all data related to the project are being stored and retrieved.  The database can be accessed directly from the command line of any computer with the PostgreSQL client installed (*psql -h 134.213.29.249 -d effdis -U postgres*) or using the ODBC (Open Database Connectivity) protocol via the R-library, RODBC.  All scripts (R, Rmarkdown, Shell, PHP) developed during the project are being backed up on GitHub (https://github.com/bearedo/effdis). Furthermore all reports and presentations, including this one, are being done with Rmarkdown, linked to GitHub which will facilitate straightforward future modification and updating.
+Note that an Ubuntu cloud server with a static IP address (134.213.29.249, rscloud.iccat.int) was set up by the ICCAT Secretariat specifically for the current work.  A PostGIS-enabled PostgreSQL server has also been installed on this machine where all data related to the project are being stored and retrieved.  The database can be accessed directly from the command line of any computer with the PostgreSQL client installed (*psql -h 134.213.29.249 -d effdis -U postgres*) or using the ODBC (Open Database Connectivity) protocol via the R-library, RODBC.  All scripts (R, Rmarkdown, Shell, PHP) developed during the project are being backed up on GitHub (https://github.com/bearedo/effdis). Furthermore all reports and presentations, including this one, are being done with Rmarkdown, linked to GitHub which will facilitate straightforward future modification and updating.
 
 The *effdis-tuna-cc1* server also hosts an online geographic information system being trialled for EFFDIS (http://134.213.29.249/effdis/#).  Although the plotting and modeling work is being done in R there are features of bona fide databases like PostgreSQL that are particularly useful, e.g. the SQL language, very rapid searches, and functionality for linking directly with GIS software such as QGIS. An example screenshot of bigeye tuna catch distribution by Chinese Taipei from the beta version of this database is shown below in Figure 1.
 
@@ -63,11 +63,11 @@ library(doMC)
 ##Install *effdisR*
 Next you will need to install and load the R-scripts and data contained in the (*effdisR*) R-package. The tarball can be obtained here, https://github.com/bearedo/effdis/blob/master/effdisR/effdisR\_1.0.tar.gz.  It can be installed in R as follows:
 
-```{r install effdis R library,eval=FALSE,include=FALSE,echo=TRUE}
+```{r install effdis R library,eval=FALSE,include=TRUE,echo=TRUE}
 install.packages('/path/to/package', repos = NULL, type="source")
 ```
 
-```{r load effdis R library,eval=TRUE,include=FALSE,echo=TRUE}
+```{r load effdis R library,eval=TRUE,include=TRUE,echo=TRUE}
 library(effdisR)
 ```
 
@@ -77,19 +77,18 @@ As described above a PostgreSQL server has been set up on a 'virtual' linux serv
 
 Once the RODBC library is installed in R the relevant PostgreSQL drivers must be installed, and a DSN (Data Source Name) that can be recognised by R must be set up. In Linux the DSN is set up by inserting the following into the /etc/odbc.ini file:
 
-[ODBC Data Sources]
-effdis = effdis-tuna-cc1
-
-[effdis-tuna-cc1]
-Driver = /usr/lib/x86_64-linux-gnu/odbc/psqlodbcw.so
-Database = effdis
-Servername = 134.213.29.249
-Username = postgres
-Password = Postgres1
-Protocol = 8.2.5
-ReadOnly = 0
-[ODBC]
-InstallDir = /usr/lib
+[ODBC Data Sources]  
+effdis = effdis-tuna-cc1  
+[effdis-tuna-cc1]  
+Driver = /usr/lib/x86_64-linux-gnu/odbc/psqlodbcw.so  
+Database = effdis  
+Servername = 134.213.29.249  
+Username = postgres  
+Password = Postgres1  
+Protocol = 8.2.5  
+ReadOnly = 0  
+[ODBC]  
+InstallDir = /usr/lib  
 
 In Windows you will neeed to open the **Control Panel**, and then choose **Adminstrative Tools** and **Data Sources (ODBC)**. Clicking the 'Add' button in the 'User DSN' tab will let you chose the relevant PostgreSQL driver, after when you will need to insert the database parameters above, see http://brazenly.blogspot.co.uk/2014/05/r-how-to-connect-r-to-database-sql.html. Note: The PostgreSQL drivers can be obtained here, http://www.postgresql.org/ftp/odbc/versions/ but it is probably easier to simply install the entire PostgreSQL package on your machine, http://www.postgresql.org/download/. Once this is all done you can connect from R by typing:
 

@@ -1,7 +1,7 @@
 
 # Load libraries
 
-library(rio)
+#library(rio)
 library(spatial)
 library(sp)
 library(doBy)
@@ -17,6 +17,7 @@ library(mapdata)
 library(RODBC)
 library(reshape2)
 library(mgcv)
+library(doMC)
 
 # Load scripts #
 
@@ -44,8 +45,6 @@ source('add.covariates.R')
 #########################
 ## Purse-seine example ##
 #########################
-
-
 
 # Purse-seine example #
 
@@ -243,9 +242,9 @@ w0 <- (1:length(lllf$year))[lllf$catchunit == 'kg' & lllf$year >= 1990]
 
 round(tapply(lllf$measured_catch[w0],list(lllf$flagname[w0],lllf$species[w0]),sum,na.rm=T))/1000
 
-setwd('/home/doug/effdis/effort-estimates')
+setwd('/home/doug/effdis/effdis-estimates')
 
-alb <- fit2stageGAMtoCatch(input=lllf,which.flag='Japan',which.species='alb',start.year=1995,end.year=2010)
+alb <- fit2stageGAMtoCatch(input=lllf,which.flag='Japan',which.species='alb',start.year=2000,end.year=2010)
 bft <- fit2stageGAMtoCatch(input=lllf,which.flag='Japan',which.species='bft',start.year=1970,end.year=2010)
 bet <- fit2stageGAMtoCatch(input=lllf,which.flag='Japan',which.species='bet',start.year=1970,end.year=2010)
 skj <- fit2stageGAMtoCatch(input=lllf,which.flag='Japan',which.species='skj',start.year=1970,end.year=2010)
@@ -266,11 +265,11 @@ big$catch <-big$measured_catch
 
 # Do we just assume here that once we've modeled NO.HOOKS as a function of time we can use that sensibly ?
 
-emod <- fitGAMtoEffort(input=lllf,which.flag='Japan',which.effort='NO.HOOKS',start.year=1970,end.year=2010,which.gam='gam')
+emod <- fitGAMtoEffort(input=lllf,which.flag='Japan',which.effort='NO.HOOKS',start.year=2000,end.year=2010)
 
 # Create grids and predict over them ###
 
-alb.aa <- predict.effdis.t2.data(cmod=alb, effmod=emod,grid.res=5,start.year=1970,end.year=2010,which.flag='Japan')
+alb.aa <- predict.effdis.t2.data(cmod=alb, effmod=emod,grid.res=5,start.year=2000,end.year=2010,which.flag='Japan')
 bft.aa <- predict.effdis.t2.data(cmod=bft, effmod=emod,grid.res=5,start.year=1970,end.year=2010,which.flag='Japan')
 bet.aa <- predict.effdis.t2.data(cmod=bet, effmod=emod,grid.res=5,start.year=1970,end.year=2010,which.flag='Japan')
 skj.aa <- predict.effdis.t2.data(cmod=skj, effmod=emod,grid.res=5,start.year=1970,end.year=2010,which.flag='Japan')
@@ -279,6 +278,10 @@ swo.aa <- predict.effdis.t2.data(cmod=swo, effmod=emod,grid.res=5,start.year=197
 bum.aa <- predict.effdis.t2.data.r(cmod=bum, effmod=emod,grid.res=5,start.year=1970,end.year=2010,which.flag='Japan')
 sai.aa <- predict.effdis.t2.data.r(cmod=sai, effmod=emod,grid.res=5,start.year=1970,end.year=2010,which.flag='Japan')
 whm.aa <- predict.effdis.t2.data.r(cmod=whm, effmod=emod,grid.res=5,start.year=1970,end.year=2010,which.flag='Japan')
+
+#Plot data
+
+plot.mods(input=alb.aa,cmod=alb,which.year=2005,grid.res=5,which.value='measured_catch.se.fit',which.gear='LL',plot.samples.only=TRUE)
 
 # Loop around all flags and species #
 
