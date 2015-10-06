@@ -1,58 +1,433 @@
 ---
-title: "Vignette Title"
-author: "Vignette Author"
+title: "effdisR User Guide"
+author: "Doug Beare"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteIndexEntry{effdisR User Guide}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
 
-Vignettes are long form documentation commonly included in packages. Because they are part of the distribution of the package, they need to be as compact as possible. The `html_vignette` output type provides a custom style sheet (and tweaks some options) to ensure that the resulting html is as small as possible. The `html_vignette` format:
+#Background
 
-- Never uses retina figures
-- Has a smaller default figure size
-- Uses a custom CSS stylesheet instead of the default Twitter Bootstrap style
+International Commission for the Conservation of Atlantic Tunas(ICCAT) contracted Doug Beare (Globefish Consultancy Services, GCS) to develop a modeling approach to estimate overall Atlantic fishing effort exploiting the spatio-temporal information available in the data. The work culminated in the construction of an R-library (*effdisR*) for analysing and visualising EFFDIS data. This *vignette* demonstrates the use of *effdisR* on the Japanese long-line fleet.  
 
-## Vignette Info
 
-Note the various macros within the `vignette` section of the metadata block above. These are required in order to instruct R how to build the vignette. Note that you should change the `title` field and the `\VignetteIndexEntry` to match the title of your vignette.
+#EFFDIS data exploration and effort estimation
 
-## Styles
+##Install required r libraries
 
-The `html_vignette` template includes a basic CSS theme. To override this theme you can specify your own CSS in the document metadata as follows:
+The first step is to install, e.g. install.packages("spatial") and then 'attach' the R-libraries required by *effdisR*, see below. *rgdal*, for example, is used for converting between standard spatial formats while RODBC is necessary for connecting to the PostgreSQL database. 
 
-    output: 
-      rmarkdown::html_vignette:
-        css: mystyles.css
-
-## Figures
-
-The figure sizes have been customised so that you can easily put two images side-by-side. 
-
-```{r, fig.show='hold'}
-plot(1:10)
-plot(10:1)
+```{r attach libraries, include =TRUE, echo=T, message=FALSE,error=FALSE,warning=FALSE}
+library(spatial)
+library(sp)
+library(doBy)
+library(rgdal)
+library(RODBC)
+library(RColorBrewer)
+library(ggplot2)
+library(vmstools)
+library(mgcv)
+library(maps)
+library(mapdata)
+library(reshape2)
+library(rgeos)
+library(lattice)
+library(pander)
+library(kfigr)
+library(doMC)
 ```
 
-You can enable figure captions by `fig_caption: yes` in YAML:
+##Install *effdisR*
+Next you will need to install and load the R-scripts and data contained in the (*effdisR*) R-package. The tarball can be obtained here, https://github.com/bearedo/effdis/blob/master/effdisR/effdisR\_1.0.tar.gz.  It can be installed in R as follows:
 
-    output:
-      rmarkdown::html_vignette:
-        fig_caption: yes
-
-Then you can use the chunk option `fig.cap = "Your figure caption."` in **knitr**.
-
-## More Examples
-
-You can write math expressions, e.g. $Y = X\beta + \epsilon$, footnotes^[A footnote here.], and tables, e.g. using `knitr::kable()`.
-
-```{r, echo=FALSE, results='asis'}
-knitr::kable(head(mtcars, 10))
+```{r install effdis R library,eval=FALSE,include=TRUE,echo=TRUE}
+install.packages('/path/to/package', repos = NULL, type="source")
 ```
 
-Also a quote using `>`:
+```{r load effdis R library,eval=TRUE,include=TRUE,echo=TRUE}
+library(effdisR)
+```
 
-> "He who gives up [code] safety for [code] speed deserves neither."
-([via](https://twitter.com/hadleywickham/status/504368538874703872))
+##Connecting R to the PostgreSQL database
+
+As described above a PostgreSQL server has been set up on a 'virtual' linux server (IP address = 134.213.29.249) in the cloud. *effdisR* connects to this database using the ODBC protocol.  This ensures that any user is always using the most up-to-date data.
+
+Once the RODBC library is installed in R the relevant PostgreSQL drivers must also be installed, and a DSN (Data Source Name) that can be recognised by R must be set up. In Linux the DSN is set up by inserting the following into the /etc/odbc.ini file:
+
+[ODBC Data Sources]  
+effdis = effdis-tuna-cc1  
+[effdis-tuna-cc1]  
+Driver = /usr/lib/x86_64-linux-gnu/odbc/psqlodbcw.so  
+Database = effdis  
+Servername = 134.213.29.249  
+Username = postgres  
+Password = Postgres1  
+Protocol = 8.2.5  
+ReadOnly = 0  
+[ODBC]  
+InstallDir = /usr/lib  
+
+In Windows you will neeed to open the **Control Panel**, and then choose **Adminstrative Tools** and **Data Sources (ODBC)**. Clicking the 'Add' button in the 'User DSN' tab will let you chose the relevant PostgreSQL driver, after when you will need to insert the database parameters above, see http://brazenly.blogspot.co.uk/2014/05/r-how-to-connect-r-to-database-sql.html. Note: The PostgreSQL drivers can be obtained here, http://www.postgresql.org/ftp/odbc/versions/ but it is probably easier to simply install the entire PostgreSQL package on your machine, http://www.postgresql.org/download/. Once this is all done you can connect from R by typing:
+
+```{r connect to db,include=TRUE,echo=TRUE}
+chan <- odbcConnect("effdis-tuna-cc1", case="postgresql", believeNRows=FALSE)
+```
+
+'chan' is then stored in R and allows you to 'talk' to the remote database, download data etc.
+
+##Exploratory data analysis
+
+For any data analysis some initial exploration is a very useful first step and *effdisR* includes a suite of tools for plotting and examining the EFFDIS data which are described below.
+
+
+### Data coverage
+The function *yr.month.coverage.task2* available in *effdisR* counts the number of samples by year and month for any strata (gear, flag etc) and displays the results as a 3D plot. This type of plot reveals non-random sampling in time.  
+
+```{r get ll data for five flags,include=TRUE,echo=TRUE,fig.height=5}
+ll <- sqlQuery(chan,"SELECT yearc AS year, trend, timeperiodid AS month, 
+flagname, region, geargrpcode,longitude,latitude, catchunit, dsettype, eff1, eff1type
+FROM t2ce
+WHERE region ='AT' AND timeperiodid < 13 AND eff1type='NO.HOOKS' AND geargrpcode = 'LL' 
+AND flagname IN ('Japan', 'Chinese Taipei','Brasil', 'U.S.A.','China P.R.') 
+AND catchunit != '--' ;")
+```
+
+```{r temporal confounding Japan and Chinese Taipei,include=TRUE,echo=TRUE,fig.height=5}
+par(mfrow=c(2,2),mar=c(2,2,2,2),oma=c(1,1,1,1))
+yr.month.coverage.task2(tdata=ll,which.gear='LL',
+              start.year=1960,end.year=2010,which.flag='Japan')
+yr.month.coverage.task2(tdata=ll,which.gear='LL',
+              start.year=1960,end.year=2010,which.flag='Chinese Taipei')
+yr.month.coverage.task2(tdata=ll,which.gear='LL',
+              start.year=1960,end.year=2010,which.flag='Brasil')
+yr.month.coverage.task2(tdata=ll,which.gear='LL',
+              start.year=1960,end.year=2010,which.flag='U.S.A.')
+```
+
+**Figure 2.** *Temporal (by year and month) sampling distribution of long-liners in Task II database by Japan, Chinese Taipei, Brazil, and U.S.A.*
+
+###Sampling in space by year - Brazil, and Japan
+The distribution of data/samples in space is similarly important. The function *spatial.coverage.by.year.task2* plots the distribution of Task II data by location for any combination of flag, gear etc. Output is illustrated for longliners for two arbitarily selected flags and time-periods in Figures 3 and 4.
+
+```{r spatial confounding Brasil,include=TRUE,echo=TRUE}
+par(mfrow=c(4,4),mar=c(0,0,1,0))
+spatial.coverage.by.year.task2(tdata=ll,
+        start.year=1975,end.year=1990,which.gear='LL',which.flag='Brasil')
+```
+
+**Figure 3.** *Spatial sampling by Brazilian long-liners between 1975 and 1990*
+
+The extent of Brazilian longlining activity has, for example, spread out from the coast of South America between 1975 and 1990 (Fig. 4). In contrast fleets from both Japan and Chinese Taipei cover substantial areas of the Atlantic Ocean (Figs. 5 and 6).
+
+```{r spatial confounding Japan, include=TRUE,echo=TRUE}
+par(mfrow=c(4,4),mar=c(0,0,1,0))
+spatial.coverage.by.year.task2(tdata=ll,
+        start.year=1985,end.year=2000,which.gear='LL',which.flag='Japan')
+```
+
+**Figure 4.** *Spatial sampling by Japanese long-liners between 1985 and 2000*
+
+
+```{r get purse-seine data,include=TRUE,echo=TRUE,fig.height=5}
+ps <- sqlQuery(chan,"SELECT yearc AS year, trend, timeperiodid AS month, 
+flagname, region, geargrpcode,longitude,latitude, catchunit, dsettype, eff1, eff1type
+FROM t2ce
+WHERE region ='AT' AND timeperiodid < 13 AND eff1type IN ('D.FISH','FISH.HOUR') 
+AND geargrpcode = 'PS' AND flagname IN ('EU.España','Japan','Other','Panama') 
+AND catchunit != '--' ;")
+```
+
+```{r plot distribution of spanish purse-seine data,include=TRUE,echo=TRUE,fig.height=5}
+par(mfrow=c(2,3),mar=c(1,1,2,1),oma=c(3,3,3,3))
+spatial.coverage.by.year.task2(tdata=ps,start.year=2005,end.year=2010,
+                                 which.gear='PS',which.flag='EU.España')
+```
+
+**Figure 5.** *Spatial sampling by Spanish purse-seiners between 1995 and 2010*
+
+Most of the purse-seining data have been supplied at a higher spatial resolution (1x1) than is available for the long-liners. This is illustrated in Figure 5 which shows the distribution of Spanish purse-seining activity off the West Coast of Africa between 2005 and 2010.
+
+### Effort by year and location (raw data, no modeling)
+
+Given that we can now determine the timing and location of fishing activities (Figs. 2-6) we now need to know its intensity, ie. how many hooks were set or days fished at a particular location ? Task II effort data of any type can be plotted spatially using the R function *three.d.effort.by.year* and example output is shown in Figures 6 to 9. 
+
+In 2006, for example, longlining effort by Japan focused on the North and Eastern Atlantic (Fig. 6). Chinese Taipei flagged long-liners, on the other hand also worked in the North Atlantic but their effort appears greater in the South Atlantic (Fig. 7). Purse-seining data are submitted to ICCAT at a higher spatial resolution (1x1 grid) and examples for Spain and Panama in 2009 are plotted in Figures 8 and 9. Both fleets focus their activity along the West Coast of Africa but the Panamanian fleet tends not to venture as far inshore as the Spanish fleet (Figs 8 & 9).
+
+```{r no of hooks shot by Japan in 2006 from task 2,include=TRUE,echo=TRUE,message = FALSE, error=FALSE, warnings=FALSE}
+par(mfrow=c(1,1))
+three.d.effort.by.year(tdata=ll,what.year=2006,
+                         what.flag='Japan',scaling.f=10000,effort.type='NO.HOOKS')  
+```
+
+**Figure 6.** *Total number of hooks set by Japanese fleet (Task II only) in 2006*
+
+```{r no of hooks shot by Chinese Taipei in 2006 from task 2,include=TRUE,echo=TRUE,message = FALSE, error=FALSE, warnings=FALSE}
+three.d.effort.by.year(tdata=ll,what.year=2006,
+                         what.flag="Chinese Taipei",scaling.f=10000,gridx=5,gridy=5,
+                         effort.type='NO.HOOKS',what.gear='LL')  
+```
+
+**Figure 7.** *Total number of hooks set by Chinese Taipei (Task II only) in 2006*
+
+```{r no of fishing hours by Spain in 2009 from task 2,include=TRUE,echo=TRUE,message = FALSE, error=FALSE, warnings=FALSE}
+three.d.effort.by.year(tdata=ps,what.year=2009,
+                         what.flag='EU.España',gridx=1,gridy=1,
+                         scaling.f=2,effort.type='FISH.HOUR',what.gear='PS')  
+```
+
+**Figure 8.** *Total fishing hours reported by Spanish purse-seiners (Task II only)  in 2009*
+
+```{r no of fishing hours by Other in 2009 from task 2,include=TRUE,echo=TRUE,message = FALSE, error=FALSE, warnings=FALSE}
+three.d.effort.by.year(tdata=ps,what.year=2009,
+                         what.flag='Panama',
+                         gridx=1,gridy=1,scaling.f=1,effort.type='FISH.HOUR',what.gear='PS')  
+```
+
+**Figure 9.** *Total fishing hours reported by Panamanian purse-seiners (Task II only) 2009*
+
+
+### Catch weights by year and location - Japanese longliners, and Spanish Purse-seiners
+
+With *circa* 27 flags, multiple species, 12 months, 61 years, and different effort submissions (e.g. days at sea, number of hooks set) there is a large number of possible combinations for examining the catches. Examples are illustrated in Figure 10 using the R function, *three.d.catch.by.year* linked to the PostgreSQL database via an SQL script (see below). In this example we extracted data for albacore tuna caught by long-line for Japan, and by purse-seine for Spain. [Note that observations were ignored where the catchunit is unknown ('--'). Numbers or kilograms caught can be selected depending on availability].
+
+
+```{r extract kg tunas caught by selected flags in 2006 from task 2,include=TRUE,echo=TRUE,message = FALSE, error=FALSE, warnings=FALSE}
+alb <- sqlQuery(chan,"SELECT yearc AS year, trend, 
+timeperiodid AS month, flagname, region, geargrpcode,longitude,latitude, 
+catchunit, dsettype, eff1, eff1type, alb as measured_catch
+FROM t2ce
+WHERE region ='AT' AND timeperiodid < 13 AND eff1type IN ('NO.HOOKS','FISH.HOUR') AND 
+geargrpcode IN ('LL','PS') AND flagname IN ('Japan','EU.España') AND catchunit != '--' ;")
+alb$species <- 'alb'
+```
+
+
+```{r weight of albacore caught by location in 2006 from task 2,include=TRUE,echo=TRUE,message = FALSE, error=FALSE, warnings=FALSE}
+par(mfrow=c(2,2),mar=c(2,1,2,1))
+three.d.catch.by.year(tdata=alb,what.year=2006,
+                        what.gear='LL',what.species='alb',what.flag='Japan',scaling.f=10,catchunit='nr')  
+three.d.catch.by.year(tdata=alb,what.year=2009,
+                        what.gear='LL',what.species='alb',what.flag='Japan',scaling.f=10,catchunit='nr')
+three.d.catch.by.year(tdata=alb,what.year=1992,
+                        what.gear='PS',what.species='alb',gridx=1,gridy=1,what.flag='EU.España',scaling.f=25,catchunit='kg')  
+three.d.catch.by.year(tdata=alb,what.year=1995,
+                        what.gear='PS',what.species='alb',gridx=1,gridy=1,what.flag='EU.España',scaling.f=25,catchunit='kg')
+```
+
+**Figure 10.** *Weight of albacore tuna caught by longline by Japan (2006 & 2009) and purse-seine by Spain (1992 & 1995)*
+
+# EFFDIS effort estimation with *effdisR*: worked example (Japanese longline)
+
+##Step 1 
+Get Task II data from the database for each dsettype using *get.effdis.t2.data* and then combine them using rbind. 
+
+```{r get japanese task 2 longline data,eval=FALSE,include=TRUE,echo=TRUE,message = FALSE, error=FALSE, warnings=FALSE}
+ll_n  <- get.effdis.t2.data(which.dsn='effdis-tuna-cc1',
+                              which.gear='LL',which.flag='All',which.dsettype = 'n-')
+ll_nw <- get.effdis.t2.data(which.dsn='effdis-tuna-cc1',
+                              which.gear='LL',which.flag='All',which.dsettype = 'nw')
+ll_w  <- get.effdis.t2.data(which.dsn='effdis-tuna-cc1',
+                              which.gear='LL',which.flag='All',which.dsettype = '-w')
+long_line <- rbind(ll_n,ll_nw,ll_w)
+```
+
+##Step 2
+Find and extract those EFFDIS data that are in the Atlantic using *find.ocean*. This function uses a shapefile which is included in *effdisR*, and can be examined by typing *data("seas")* and then *plot(seas)*.  The definitions of 'Atlantic' used by ICCAT are rather crude. Thus function tries to mimic ICCAT definitions and 'Atlantic', for example, includes the Gulf of St Lawrence, the Caribbean Sea, The Celtic Sea, The Gulf of Guinea, The Gulf of Mexico and The Irish Sea. Obviously this is flexible and can easily be changed.  Data for land, the Mediterranean and Pacific can be extracted using the strings, 'land', 'med', and 'pac' respectively in the place of 'atl' below. 
+
+```{r identify data in Atlantic,eval=FALSE,include=TRUE,echo=TRUE,message = FALSE, error=FALSE, warnings=FALSE}
+long_line<-find.ocean(long_line)
+long_line <- long_line[long_line$which.ocean == 'atl',]
+```
+
+##Step 3
+Make sure the data are 'clean' using *prepare.effdis.data* as follows. Sometimes downloading from a database creates 'factor' objects in R which can cause problems. This function converts them to character strings.
+
+```{r get Japanese task 2 longline data,eval=FALSE,include=TRUE,echo=TRUE,message = FALSE, error=FALSE, warnings=FALSE}
+long_line<-prepare.effdis.data(input=long_line)
+```
+
+##Step 4
+Convert data from 'short format' to 'long format' using *convert2long.format.t2*. We do this because the long format is required for subsequent regression modeling.
+
+```{r Convert data to long format,eval=FALSE,include=TRUE,echo=TRUE,message = FALSE, error=FALSE, warnings=FALSE}
+long_line_lf <- convert2long.format.t2(input =long_line)
+```
+
+##Step 5
+Estimate catch weights from numbers where none are supplied using the functions *model.nos.kgs* (fits the model) and *kgs.from.nos* which imputes weights for countries that supply only numbers caught. Note that some countries report catches by total weight, some by total numbers and some by both. For the purposes of the effort estimations we are attempting to make here, it is essential that the catch data are available in the same unit of measurement.  The data for countries that have reported both weights and numbers were, therefore, extracted and examined together. The relationships betweem them are highly linear (see Interim Report) and we decided to model the weight caught as a (linear) function of number caught plus other useful, predictive covariates (e.g. flag, species, and trend). A stepwise model selection procedure selects the 'best' model (bm) which is then used to impute catch weights in kgs for Task II in cases where total numbers only were supplied, e.g. U.S.A. The model below (bm) fits the data well and explains most of the variance ($R^2$ = 83%).  This part of the procedure/model is included in the error variance estimation. 
+
+```{r model weights as a function of numbers,eval=FALSE,include=TRUE,echo=TRUE,message = FALSE, error=FALSE, warnings=FALSE}
+bm <- model.nos.kgs(input=long_line_lf,which.gear='LL')
+long_line_lf <- kgs.from.nos(long_line_lf) 
+```
+
+```{r load best.model ,eval=TRUE,include=FALSE,echo=FALSE,message = FALSE, error=FALSE, warnings=FALSE}
+load('/home/doug/effdis/data/best.model.ll.RData')
+```
+
+*Table 3. Linear model summarising the relationship between weights and numbers for countries that sent both to ICCAT for the Task II database*
+```{r display bestmodel,eval=TRUE,include=TRUE,echo=TRUE}
+panderOptions("digits",1)
+pander(bm)
+```
+
+##Step 6
+Fit regression models to the Task II catch and effort data using *fit2stageGAMtoCatch* and *fitGAMtoEffort*. This step is illustrated here for speed and convenience with bluefin tuna only ('bft') and only between 1990 and 2000. To get a global estimate of effort, however, you would, of course, need to do the same for all nine species but it would be straightforward to add any others if necessary.  The functions fit and test a suite of generalised additive models (GAMs) fitted to the Task II catch and effort data.  GAMs were selected because they are highly flexible, impose no particular functional form on the data, and they can deal with skew distributions and high prevalences of zeros.  The models take the relevant variables (eg. number of hooks set, weight of fish caught) and model them as smooth functions of various combinations of covariates of location (latitude, longitude, bottom depth) and time (year and month). 
+
+The first stage models the probability of recording a catch using a GAM from the Quasibinomial family (Model 1), where $P$ is the probability of catching a fish.
+
+1. $P_{xytm} = s(x,y)+s(t)+s(m)+\epsilon$
+
+We then model the positive component of the catch, $C$, with a GAM from the Gamma family (Model 2).
+
+2. $C_{xytm} = s(x,y)+s(t)+s(m)+\epsilon$
+
+And finally the fishing effort (number of hooks) is modeled using a GAM from the QuasiPoisson family (Model 3).
+
+3. $E_{xytm} = s(x,y)+s(t)+s(m)+\epsilon$
+
+In all 3 models, $x$,$y$,$t$, and $m$ are longitude, latitude, trend, and month respectively and $s$ are spline smooth functions fitted by generalised-cross-validation using the MGCV R-library, see https://cran.r-project.org/web/packages/mgcv/mgcv.pdf. $\epsilon$ is different, as appropriate, for each model. 
+
+```{r model catches as a function of space and time,eval=FALSE, include=TRUE,echo=TRUE,message = FALSE, error=FALSE, warnings=FALSE}
+j_bft_ll <- fit2stageGAMtoCatch(input=long_line_lf,
+                                  which.flag='Japan',which.species='bft',start.year=1990,end.year=2010)
+j_emod_ll <- fitGAMtoEffort(input=long_line_lf,
+                              which.flag='Japan',which.effort='NO.HOOKS',start.year=1990,end.year=2010)
+```
+
+##Step 7
+Use the models to predict values over a grid of 'new data'.  Currently this takes the range of locations **ever** recorded in the data, constructs a grid for each time-step (1950 to present by month) and makes the predictions with the model. The function *predict.effdis.t2.data* also identifies and flags up those points in space and time where data were actually collected.
+
+```{r predict catches over grid,eval=FALSE,include=TRUE,echo=TRUE,message = FALSE, error=FALSE, warnings=FALSE}
+j_bft.ll.pred <- predict.effdis.t2.data(cmod=j_bft_ll,
+                                          effmod=j_emod_ll,grid.res=5,
+                                          start.year=1990,end.year=2010,which.flag='Japan')
+```
+
+Once assessed for adequacy of fit the model parameters are used to 'predict' values of catch, effort and catch-per-unit-effort as functions on a grid of all combinations of the selected covariates, together with error or variance if required using the function *predict.effdis.t2.data*.  Note that total Task II catch is calculated by multiplying the fits from Models 1 and 2, ie. 'given that fish were caught, how many/much', in a 'two-stage process'.  The function *plot.mods* can be used to plot selected subsets of the model output. A map of the 'probability of the Japanese long-line fleet catching a blue fin tuna in January 1995 can, for example, be created using the following code:
+
+```{r load predictions for Japanese bluefin long-line,eval=TRUE,include=FALSE,echo=FALSE,message = FALSE, error=FALSE, warnings=FALSE}
+load('/home/doug/effdis/data/j_bft_ll.RData')
+load('/home/doug/effdis/data/j_bft.ll.pred.RData')
+```
+
+```{r plot P over grid,eval=TRUE, include=TRUE,echo=TRUE,message = FALSE, error=FALSE, warnings=FALSE}
+par(mfrow=c(1,2))
+plot.mods(input=j_bft.ll.pred,cmod=j_bft_ll,
+            which.year = 1995,which.month=1,which.value = 'prob',grid.res=5,which.gear='LL')
+plot.mods(input=j_bft.ll.pred,cmod=j_bft_ll,
+            which.year = 1995,which.month=1,which.value = 'prob',grid.res=5,which.gear='LL',
+            plot.samples.only = FALSE)
+```
+
+**Figure 11.** *Probability of catching a bluefin tuna (Japanese longline fleet)*
+
+Figure 11 shows predictions for bluefin tuna from the binary (Bernouilli) model for January 1995. The probability of catching one is highest in the Caribbean, Gulf of Mexico and North Atlantic.  The left-hand plot shows the model output for grid cells where a real observation exists, while the right-hand plot is the interpolation based on the area of the entire dataset.
+
+## Step 8
+Obtain (and aggregate for later use) Task I long-line data from the database using *get.effdis.t1.data*. Note that Task 1 are annual catch totals which are thought to be comprehensive.
+
+```{r get task 1 data,eval=FALSE, include=TRUE,echo=TRUE,message = FALSE, error=FALSE, warnings=FALSE}
+long_line.t1 <- get.effdis.t1.data(which.dsn='effdis-tuna-cc1',
+                                     which.gear = 'LL',which.region='AT',which.flag='Japan')
+long_line.sum.t1 <- aggregate(list(qty_t=long_line.t1$qty_t),
+                              list(year=long_line.t1$yearc),sum,na.rm=T)
+```
+
+##Step 9
+Collect model data together into a single database. In our method you bind up the model estimates for all 9 species as follows. Remember that you need to run Steps 6 and 7 for each species (code not shown here).
+
+```{r bind task 2 estimates ,eval=FALSE, include=TRUE,echo=TRUE,message = FALSE, error=FALSE, warnings=FALSE}
+model.data <- rbind(j_alb.ll.pred,j_bft.ll.pred,j_bet.ll.pred,
+                    j_bum.ll.pred,j_skj.ll.pred,j_yft.ll.pred,
+                    j_swo.ll.pred,j_sai.ll.pred,j_whm.ll)
+```
+
+##Step 10
+Block out places and times for which data were never collected. This is optional and if all the data are used (see Figure 11 above) the results are very similar.
+
+```{r block out unsampled grids ,eval=FALSE, include=TRUE,echo=TRUE,message = FALSE, error=FALSE, warnings=FALSE}
+model.data$catch[big$observation == FALSE] <- NA
+model.data$prob[big$observation == FALSE] <- NA
+model.data$measured_catch[big$observation == FALSE] <- NA
+model.data$eff[big$observation == FALSE]  <- NA
+```
+
+##Step 11
+Convert Task II catches from kgs to tonnes to match with the Task I data.
+
+```{r convert task 2 to tonnes ,eval=FALSE, include=TRUE,echo=TRUE,message = FALSE, error=FALSE, warnings=FALSE}
+model.data$catch <- model.data$catch/1000
+```
+
+##Step 12
+Sum Task II data (catch and effort) for all 9 species.
+
+```{r sum modeled task 2 over year ,eval=FALSE, include=TRUE,echo=TRUE,message = FALSE, error=FALSE, warnings=FALSE}
+model.data.totals <- aggregate(list(catch=model.data$catch,catch=model.data$catch,eff=model.data$eff), 
+                  by=list(year=model.data$year),sum,na.rm=T)
+```
+
+##Step 13
+Merge the Task 1 and modeled Task 2 totals, calculate a global, modeled Task II CPUE and raise by Task 1 CPUE to give raised effort.
+
+```{r merge task 1 and task 2 totals,eval=FALSE, include=TRUE,echo=TRUE,message = FALSE, error=FALSE, warnings=FALSE}
+t1.t2.merged <- merge(model.data.totals,long_line.sum.t1)
+t1.t2.merged$cpue <- t1.t2.merged$catch/t1.t2.merged$eff
+t1.t2.merged$raised.effort <- t1.t2.merged$qty_t/t1.t2.merged$cpue
+```
+
+##Step 14
+Plot the raised effort as a function of year.
+
+```{r plot estimate for Japan 1970-2010,eval=TRUE, include=TRUE,echo=TRUE,message = FALSE, error=FALSE, warnings=FALSE}
+effdis <- read.table('/home/doug/effdis/data/japan-effdis-estimate.csv',sep=',',header=T)
+par(mfrow=c(1,1),mar=c(5,5,4,4))
+plot(effdis$year,effdis$raised.effort/1000000,xlab='',ylab='hooks',type='l',lwd=3,xlim=c(1970,2010))
+abline(v=seq(1960,2010,by=5),lty=2,col='blue')
+title('Task 1 Catch / Task 2 CPUE for Japanese long-liners')
+```
+
+**Figure 12.** *Estimate of total effort (no of hooks) calculated for Japanese long-liners according to $C_{task1}/U_{task2}$ where C=catch and U = catch-per-unit effort.*
+
+
+#Conclusions
+
+The use of the *effdisR* library for raising Task II EFFDIS effort estimates by Task I totals has been demonstrated here for Japanese longliners. The code above also works for other gears (purse-seiners, baitboats) but obviously different input parameters need to be inserted into the functions. The estimate shown here for the Japanese long-line fleet is very similar to that calculated by de Bruyn et al (2014). To get global estimates the code above should be re-run for each fleet or flag and the estimates summed. 
+
+
+
+#Appendices
+##Appendix I. Recommendations of the Sub-Committee on Ecosystems (SCRS/P/2015/026)
+In the past, the Sub-Committee on Ecosystems and the Working Group on Stock Assessment Methods have both made a number of recommendations for updating and improving EFFDIS, which will be incorporated in the new estimates. The Sub-Committee agreed that the EFFDIS data are complex, and difficult to analyse.  GCS has been working to understand the data and identify issues related to non-random, non-representative sampling. All the analyses are available on a github repository http://iccat-stats.github.io/. 
+
+It was also clarified that the EFFDIS data are reliant on Task II catch and effort information, and it is known that there are errors in these data. The secretariat said that data screening would take place to eliminate problems such as effort duplication. This revision should reduce the amount of problematic data used for the EFFDIS estimation. The secretariat and GCS are also working to harmonise the very heterogeneous catch and effort data in order to make it comparable, and facilitate its use in the development of EFFDIS. 
+
+It was also discussed that the EFFDIS estimations rely on species composition information (for key target species). This is problematic when applying to by-catch species since the composition is biased towards target species and there are in-consistent historical trends in this bias. GCS is hoping to address this issue using cross-validation although non-random bias remains a complicated problem. The Sub-Committee also requested the addition of southern Bluefin tuna catch information into the estimation of EFFDIS.  
+
+Due to the fact that by-catch information is usually recorded on a set by set basis for purse seine, this unit of effort would be the most appropriate metric in the EFFDIS dataset for this gear. It is not, however, the most frequently reported unit of effort for purse seines, and thus GCS will have to evaluate the practicality of using this metric. 
+
+The Sub-committee also discussed the proposal by the 2013 Working group on stock assessment methods (WGSAM) regarding the additional gears that should be included in the EFFDIS estimation. Previously, it was requested that estimations be done for both purse seine and baitboat fleets. It was pointed out, however, that EFFDIS is only used to assess the fishing impacts of ICCAT fleets on by-catch species, and since by-catch in baitboat fisheries is minimal, there is no point in conducting this exercise for that gear. It was thus agreed that GCS should focus on the more important longline and purse seine estimations under the current contract. 
+
+The Sub-Committee also suggested that, when examining 'fleet profiles' for the purse seine fleet, instead of just separating the effort into 'FAD' or 'Free school fishing', an additional category, namely the Ghanaian purse seine/baitboat co-operative fishery should be considered. This is due to the different catchability apparent for this fleet due to the close co-operation in fishing operations between these two gear types and the sharing of catch, which could bias effort estimates. It was suggested that Ghanaian scientists be consulted to fully explore this unique sector.
+
+##Appendix II. Feedback and recommendations from The 2015 ICCAT Blue Shark Stock Assessment Session, Lisbon, 27-31 July 2015.
+
+Presentation SCRS/P/2015/030 given at the Lisbon meeting detailed a statistical modeling framework approach, provided by an external contractor (GCS), to estimating overall Atlantic fishing effort on tuna and tuna-like species which is being developed using 'Task I’ nominal catch and 'Task II'catch and effort data from the EFFDIS database. Initial findings are promising but problems of confounding (non-random sampling in both space and time) are substantial, and proving difficult to ignore. The purpose of the presentation was to describe the models, the outputs and the estimates of fishing effort made for the Atlantic thus far.
+
+Feedback from the Group was positive and the overall modeling strategy/framework was approved. Some members of the group were, however, concerned about the treatment of the 'fleet' or 'flag'. Aggregating the data by location and temporal variables could be too much of an oversimplification. Some fleets, for example, set surface longlines, others set them in mid or deepwater. Hook sizes, baits and targeting strategies all vary, and have varied substantially over time. Given that the data are particularly patchy prior to the 1960s it was suggested that the modeling framework could concentrate on more recent years only. This would substantially reduce the burden on computation. Also the contractor was asked to include data on artisanal fisheries and to consider ways to include information on fleet/flag combinations that report only Task 1 data. Data catalogues, prepared by the Secretariat are freely available for this.
+
+The method being developed is modular in nature so it could easily be altered to include information from fleet or flag. Polygons could be set up around the data for each fleet and the same regression model (i.e. catch fitted to covariates of location and time) fitted to the data within each. 'Surfaces' estimated using the models could then be built up for each fleet, and effort estimated in the same manner as described above. The contractor agreed that aggregation of data was probably only 'hiding' the underlying variability due to the fleet effect and agreed to experiment with this but noted that problems would arise because of: (i) non-random sampling in space and time; (ii) the fact that some fleets fail to report Task II data at all; and (iii) that the challenge of understanding the different fishing methods/activities is daunting.
+
+The contractor was urged to remember the original purpose of the work. The main interest in the spatio-temporally resolved effort estimates is driven by the need to identify effort distribution by areas and time of year. This information is needed to estimate fishing impact on target and by-catch species.  The Group discussed that, because fishing strategies are different among fleets, the estimation of EFFDIS by fleet is the preferable approach. It was also suggested that Task II data on their own would be enough for this and that the 'raising' to Task II might be unnecessary as an intermediate step. The contractor was also asked to consider the inclusion of artisanal fisheries which are important but it remains unclear where the data for this would come from and their likely quality.
+
+In summary the contractor agreed to explore the effect of fleet/flag in more detail and make an effort to better understand the needs of the potential users for these data. The contractor is also extending the analysis too far south and the ICCAT secretariat agreed to provide more realistic boundaries within which interpolation would take place. 
+
+
+
+
+
+

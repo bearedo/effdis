@@ -14,11 +14,9 @@ knitr::opts_chunk$set(fig.width=6, fig.height=6, fig.path='Figs/',
                       echo=FALSE, warning=FALSE, message=FALSE)
 ```
 
-#Executive Summary
+#Background
 
 ICCAT contracted Doug Beare (Globefish Consultancy Services, GCS) to develop a modeling approach to estimate overall Atlantic fishing effort exploiting the spatio-temporal information available in the data. This work has culminated in the construction of an R-library (*effdisR*) for analysing and visualising EFFDIS data. This document is a set of instructions in the use of *effdisR* using arbitarily selected fleets as examples. The methods have been presented so far at three International fora: (i) The Sub-Committee on Ecosystems by Dr L. Kell in June 2015; (ii) by Doug Beare at the Blue Shark Stock Assessment Meeting in Lisbon in July 2015; and (iii) by Doug Beare at the SCRS meeting in Madrid in September 2015.  
-
-#Background
 
 The International Commission for the Conservation of Atlantic Tunas (ICCAT) (www.iccat.int) maintains a database of fishing effort and catches distributed by time-area strata which is known as 'EFFDIS'. A  total of 27 different fishing nations submit catch and effort data to ICCAT for the main gears they use for targeting tuna and tuna-like species within the ICCAT convention area. EFFDIS data are available in two main groups termed, 'Task I' and 'Task II'. Task 1 data are annual totals for catch (eg. tons bluefin tuna caught in 1999 by Japan) by gear in the various relevant 'regions' (Atlantic & Mediterranean) and are believed to be totally comprehensive. Task 2 data, on the other hand, are much more detailed, available at greater spatial (e.g. 5ºx5º degree square grid) and temporal (e.g. month and year) resolution. The negative side is that they tend to be only partially complete. Comprehensive estimates of fishing effort can, therefore, potentilly be made by 'raising' the Task II estimates by those from Task I.  The EFFDIS database thus represents a rich and valuable source of information on fishing activity in the Atlantic and Mediterranean since 1950. It has the potential to reveal both seasonal and long-term changes in the distributions of the fisheries, and their target species in addition to exposing the vulnerability of various by-catch taxa such as turtles and seabirds.   
 
@@ -458,40 +456,6 @@ title('Task 1 Catch / Task 2 CPUE for Japanese long-liners')
 #Conclusions
 
 The use of the *effdisR* library for raising Task II EFFDIS effort estimates by Task I totals has been demonstrated here for Japanese longliners. The code above also works for other gears (purse-seiners, baitboats) but obviously different input parameters need to be inserted into the functions. The estimate shown here for the Japanese long-line fleet is very similar to that calculated by de Bruyn et al (2014). To get global estimates the code above should be re-run for each fleet or flag and the estimates summed. 
-
-
-
-#Appendices
-##Appendix I. Recommendations of the Sub-Committee on Ecosystems (SCRS/P/2015/026)
-In the past, the Sub-Committee on Ecosystems and the Working Group on Stock Assessment Methods have both made a number of recommendations for updating and improving EFFDIS, which will be incorporated in the new estimates. The Sub-Committee agreed that the EFFDIS data are complex, and difficult to analyse.  GCS has been working to understand the data and identify issues related to non-random, non-representative sampling. All the analyses are available on a github repository http://iccat-stats.github.io/. 
-
-It was also clarified that the EFFDIS data are reliant on Task II catch and effort information, and it is known that there are errors in these data. The secretariat said that data screening would take place to eliminate problems such as effort duplication. This revision should reduce the amount of problematic data used for the EFFDIS estimation. The secretariat and GCS are also working to harmonise the very heterogeneous catch and effort data in order to make it comparable, and facilitate its use in the development of EFFDIS. 
-
-It was also discussed that the EFFDIS estimations rely on species composition information (for key target species). This is problematic when applying to by-catch species since the composition is biased towards target species and there are in-consistent historical trends in this bias. GCS is hoping to address this issue using cross-validation although non-random bias remains a complicated problem. The Sub-Committee also requested the addition of southern Bluefin tuna catch information into the estimation of EFFDIS.  
-
-Due to the fact that by-catch information is usually recorded on a set by set basis for purse seine, this unit of effort would be the most appropriate metric in the EFFDIS dataset for this gear. It is not, however, the most frequently reported unit of effort for purse seines, and thus GCS will have to evaluate the practicality of using this metric. 
-
-The Sub-committee also discussed the proposal by the 2013 Working group on stock assessment methods (WGSAM) regarding the additional gears that should be included in the EFFDIS estimation. Previously, it was requested that estimations be done for both purse seine and baitboat fleets. It was pointed out, however, that EFFDIS is only used to assess the fishing impacts of ICCAT fleets on by-catch species, and since by-catch in baitboat fisheries is minimal, there is no point in conducting this exercise for that gear. It was thus agreed that GCS should focus on the more important longline and purse seine estimations under the current contract. 
-
-The Sub-Committee also suggested that, when examining 'fleet profiles' for the purse seine fleet, instead of just separating the effort into 'FAD' or 'Free school fishing', an additional category, namely the Ghanaian purse seine/baitboat co-operative fishery should be considered. This is due to the different catchability apparent for this fleet due to the close co-operation in fishing operations between these two gear types and the sharing of catch, which could bias effort estimates. It was suggested that Ghanaian scientists be consulted to fully explore this unique sector.
-
-##Appendix II. Feedback and recommendations from The 2015 ICCAT Blue Shark Stock Assessment Session, Lisbon, 27-31 July 2015.
-
-Presentation SCRS/P/2015/030 given at the Lisbon meeting detailed a statistical modeling framework approach, provided by an external contractor (GCS), to estimating overall Atlantic fishing effort on tuna and tuna-like species which is being developed using 'Task I’ nominal catch and 'Task II'catch and effort data from the EFFDIS database. Initial findings are promising but problems of confounding (non-random sampling in both space and time) are substantial, and proving difficult to ignore. The purpose of the presentation was to describe the models, the outputs and the estimates of fishing effort made for the Atlantic thus far.
-
-Feedback from the Group was positive and the overall modeling strategy/framework was approved. Some members of the group were, however, concerned about the treatment of the 'fleet' or 'flag'. Aggregating the data by location and temporal variables could be too much of an oversimplification. Some fleets, for example, set surface longlines, others set them in mid or deepwater. Hook sizes, baits and targeting strategies all vary, and have varied substantially over time. Given that the data are particularly patchy prior to the 1960s it was suggested that the modeling framework could concentrate on more recent years only. This would substantially reduce the burden on computation. Also the contractor was asked to include data on artisanal fisheries and to consider ways to include information on fleet/flag combinations that report only Task 1 data. Data catalogues, prepared by the Secretariat are freely available for this.
-
-The method being developed is modular in nature so it could easily be altered to include information from fleet or flag. Polygons could be set up around the data for each fleet and the same regression model (i.e. catch fitted to covariates of location and time) fitted to the data within each. 'Surfaces' estimated using the models could then be built up for each fleet, and effort estimated in the same manner as described above. The contractor agreed that aggregation of data was probably only 'hiding' the underlying variability due to the fleet effect and agreed to experiment with this but noted that problems would arise because of: (i) non-random sampling in space and time; (ii) the fact that some fleets fail to report Task II data at all; and (iii) that the challenge of understanding the different fishing methods/activities is daunting.
-
-The contractor was urged to remember the original purpose of the work. The main interest in the spatio-temporally resolved effort estimates is driven by the need to identify effort distribution by areas and time of year. This information is needed to estimate fishing impact on target and by-catch species.  The Group discussed that, because fishing strategies are different among fleets, the estimation of EFFDIS by fleet is the preferable approach. It was also suggested that Task II data on their own would be enough for this and that the 'raising' to Task II might be unnecessary as an intermediate step. The contractor was also asked to consider the inclusion of artisanal fisheries which are important but it remains unclear where the data for this would come from and their likely quality.
-
-In summary the contractor agreed to explore the effect of fleet/flag in more detail and make an effort to better understand the needs of the potential users for these data. The contractor is also extending the analysis too far south and the ICCAT secretariat agreed to provide more realistic boundaries within which interpolation would take place. 
-
-
-
-
-
-
 
 
 
