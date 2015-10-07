@@ -133,7 +133,7 @@ eff1type AS Effort_type, count(eff1type) as No_records
 ```
 
 *Table 2. Effort type sampling by flag for purse-seiners in EFFDIS Task II database*
-```{r make table for ps data by flag,include=FALSE,echo=TRUE}
+```{r make table for ps data by flag,include=TRUE,echo=FALSE}
 pander(effort_type_by_flag_ps)
 ```
 
