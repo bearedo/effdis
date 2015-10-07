@@ -2,7 +2,7 @@
 title: "Instruction Manual for effdisR"
 author: "Doug Beare"
 date: "6 October 2015"
-output: pdf_document
+output: html_document
 header-includes: \usepackage{tabularx}
 subtitle: null
 Grmd::docx_document:
