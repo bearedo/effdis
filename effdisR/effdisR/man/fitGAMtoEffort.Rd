@@ -58,50 +58,8 @@ Doug Beare
 }
 \examples{
 
-emod <- fitGAMtoEffort(input=lllf,which.flag='Japan',which.effort='NO.HOOKS',start.year=1970,end.year=2010,which.gam='gam')
+#emod <- fitGAMtoEffort(input=lllf,which.flag='Japan',which.effort='NO.HOOKS',start.year=1970,end.year=2010)
 
-
-
-## The function is currently defined as
-function (input = lllf, which.flag = "Japan", which.effort = "NO.HOOKS", 
-    start.year = 1950, end.year = 2010, kk = 6) 
-{
-    if (which.flag == "All") {
-        input <- input
-        print("Modeling all data")
-    }
-    else {
-        input <- input[input$flagname == which.flag, ]
-    }
-    n0 <- input[input$dsettype == "n-", ]
-    nw <- input[input$dsettype == "nw", ]
-    mm <- duplicated(nw[, c(1:11)])
-    nw <- nw[mm == TRUE, ]
-    w0 <- input[input$dsettype == "-w", ]
-    input1 <- rbind(n0, nw, w0)
-    input2 <- aggregate(list(eff1 = input1$eff1), by = list(trend = input1$trend, 
-        month = input1$month, longitude = input1$longitude, latitude = input1$latitude), 
-        sum)
-    dat0 <- input2
-    ss = cc = matrix(NA, nr = length(dat0[, 1]), nc = 6)
-    for (i in 1:6) {
-        cc[, i] <- cos(2 * pi * i * dat0$trend/12)
-        ss[, i] <- sin(2 * pi * i * dat0$trend/12)
-    }
-    ss <- ss[, -6]
-    dat1 <- cbind(dat0, ss, cc)
-    dd <- dim(dat0)
-    dimnames(dat1)[[2]][(dd[2] + 1):(dim(dat1)[2])] <- c(paste("sin", 
-        1:5, sep = ""), paste("cos", 1:6, sep = ""))
-    input2 <- dat1
-    bbs <- "cr"
-    h1 <- gam(eff1 ~ te(longitude, latitude, k = kk, bs = bbs) + 
-        te(trend, k = kk, bs = bbs) + sin1 + cos1 + sin2 + cos2 + 
-        sin3 + cos3 + sin4 + cos4 + sin5 + cos5 + cos6, family = quasipoisson(link = "log"), 
-        method = "REML", data = input2)
-    out <- list(emod = h1, emod.data = input2)
-    out
-  }
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

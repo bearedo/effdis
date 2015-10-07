@@ -5,7 +5,7 @@
 Function to plot data distribution as a function of year and month
 }
 \description{
-%%  ~~ A concise (1-5 lines) description of what the function does. ~~
+Extracts the relevant subset of the data, sums them over month and year and plots the frequencies on a 3D image plot. It allows the analyst to see where sampling has occurred in time. Remember that the spatial aspect is effectively ignored.
 }
 \usage{
 yr.month.coverage.task2(tdata = t2ce, start.year = 1950, end.year = 2010, which.gear = "LL", which.region = "AT", which.flag = "EU.Portugal")

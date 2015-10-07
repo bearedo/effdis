@@ -59,8 +59,7 @@ Doug Beare
 %% ~~objects to See Also as \code{\link{help}}, ~~~
 }
 \examples{
-#plot.mods(input=j_bft.ll.pred,cmod=j_bft_ll,
-            which.year = 1995,which.month=1,which.value = 'prob',grid.res=5,which.gear='LL')
+#plot.mods(input=j_bft.ll.pred,cmod=j_bft_ll,which.year = 1995,which.month=1,which.value = 'prob',grid.res=5,which.gear='LL')
 
 
 }

@@ -2,16 +2,14 @@
 \alias{model.nos.kgs}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-Function to fit linear model (kgs as a function of numbers) for those flags that send both
-%%  ~~function to do ... ~~
+Function to fit linear model (kgs as a function of numbers) for those flags that send both numbers of fish and their total weight
 }
 \description{
-%%  ~~ A concise (1-5 lines) description of what the function does. ~~
+There is some variation in how different flag nations send in their data to the ICCAT secretariat. Some send data as numbers of fish caught, some as total weight of fish caught and others send both. This function takes out countries that send both numbers and weights and uses those relationships to impute weights for flag nations that send in numbers only.
 }
 \usage{
 model.nos.kgs(input = pslf, which.gear = "LL")
 }
-%- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{input}{
 Task II data in the long format
