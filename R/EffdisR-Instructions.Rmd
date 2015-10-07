@@ -106,7 +106,7 @@ For any data analysis some initial exploration is a very useful first step and *
 
 In Table 1 we connect to the database in R using 'chan' and count the frequencies with which each effort-type has been recorded in the Task II data for longliners. The table illustrates the sort of problems that exist with these data. Chinese Taipei, for example, has supplied 'NO. HOOKS' (37795) only while Belize has supplied both 'NO. HOOKS' (629) and 'D.FISH' (485). Similarly in Table 2 we summarise the different types of fishing effort that have been recorded for purse-seiners. Spain which has an important Atlantic purse-seining fleet has sent data as, 'D.AT SEA', 'D.FISH', and 'FISH.HOUR'. It is also worth noting that, in many cases, no effort data have been submitted with catches for Task II at all, see '-none-' (Tables 1 & 2).
 
-*Table 1. Effort type sampling by flag for longline in EFFDIS Task II database*
+
 ```{r get ll data by flag,include=TRUE,echo=TRUE}
 effort_type_by_flag_ll <- sqlQuery(chan, "SELECT flagname AS Flag, 
 eff1type AS Effort_type, count(eff1type) as No_records
@@ -114,10 +114,15 @@ eff1type AS Effort_type, count(eff1type) as No_records
                  WHERE region ='AT' AND geargrpcode = 'LL'
                  GROUP BY flagname, eff1type
                  ORDER BY flagname, eff1type, No_records;")
+```
+
+
+*Table 1. Effort type sampling by flag for longline in EFFDIS Task II database*
+```{r make table for ll data by flag,include=TRUE,echo=FALSE}
 pander(effort_type_by_flag_ll)
 ```
 
-*Table 2. Effort type sampling by flag for purse-seiners in EFFDIS Task II database*
+
 ```{r get ps data by flag,include=TRUE,echo=TRUE}
 effort_type_by_flag_ps <- sqlQuery(chan, "SELECT flagname AS Flag, 
 eff1type AS Effort_type, count(eff1type) as No_records
@@ -125,6 +130,10 @@ eff1type AS Effort_type, count(eff1type) as No_records
                  WHERE region ='AT' AND geargrpcode = 'PS'
                  GROUP BY flagname, eff1type
                  ORDER BY flagname, eff1type, No_records;")
+```
+
+*Table 2. Effort type sampling by flag for purse-seiners in EFFDIS Task II database*
+```{r make table for ps data by flag,include=FALSE,echo=TRUE}
 pander(effort_type_by_flag_ps)
 ```
 
@@ -132,13 +141,18 @@ After examining Tables 1 and we made the decision to examine records with 'NO. H
 
 Catchunit is another important variable in the Task II data, denoting whether the catch was recorded in terms of total numbers (nr) or total weight (kg). Table 3 illustrates that there are many records (121225) in the Task II data with catchunit = '--' and these rows were also removed from subsequent analyses.
 
-*Table 3. Catch unit sampling by flag in EFFDIS Task II database*
+
 ```{r catch unit sampling by flag,include=TRUE,echo=TRUE}
 catchunit <- sqlQuery(chan, "SELECT catchunit AS catchunit, count(catchunit) as No_records
                  FROM t2ce
                  WHERE region ='AT'
                  GROUP BY catchunit
                  ORDER BY catchunit, No_records;")
+```
+
+
+*Table 3. Catch unit sampling by flag in EFFDIS Task II database*
+```{r make table for catch unit sampling by flag,include=TRUE,echo=FALSE}
 pander(catchunit)
 ```
 
