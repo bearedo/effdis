@@ -55,7 +55,7 @@ library(effdisR)
 
 ##Connecting R to the PostgreSQL database
 
-As described above a PostgreSQL server has been set up on a 'virtual' linux server (IP address = 134.213.29.249) in the cloud. *effdisR* connects to this database using the ODBC protocol.  This ensures that any user is always using the most up-to-date data.
+As described above a PostgreSQL server has been set up on a 'virtual' linux server (rscloud.iccat.int, IP address = 134.213.29.249) in the cloud. *effdisR* connects to this database using the ODBC protocol.  This ensures that any user is always using the most up-to-date data.
 
 Once the RODBC library is installed in R the relevant PostgreSQL drivers must also be installed, and a DSN (Data Source Name) that can be recognised by R must be set up. In Linux the DSN is set up by inserting the following text into the /etc/odbc.ini file.
 

@@ -18,32 +18,11 @@ library(RODBC)
 library(reshape2)
 library(mgcv)
 library(doMC)
+library(effdisR)
 
-# Load scripts #
-
-setwd("/home/doug/effdis/effdisR/effdisR/R")
-source("yr.month.coverage.task2.R")
-source("trend.R")
-source("spatial.coverage.by.year.task2.R")
-source("three.d.effort.by.year.R")
-source("three.d.catch.by.year.R")
-source('fitGAMtoEffort.R')
-source('convert2long.format.t2.R')
-source('fit2stageGAMtoCatch.R')
-source('get.effdis.t2.data.R')
-source('get.effdis.t1.data.R')
-source('plot.mods.R')
-source('prepare.effdis.data.R')
-source('model.nos.kgs.R')
-source('kgs.from.nos.R')
-source('convert2long.format.t2.R')
-source('predict.effdis.t2.data.R')
-source('find.ocean.R')
-source('aggt2data.R')
-source('add.covariates.R')
 
 #########################
-## Purse-seine example ##
+## Purse-seiners example ##
 #########################
 
 # Purse-seine example #
@@ -201,7 +180,7 @@ par(mfrow=c(1,1))
 plot(big2$year,big2$new.effort/1000000,xlim=c(1970,2010),type='l')
 
 ##########################################
-######## Longline example ################
+######## Longliners  #####################
 ##########################################
 
 # Get data for each dsettype

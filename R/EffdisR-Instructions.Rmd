@@ -2,9 +2,9 @@
 title: "Instruction Manual for effdisR"
 author: "Doug Beare"
 date: "6 October 2015"
-output: word_document
+output: pdf_document
 header-includes: \usepackage{tabularx}
-subtitle:
+subtitle: null
 Grmd::docx_document:
   fig_caption: yes
   force_captions: yes
@@ -297,6 +297,7 @@ long_line <- rbind(ll_n,ll_nw,ll_w)
 Find and extract those EFFDIS data that are in the Atlantic using *find.ocean*. This function uses a shapefile which is included in *effdisR*, and can be examined by typing *data("seas")* and then *plot(seas)*.  The definitions of 'Atlantic' used by ICCAT are rather crude. Thus function tries to mimic ICCAT definitions and 'Atlantic', for example, includes the Gulf of St Lawrence, the Caribbean Sea, The Celtic Sea, The Gulf of Guinea, The Gulf of Mexico and The Irish Sea. Obviously this is flexible and can easily be changed.  Data for land, the Mediterranean and Pacific can be extracted using the strings, 'land', 'med', and 'pac' respectively in the place of 'atl' below. 
 
 ```{r identify data in Atlantic,eval=FALSE,include=TRUE,echo=TRUE,message = FALSE, error=FALSE, warnings=FALSE}
+data("seas")
 long_line<-find.ocean(long_line)
 long_line <- long_line[long_line$which.ocean == 'atl',]
 ```
