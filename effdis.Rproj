@@ -13,6 +13,6 @@ RnwWeave: Sweave
 LaTeX: pdfLaTeX
 
 BuildType: Package
+PackageUseDevtools: Yes
 PackagePath: effdisR/effdisR
-PackageBuildArgs: -no-multiarch --with-keep.source --build
 PackageRoxygenize: rd,collate,namespace,vignette

@@ -1,10 +1,10 @@
 ---
-title: "Using effdisR to Estimate Overall Atlantic Fishing Effort By Time-area strata."
+title: "Instruction Manual for effdisR"
 author: "Doug Beare"
-date: "4 October 2015"
+date: "6 October 2015"
 output: word_document
 header-includes: \usepackage{tabularx}
-subtitle: Instruction Manual for effdisR
+subtitle:
 Grmd::docx_document:
   fig_caption: yes
   force_captions: yes
@@ -74,7 +74,7 @@ library(effdisR)
 As described above a PostgreSQL server has been set up on a 'virtual' linux server (IP address = 134.213.29.249) in the cloud. *effdisR* connects to this database using the ODBC protocol.  This ensures that any user is always using the most up-to-date data.
 
 Once the RODBC library is installed in R the relevant PostgreSQL drivers must be installed, and a DSN (Data Source Name) that can be recognised by R must be set up. In Linux the DSN is set up by inserting the following into the /etc/odbc.ini file:
-
+~~~~~~~~~~~~~~~~~~~~~~~~
 [ODBC Data Sources]  
 effdis = effdis-tuna-cc1  
 [effdis-tuna-cc1]  
@@ -86,7 +86,8 @@ Password = Postgres1
 Protocol = 8.2.5  
 ReadOnly = 0  
 [ODBC]  
-InstallDir = /usr/lib  
+InstallDir = /usr/lib 
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
 In Windows you will neeed to open the **Control Panel**, and then choose **Adminstrative Tools** and **Data Sources (ODBC)**. Clicking the 'Add' button in the 'User DSN' tab will let you chose the relevant PostgreSQL driver, after when you will need to insert the database parameters above, see http://brazenly.blogspot.co.uk/2014/05/r-how-to-connect-r-to-database-sql.html. Note: The PostgreSQL drivers can be obtained here, http://www.postgresql.org/ftp/odbc/versions/ but it is probably easier to simply install the entire PostgreSQL package on your machine, http://www.postgresql.org/download/. Once this is all done you can connect from R by typing:
 
@@ -95,7 +96,7 @@ In Windows you will neeed to open the **Control Panel**, and then choose **Admin
 chan <- odbcConnect("effdis-tuna-cc1", case="postgresql", believeNRows=FALSE)
 ```
 
-'chan' is then stored in R and allows you to 'talk' to the remote database, download data etc.
+'chan' is then stored in R and allows you to connect to the remote database, download data etc.
 
 ##Exploratory data analysis
 
@@ -351,9 +352,9 @@ In all 3 models, $x$,$y$,$t$, and $m$ are longitude, latitude, trend, and month 
 
 ```{r model catches as a function of space and time,eval=FALSE, include=TRUE,echo=TRUE,message = FALSE, error=FALSE, warnings=FALSE}
 j_bft_ll <- fit2stageGAMtoCatch(input=long_line_lf,
-                                  which.flag='Japan',which.species='bft',start.year=1990,end.year=2010)
+                                  which.flag='Japan',which.species='bft',start.year=1970,end.year=2010)
 j_emod_ll <- fitGAMtoEffort(input=long_line_lf,
-                              which.flag='Japan',which.effort='NO.HOOKS',start.year=1990,end.year=2010)
+                              which.flag='Japan',which.effort='NO.HOOKS',start.year=1970,end.year=2010)
 ```
 
 ##Step 7
@@ -362,7 +363,7 @@ Use the models to predict values over a grid of 'new data'.  Currently this take
 ```{r predict catches over grid,eval=FALSE,include=TRUE,echo=TRUE,message = FALSE, error=FALSE, warnings=FALSE}
 j_bft.ll.pred <- predict.effdis.t2.data(cmod=j_bft_ll,
                                           effmod=j_emod_ll,grid.res=5,
-                                          start.year=1990,end.year=2010,which.flag='Japan')
+                                          start.year=1970,end.year=2010,which.flag='Japan')
 ```
 
 The fitted model parameters are used to 'predict' values of catch, effort and catch-per-unit-effort on a grid of all combinations of the selected covariates, together with error or variance if required using the function *predict.effdis.t2.data*.  Note that total Task II catch is calculated by multiplying the predictions from Models 1 and 2, ie. 'given that fish were caught, how many/much?', in a 'two-stage process'.  The function *plot.mods* can be used to plot selected subsets of the model output. A map of the 'probability of the Japanese long-line fleet catching a blue fin tuna in January 1995 can, for example, be created using the following code:
@@ -442,7 +443,7 @@ t1.t2.merged$raised.effort <- t1.t2.merged$qty_t/t1.t2.merged$cpue
 Plot the raised effort as a function of year.
 
 ```{r plot estimate for Japan 1970-2010,eval=TRUE, include=TRUE,echo=TRUE,message = FALSE, error=FALSE, warnings=FALSE}
-effdis <- read.table('/home/doug/effdis/data/japan-effdis-estimate.csv',sep=',',header=T)
+data("japan-effdis-estimates")
 par(mfrow=c(1,1),mar=c(5,5,4,4))
 plot(effdis$year,effdis$raised.effort/1000000,xlab='',ylab='hooks',type='l',lwd=3,xlim=c(1970,2010))
 abline(v=seq(1960,2010,by=5),lty=2,col='blue')
