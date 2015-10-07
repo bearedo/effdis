@@ -13,10 +13,10 @@ An example of Japanese long-line fishing effort calculated using the effdisR lib
  chr "japan-effdis-estimates"
 }
 \details{
-%%  ~~ If necessary, more details than the __description__ above ~~
+This the result of fitting with the 2-stage GAM process and then raising with Task I data.
 }
 \source{
-%%  ~~ reference to a publication or URL from which the data were obtained ~~
+http://rscloud.iccat.int/effdis/#
 }
 \references{
 %%  ~~ possibly secondary sources and usages ~~
