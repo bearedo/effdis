@@ -6,7 +6,7 @@ function(input=grd)
   # whether it is in Atlantic, Pacific or Med. The definitions of the 'Atlantic' etc are very general.
   #input <- grd
   #seas <- readOGR(dsn="/home/doug/effdis/data", layer="World_Seas") # World seas and oceans
-  data("seas")
+  #data("seas")
   geogWGS84 <- CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs") # Make sure proj is what we think it is.
   seas@proj4string <- geogWGS84
   seas.polys <- as.character(sort(unique(seas@data$NAME)))
