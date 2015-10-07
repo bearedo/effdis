@@ -22,22 +22,21 @@ DSN for database.
 }
 }
 \details{
-In linux the DSN is set up in the file etc/odbc.ini, in Windows you need to install the PostgreSQL drivers first and set up the DSN from the Control Panel -> Administrative Tools. See functions get.effdis.t2.data and get.effdis.t1.data for more details.
-
+depth_m - ocean depths from the SRTM30 Plus bathymetry dataset downloaded from MARSPEC (http://www.marspec.org/Modern_Data.html)
+m_ann_sst - mean annual sst (2009-2013) from UNEP-WCMC (http://data.unep-wcmc.org/datasets/36)
+m_ann_chla - mean annual chlorophyll-a concentration (2009-2013) from UNEP-WCMC (http://data.unep-wcmc.org/datasets/37)
+aq_primpro - Aquamaps HCAF v4 primary productivity from SeaWiFS data from GMED (http://gmed.auckland.ac.nz/data.html#)
+bo_ph - pH data from WOD 2009 from GMED (http://gmed.auckland.ac.nz/data.html#)
 }
 \value{
 Output is a new data frame with columns added for depth, sea surface temperature, primary production and chlorophyll a concentration.
-%%  ~Describe the value returned
-%%  If it is a LIST, use
-%%  \item{comp1 }{Description of 'comp1'}
-%%  \item{comp2 }{Description of 'comp2'}
-%% ...
+
 }
 \references{
 %% ~put references to the literature/web site here ~
 }
 \author{
-Doug Beare
+Doug Beare and Jason Jon Benedict
 }
 \note{
 %%  ~~further notes~~
