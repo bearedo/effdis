@@ -27,7 +27,7 @@ function (input = pslf,which.species ='bft',start.year=1950, end.year=2015,which
    
    tbin <- table(ninput$bin)
    
-   if(sum(bin) >= 10)
+   if(sum(bin) >= 50)
    {
   ## Take out only the kgs. [NB. The flags which report only numbers have been converted.]
   
@@ -79,9 +79,9 @@ ninput <- dat1
 # else
 #     {
 #     #Fit the GAM using Simon Wood's Generalized Cross-validation
-     print('fitting MGCV to binary data')
+     print('Fitting MGCV to binary data')
      registerDoMC(core=2)
-   b1 <- gam(bin~te(longitude,latitude,k=6,bs=bbs)+te(trend,k=6,bs=bbs)+sin1+cos1+sin2+cos2+sin3+cos3+sin4+cos4+sin5+cos5+cos6,data=ninput,
+   b1 <- gam(bin~te(longitude,latitude,k=kk,bs=bbs)+te(trend,k=kk,bs=bbs)+sin1+cos1+sin2+cos2+sin3+cos3+sin4+cos4+sin5+cos5+cos6,data=ninput,
              family=quasibinomial(link="logit"),method="REML",select=TRUE)
 #   }
 #   
@@ -147,7 +147,7 @@ ninput <- dat1
   
   gc(reset=T)
   
-  mods <- list(pmod = b1, pmod.data=input, gmod = g1, gmod.data = input2)
+  mods <- list(pmod = b1, pmod.data=ninput, gmod = g1, gmod.data = input2)
   
   mods
    }

@@ -104,9 +104,9 @@ function (cmod=mods, effmod=emod,grid.res=5,start.year=1995,end.year=2010,which.
   
   ngrd$species <-which.species
   
-  ngrd$catch <- round(ngrd$prob * ngrd$measured_catch,3)
+  ngrd$catch <- ngrd$prob * ngrd$measured_catch
   
-  ngrd$cpue <- round(ngrd$catch/ngrd$eff,3)
+  ngrd$cpue <- ngrd$catch/ngrd$eff
   
   # It doesn't make sense to plot over the entire grid because you don't always have data in every combination of 
   # longitude, latitude, month, and trend. So we need to make an index to tell us what numbers to use when summing the catches
@@ -120,7 +120,7 @@ function (cmod=mods, effmod=emod,grid.res=5,start.year=1995,end.year=2010,which.
   
   model.data <- ngrd[,-c(9:19)]# Don't bother writing out all the harmonix
   for(i in c(1,2,9:14,16,17))
-  {model.data[,i] <- round(model.data[,i],1)} # Mke data smaller.
+  {model.data[,i] <- round(model.data[,i],5)} # Mke data smaller.
   
   
   #print(summary(model.data$catch[ngrd$observation == T]/1000))
