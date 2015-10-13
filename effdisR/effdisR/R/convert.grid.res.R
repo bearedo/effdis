@@ -7,8 +7,8 @@ convert.grid.res <- function(input=ll1)
 res1 <- input[input$squaretypecode == '1x1',]
 res5 <- input[input$squaretypecode == '5x5',]
 
-coords5  <- SpatialPointsDataFrame(cbind(x=as.numeric(as.character(input$longitude)),y=as.numeric(as.character(input$latitude))),data=input[,c(4,5)])
-coords1      <- SpatialPointsDataFrame(cbind(x=as.numeric(as.character(res1$longitude)),y=as.numeric(as.character(res1$latitude))),data=res1[,c(4,5)])
+coords5  <- SpatialPointsDataFrame(cbind(x=as.numeric(as.character(res5$longitude)),y=as.numeric(as.character(res5$latitude))),data=res5[,c(4,5)])
+coords1  <- SpatialPointsDataFrame(cbind(x=as.numeric(as.character(res1$longitude)),y=as.numeric(as.character(res1$latitude))),data=res1[,c(4,5)])
 
 geogWGS84 <- CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs") # Make sure proj is what we think it is.
 
