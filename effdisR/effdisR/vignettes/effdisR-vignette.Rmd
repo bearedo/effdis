@@ -125,8 +125,8 @@ Given that we can now determine the timing and location of fishing activities we
 
 ```{r no of hooks shot by Japan in 2006 from task 2,include=TRUE,echo=TRUE,message = FALSE, error=FALSE, warnings=FALSE}
 par(mfrow=c(1,1))
-three.d.effort.by.year(tdata=ll,what.year=2006,
-                         what.flag='Japan',scaling.f=10000,effort.type='NO.HOOKS')  
+three.d.effort.by.year(tdata=ll,which.year=2006,
+                         which.flag='Japan',scaling.f=10000,effort.type='NO.HOOKS')  
 ```
 
 **Figure 3.** *Total number of hooks set by Japanese fleet (Task II only) in 2006*
@@ -148,7 +148,7 @@ alb$species <- 'alb'
 
 
 ```{r weight of albacore caught by location in 2006 from task 2,include=TRUE,echo=TRUE,message = FALSE, error=FALSE, warnings=FALSE}
-three.d.catch.by.year(tdata=alb,what.year=2009,what.gear='LL',what.species='alb',what.flag='Japan',scaling.f=10,catchunit='nr')
+three.d.catch.by.year(tdata=alb,which.year=2009,which.gear='LL',which.species='alb',which.flag='Japan',scaling.f=10,catchunit='nr')
 ```                  
 
 **Figure 4.** *Weight of albacore tuna caught by longline by Japan (2006 & 2009)*
