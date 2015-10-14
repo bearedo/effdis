@@ -10,17 +10,17 @@ Takes the Task II data in the long format, builds a grid and sums the effort val
 %%  ~~ A concise (1-5 lines) description of what the function does. ~~
 }
 \usage{
-three.d.effort.by.year(tdata = task2.lf, what.gear = "LL", what.year = 2005, gridx = 5, gridy = 5, effort.type = "NO.HOOKS", what.flag = "All", scaling.f = 1e+06)
+three.d.effort.by.year(tdata = task2.lf, which.gear = "LL", which.year = 2005, gridx = 5, gridy = 5, effort.type = "NO.HOOKS", which.flag = "All", scaling.f = 1e+06)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{tdata}{
 Task II data in the long format
 }
-  \item{what.gear}{
+  \item{which.gear}{
 Select gear to plot
 }
-  \item{what.year}{
+  \item{which.year}{
 Select year to plot
 }
   \item{gridx}{
@@ -32,7 +32,7 @@ Grid resolution, latitude
   \item{effort.type}{
 Effort type to plot, e.g. NO.HOOKS
 }
-  \item{what.flag}{
+  \item{which.flag}{
 Flag nation to plot
 }
   \item{scaling.f}{

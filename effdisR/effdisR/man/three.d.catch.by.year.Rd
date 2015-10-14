@@ -8,17 +8,17 @@ Function to plot spatial distribution of EFFDIS Task II catch data for a selecte
 Takes the Task II data in the long format, builds a grid and sums the catches within each grid cell for a whole year and plots the output on a map.
 }
 \usage{
-three.d.catch.by.year(tdata = task2.lf, what.gear = "LL", what.year = 2005, gridx = 5, gridy = 5, what.species = "alb", what.flag = "All", catchunit = "kg", scaling.f = 1e+06)
+three.d.catch.by.year(tdata = task2.lf, which.gear = "LL", which.year = 2005, gridx = 5, gridy = 5, which.species = "alb", which.flag = "All", catchunit = "kg", scaling.f = 1e+06)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{tdata}{
 Task II data in the long format
 }
-  \item{what.gear}{
+  \item{which.gear}{
 Select gear to plot
 }
-  \item{what.year}{
+  \item{which.year}{
 Select year to plot
 }
   \item{gridx}{
@@ -27,10 +27,10 @@ Grid resolution, longitude
   \item{gridy}{
 Grid resolution, latitude
 }
-  \item{what.species}{
+  \item{which.species}{
 Select species to plot, e.g. alb
 }
-  \item{what.flag}{
+  \item{which.flag}{
 Select flag nation to plot
 }
   \item{catchunit}{

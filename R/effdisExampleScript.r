@@ -190,81 +190,34 @@ llw  <- get.effdis.t2.data(which.dsn='effdis-tuna-cc1',which.gear='LL',which.fla
 
 ll1 <- rbind(lln,llnw,llw)
 
-#plot(ll1$longitude[ll1$flagname == 'Japan'],ll1$latitude[ll1$flagname =='Japan'],pch='+')
-#points(ll1$longitude[ll1$flagname == 'EU.Portugal'],ll1$latitude[ll1$flagname =='EU.Portugal'],pch='+',col='red')
-
+# Set up data for modeled estimate (have to have some spatial detail)
 ll1 <- convert.grid.res(ll1) # Some data, eg. Portugal are supplied at 1x1 but for the modeling we need to be consistent.
-
-#points(ll2$longitude[ll2$flagname == 'EU.Portugal'],ll2$latitude[ll2$flagname =='EU.Portugal'],pch='+',col='blue')
-#points(ll2$longitude[ll2$flagname == 'U.S.A.'],ll2$latitude[ll2$flagname =='U.S.A.'],pch='+',col='green')
-
-#t2 <- tapply(ll1$totsp9,list(ll1$flagname,ll1$year),sum,na.rm=T)
-
 data("seas")
 ll1<-find.ocean(ll1)
 ll1 <- ll1[ll1$which.ocean == 'atl',]
 ll1 <- ll1[ll1$squaretypecode == '5x5',]
-
-lllf <- convert2long.format.t2(input =ll1)
+lllf <- convert2long.format.t2(input =ll1) # NB I do this not because it matters for the modeling but because I need to know where the data were and want to do predictions on an ordely grid?
 lllf<-prepare.effdis.data(input=lllf)
-
 bm <- model.nos.kgs(input=lllf,which.gear='LL')
-
 lllf <- kgs.from.nos(lllf) # for those fleets that supply only number
-lllf <- lllf[lllf$eff1type=='NO.HOOKS',]
+#lllf <- lllf[lllf$eff1type=='NO.HOOKS',] # Quite a no of eff1type = '-none-' but they are important e.g. Spanish LL so leave them in here, model them and use the model to predict effort at the places where it is none or something else.
+dim(lllf) #= 2079549
 
-three.d.catch.by.year(tdata=lllf,scaling.f=100)
+# Set up data to estimate from the raw data
+data("seas")
+ll2<-find.ocean(ll1)
+ll2 <- ll2[ll2$which.ocean == 'atl',]
+lllf2 <- convert2long.format.t2(input =ll2)
+lllf2<-prepare.effdis.data(input=lllf2)
+bm2 <- model.nos.kgs(input=lllf2,which.gear='LL')
+lllf2 <- kgs.from.nos(lllf2) # for those fleets that supply only number
+lllf2 <- lllf2[lllf2$eff1type=='NO.HOOKS',]
+dim(lllf2) #= 2139498
 
-##Japan##
-
-setwd('/home/doug/effdis/effdis-estimates')
-
-alb <- fit2stageGAMtoCatch(input=lllf,which.flag='Japan',which.species='alb',start.year=1950,end.year=2010)
-bft <- fit2stageGAMtoCatch(input=lllf,which.flag='Japan',which.species='bft',start.year=1950,end.year=2010)
-bet <- fit2stageGAMtoCatch(input=lllf,which.flag='Japan',which.species='bet',start.year=1950,end.year=2010)
-skj <- fit2stageGAMtoCatch(input=lllf,which.flag='Japan',which.species='skj',start.year=1950,end.year=2010)
-yft <- fit2stageGAMtoCatch(input=lllf,which.flag='Japan',which.species='yft',start.year=1950,end.year=2010)
-swo <- fit2stageGAMtoCatch(input=lllf,which.flag='Japan',which.species='swo',start.year=1950,end.year=2010)
-bum <- fit2stageGAMtoCatch(input=lllf,which.flag='Japan',which.species='bum',start.year=1950,end.year=2010)
-sai <- fit2stageGAMtoCatch(input=lllf,which.flag='Japan',which.species='sai',start.year=1950,end.year=2010)
-whm <- fit2stageGAMtoCatch(input=lllf,which.flag='Japan',which.species='whm',start.year=1950,end.year=2010)
-
-
-#Try calculating effort directly from the raw data instead
-
-#big <- aggt2data()
-#big$catch <-big$measured_catch
-
-# Do we just assume here that once we've modeled NO.HOOKS as a function of time we can use that sensibly ?
-
-emod <- fitGAMtoEffort(input=lllf,which.flag='Japan',which.effort='NO.HOOKS',start.year=1950,end.year=2010)
-
-# Create grids and predict over them ###
-
-setwd('/home/doug/effdis/effdis-estimates')
-alb.aa <- predict.effdis.t2.data(cmod=alb, effmod=emod,grid.res=5,start.year=1950,end.year=2010,which.flag='Japan')
-bft.aa <- predict.effdis.t2.data(cmod=bft, effmod=emod,grid.res=5,start.year=1950,end.year=2010,which.flag='Japan')
-bet.aa <- predict.effdis.t2.data(cmod=bet, effmod=emod,grid.res=5,start.year=1950,end.year=2010,which.flag='Japan')
-skj.aa <- predict.effdis.t2.data(cmod=skj, effmod=emod,grid.res=5,start.year=1950,end.year=2010,which.flag='Japan')
-yft.aa <- predict.effdis.t2.data(cmod=yft, effmod=emod,grid.res=5,start.year=1950,end.year=2010,which.flag='Japan')
-swo.aa <- predict.effdis.t2.data(cmod=swo, effmod=emod,grid.res=5,start.year=1950,end.year=2010,which.flag='Japan')
-bum.aa <- predict.effdis.t2.data(cmod=bum, effmod=emod,grid.res=5,start.year=1950,end.year=2010,which.flag='Japan')
-sai.aa <- predict.effdis.t2.data(cmod=sai, effmod=emod,grid.res=5,start.year=1950,end.year=2010,which.flag='Japan')
-whm.aa <- predict.effdis.t2.data(cmod=whm, effmod=emod,grid.res=5,start.year=1950,end.year=2010,which.flag='Japan')
-
-# #Plot data
-# 
-# plot.mods(input=alb.aa,cmod=alb,which.year=2005,grid.res=5,which.value='measured_catch.se.fit',which.gear='LL',plot.samples.only=TRUE)
-# plot.mods(input=alb.aa,cmod=alb,which.year=2005,grid.res=5,which.value='measured_catch',which.gear='LL',plot.samples.only=TRUE)
-# plot.mods(input=bet.aa,cmod=bet,which.month=9,which.year=2000,grid.res=5,which.value='measured_catch',which.gear='LL',plot.samples.only=F)
-# plot.mods(input=whm.aa,cmod=whm,which.year=1995,grid.res=5,which.value='cpue',which.gear='LL',plot.samples.only=TRUE)
-
-# Loop around all flags and species #
-
-#table(as.character(lllf$flagname))
+esp<-lllf2[lllf2$flagname == 'EU.España', ]
 
 us <- sort(as.character(unique(lllf$species)))
-#uf <- sort(as.character(unique(lllf$flagname)))
+uf <- sort(as.character(unique(lllf$flagname)))
 #uf <- uf[-c(7,10,15,17,18,19,21)]
 
 #setwd('/home/doug/effdis/data')
@@ -433,9 +386,9 @@ mod.spain <- as.list(1:9)
 
 for(i in 1:9)
 {
-  sp <- us[i]
+  i <- 3
   print(sp)
-  mod.spain[[i]] <- fit2stageGAMtoCatch(input=lllf,which.flag='EU.España',which.species=sp,start.year=1960,end.year=2010)
+  mod.spain[[i]] <- fit2stageGAMtoCatch(input=lllf,which.flag="EU.España",which.species=sp,start.year=1960,end.year=2010)
 }
 
 for(i in 1:9)
@@ -864,20 +817,37 @@ setwd('/home/doug/effdis/effdis-estimates')
 
 
 effdis_estimates <- read.table('effdis-estimates.csv',sep=',')
-dim(effdis_estimates)
+dim(effdis_estimates) # = 781342
 
 dimnames(effdis_estimates)[[2]] <- c("longitude","latitude","which.ocean","year","month","trend","flagname","geargrp","prob","prob.se.fit","measured_catch","measured_catch.se.fit",
                                      "eff","eff.se.fit","species","catch","cpue","observation")          
 
+#Try calculating effort directly from the raw data instead
+
+allt2 <- aggt2data(input=lllf,which.flag='All',which.effort="NO.HOOKS")
+dimnames(allt2)[[2]][c(7,8)]<-c('raw_eff','raw_catch')
+esp<-allt2[allt2$flagname == 'EU.España',]
+
+#Merge modeled and original data
+
+neffdis_estimates <- merge(allt2,effdis_estimates,all.x=T)
+esp<-neffdis_estimates[neffdis_estimates$flagname == 'EU.España',]
 
 
-#Get Task 1 data
+#plot(effdis_estimates$raw_eff,effdis_estimates$eff,ylim=c(0,2e+07),xlim=c(0,2e+07))
+
+# plot(log(effdis_estimates$raw_eff),log(effdis_estimates$eff))
+# xyplot(log(raw_eff)~log(eff)|flagname,data=effdis_estimates)
+# xyplot(log(raw_eff)~trend|flagname,data=effdis_estimates,type='l')
+# xyplot(log(eff)~trend|flagname,data=effdis_estimates,type='l')
+
+# Get Task 1 data
 
 ll.t1 <- get.effdis.t1.data(which.dsn='effdis-tuna-cc1',which.gear = 'LL',which.region='AT',which.flag='All')
 #ll.t1 <- get.effdis.t1.data.r(which.dsn='effdis-local',which.gear = 'LL',which.region='AT',which.flag='All')
 
 #Convert Task 1 to 'Other'
-
+uf<-sort(unique(lllf$flagname))
 uf2 <- uf
 uf1 <- as.character(sort(unique(ll.t1$flag)))
 ll.t1$flag <- as.character(ll.t1$flag)
@@ -909,16 +879,30 @@ t1x[t1x$species == 'bft',]
 
 
 #Convert catch to tonnes from kgs
-
+head(effdis_estimates)
 effdis_estimates$catch <- effdis_estimates$catch/1000
 effdis_estimates$measured_catch <- effdis_estimates$measured_catch/1000
-#effdis_estimates$eff <- effdis_estimates$eff/9 # Effort is the same for each species so divide by 9
+effdis_estimates$raw_catch <- effdis_estimates$raw_catch/1000
+
+# Effort is repeated for each species so divide by 9
+effdis_estimates$eff <- effdis_estimates$eff/9
+effdis_estimates$raw_eff<-effdis_estimates$raw_eff/9
 
 
-effdis_estimates1 <- aggregate(list(measured_catch=effdis_estimates$measured_catch,catch=effdis_estimates$catch,eff=effdis_estimates$eff), 
+
+effdis_estimates1 <- aggregate(list(measured_catch=effdis_estimates$measured_catch,catch=effdis_estimates$catch,
+                                    eff=effdis_estimates$eff,raw_catch=effdis_estimates$raw_catch,raw_eff=effdis_estimates$raw_eff), 
                   by=list(year=effdis_estimates$year,flagname=effdis_estimates$flagname),sum,na.rm=T)
 
-effdis_estimates1$cpue <- effdis_estimates1$catch/effdis_estimates1$eff
+plot(effdis_estimates1$catch,effdis_estimates1$raw_catch)
+x<-effdis_estimates1$catch/effdis_estimates1$raw_catch
+plot(x,ylim=c(0,10))
+y<-(effdis_estimates1$eff/9)/effdis_estimates1$raw_eff
+plot(y,ylim=c(0,5))
+
+#effdis_estimates1$cpue <- effdis_estimates1$catch/effdis_estimates1$eff
+#effdis_estimates1$raw_cpue <- effdis_estimates1$raw_catch/effdis_estimates1$raw_eff
+
 
 # Aggregate estimates from Task 1
 
@@ -929,26 +913,94 @@ sum.t1 <- aggregate(list(qty_t=ll.t1$qty_t),list(year=ll.t1$yearc,flagname=ll.t1
 effdis_estimates2 <- merge(effdis_estimates1,sum.t1)
 
 effdis_estimates2$cpue <- effdis_estimates2$catch/effdis_estimates2$eff
+effdis_estimates2$raw_cpue <- effdis_estimates2$raw_catch/effdis_estimates2$raw_eff
 
 library(lattice)
-xyplot(cpue~year|flagname,data=effdis_estimates2,type='b',ylim=c(0,.0001))
+xyplot(cpue~year|flagname,data=effdis_estimates2,type='b',ylim=c(0,1))
 
 plot(effdis_estimates2$year,effdis_estimates2$catch,ylim=c(range(effdis_estimates2$catch,effdis_estimates2$qty_t)))
 lines(effdis_estimates2$year,effdis_estimates2$qty_t)
 
+plot(effdis_estimates2$cpue*9,effdis_estimates2$raw_cpue,xlim=c(0,.02),ylim=c(0,.02))
+
 
 effdis_estimates2$raised.effort <- effdis_estimates2$qty_t/effdis_estimates2$cpue
+effdis_estimates2$raw_raised.effort <- effdis_estimates2$qty_t/effdis_estimates2$raw_cpue
+
 
 #write.table(big2,'/home/doug/effdis/data/japan-effdis-estimate.csv',sep=',',row.names=F)
 
 xxx <- read.table('/home/doug/effdis/data/japan-effdis-estimate.csv',sep=',',header=T)
 xxx1 <- effdis_estimates2[effdis_estimates2$flagname == 'Japan',]
 
-par(mfrow=c(1,1))
+par(mfrow=c(2,1))
 plot(effdis_estimates2$year[effdis_estimates2$flagname == 'Japan'],
-     effdis_estimates2$raised.effort[effdis_estimates2$flagname == 'Japan']/1000000,type='l')
+     effdis_estimates2$raised.effort[effdis_estimates2$flagname == 'Japan']/1000000/9,type='l',ylim=c(0,120))
 
-xyplot(raised.effort~year|flagname,data=effdis_estimates2[effdis_estimates2$flagname == 'Japan',],type='b')
+plot(effdis_estimates2$year[effdis_estimates2$flagname == 'Japan'],
+     effdis_estimates2$raw_raised.effort[effdis_estimates2$flagname == 'Japan']/1000000,type='l',ylim=c(0,120))
+
+
+
+xyplot(log(raw_raised.effort)~year|flagname,data=effdis_estimates2,type='b')
+xyplot(log(raised.effort*9)~year|flagname,data=effdis_estimates2,type='b')
+
+ggplot(data = effdis_estimates2, aes(x = year, y = raw_raised.effort)) +
+  geom_line() +
+  facet_wrap(~ flagname, scales = "free_y") +
+  theme(axis.text.x  = element_text(angle = 45, vjust = 1, hjust = 1))
+
+ggplot(data = effdis_estimates2, aes(x = year, y = raised.effort/9,color=flagname)) +
+  geom_line() +
+  facet_wrap(~ flagname, scales = "free_y") +
+  theme(axis.text.x  = element_text(angle = 45, vjust = 1, hjust = 1))
+
+p <- ggplot() + 
+  geom_line(data = effdis_estimates2, aes(x = year, y = raised.effort/10000000, color = "Modeled data")) +
+  facet_wrap(~flagname,scales="free_y") +
+  geom_line(data = effdis_estimates2, aes(x = year, y = raw_raised.effort/1000000, color = "Raw data"))  +
+  facet_wrap(~flagname,scales="free_y") +
+  xlab('Year') +
+  ylab('No Hooks (millions)')
+p
+
+effdis_estimates3 <- aggregate(list(raw_raised.effort=effdis_estimates2$raw_raised.effort,raised.effort=effdis_estimates2$raised.effort),
+                               by=list(year=effdis_estimates2$year),sum,na.rm=T)
+
+
+p <- ggplot() + 
+  geom_line(data = effdis_estimates3, aes(x = year, y = raised.effort/10000000, color = "Modeled data")) +
+  geom_line(data = effdis_estimates3, aes(x = year, y = raw_raised.effort/1000000, color = "Raw data"))  +
+  ggtitle("Total number of hooks raised with Task I data\n")+
+  xlab('Year') +
+  ylab('No Hooks (millions)')+
+  labs(color='Which model') +
+  theme(axis.text.x = element_text(angle = -30, hjust =0,size=15),
+  plot.title = element_text(lineheight=1.2, face="bold",size = 17, colour = "grey20"),
+panel.border = element_rect(colour = "black",fill=F,size=0.5),
+panel.grid.major = element_line(colour = "grey",size=0.75,linetype='longdash'),
+panel.grid.minor = element_blank(),
+axis.title.y=element_text(size=15,colour="grey20"),
+axis.title.x=element_text(size=15,colour="grey20"),
+axis.text.y=element_text(size=15,colour="grey20"),
+panel.background = element_rect(fill = NA,colour = "black"))
+
+p
+
+ggsave(p,file="/home/doug/GlobalEffdisEstimates.png",dpi=500,w=10,h=6,unit="in",type="cairo-png")
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 plot(aa$month,aa$prob)

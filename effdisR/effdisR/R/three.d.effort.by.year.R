@@ -1,9 +1,9 @@
 three.d.effort.by.year <-
-function(tdata = task2.lf, what.gear = 'LL', what.year = 2005, gridx=5,gridy=5,effort.type='NO.HOOKS', 
-                                     what.flag = 'All',scaling.f=1000000)
+function(tdata = task2.lf, which.gear = 'LL', which.year = 2005, gridx=5,gridy=5,effort.type='NO.HOOKS', 
+                                     which.flag = 'All',scaling.f=1000000)
 {
   
-  #tdata<-ps; what.gear <- 'PS'; what.year <- 2006;  gridx <- 5;  gridy <- 5; what.flag <- 'EU.España'; effort.type <-'FISH.HOUR'
+  #tdata<-ps; which.gear <- 'PS'; which.year <- 2006;  gridx <- 5;  gridy <- 5; which.flag <- 'EU.España'; effort.type <-'FISH.HOUR'
 
    # If you have numbers and weights (nw) then effort is duplicated 
    
@@ -20,19 +20,19 @@ function(tdata = task2.lf, what.gear = 'LL', what.year = 2005, gridx=5,gridy=5,e
   #tdata1$flagname[tdata1$flagname == 'EU.España'] <- 'Spain'
   
   
-  if(what.flag == 'All')
+  if(which.flag == 'All')
     {
    
-   tdata2 <- tdata1[tdata1$month < 13 & tdata1$year == what.year & tdata1$eff1type == effort.type & tdata1$geargrpcode == what.gear,]
+   tdata2 <- tdata1[tdata1$month < 13 & tdata1$year == which.year & tdata1$eff1type == effort.type & tdata1$geargrpcode == which.gear,]
   #print(dim(tdata2))
   #print('Plotting all data')
   
   }
-  if(what.flag != 'All')
+  if(which.flag != 'All')
   {
  
-  tdata2 <- tdata1[tdata1$month < 13 & tdata1$year == what.year & tdata1$eff1type == effort.type & tdata1$flagname == what.flag & tdata1$geargrpcode == what.gear,]
-  #print(paste('Plotting',what.flag))
+  tdata2 <- tdata1[tdata1$month < 13 & tdata1$year == which.year & tdata1$eff1type == effort.type & tdata1$flagname == which.flag & tdata1$geargrpcode == which.gear,]
+  #print(paste('Plotting',which.flag))
   #print(dim(tdata2))
     }
   
@@ -125,7 +125,7 @@ legend(x='topright',fill=c('white',colintens),legend=legval$ALL,bg='white',title
 
 
 #- Add axis and title
-title(main=paste(what.flag,what.year,what.gear,effort.type),outer=F,cex=cl)
+title(main=paste(which.flag,which.year,which.gear,effort.type),outer=F,cex=cl)
 #mtext(xl$label,side=1,outer=T,line=-3,at=0.5,font=xl$font,cex=xl$cex)
 #mtext(yl$label,side=2,outer=T,line=-1.5,at=0.5,font=yl$font,cex=yl$cex)                                                                                       
 
@@ -135,7 +135,7 @@ grdPolsDF@data         <- data.frame(value=grd@data[an(names(table(idx))),1],col
 proj4string(grdPolsDF) <- CRS("+proj=longlat +ellps=WGS84")
 #dir.create("/home/doug/effdis/shp_files/")
 #setwd("/home/doug/effdis/shp_files/longline")
-#layer.name <- paste(what.flag,what.year,what.gear,effort.type,sep="_")
+#layer.name <- paste(which.flag,which.year,which.gear,effort.type,sep="_")
 #writeOGR(grdPolsDF, dsn = '.', layer = layer.name, overwrite_layer=TRUE,driver = "ESRI Shapefile")
 }
 }

@@ -1,17 +1,17 @@
 three.d.catch.by.year <-
-function(tdata = task2.lf, what.gear = 'LL', what.year = 2005, gridx=5,gridy=5,what.species='alb', what.flag = 'All',catchunit='kg', scaling.f=1000000)
+function(tdata = task2.lf, which.gear = 'LL', which.year = 2005, gridx=5,gridy=5,which.species='alb', which.flag = 'All',catchunit='kg', scaling.f=1000000)
   
     {
     
-    #tdata<-alb; what.gear <- 'PS'; what.flag<- 'EU.España'; what.year <- 1994; gridx <- 1; gridy <- 1;  what.species <- 'alb'; catchunit <- 'kg'
-    #what.flag<- 'Japan'
+    #tdata<-alb; which.gear <- 'PS'; which.flag<- 'EU.España'; which.year <- 1994; gridx <- 1; gridy <- 1;  which.species <- 'alb'; catchunit <- 'kg'
+    #which.flag<- 'Japan'
   
-    if(what.flag == 'All'){
-      tdata1 <- tdata[tdata$geargrpcode == what.gear & tdata$month < 13 & tdata$year == what.year & tdata$species == what.species & tdata$catchunit == catchunit,]
+    if(which.flag == 'All'){
+      tdata1 <- tdata[tdata$geargrpcode == which.gear & tdata$month < 13 & tdata$year == which.year & tdata$species == which.species & tdata$catchunit == catchunit,]
     }
     else{
       
-      tdata1 <- tdata[tdata$geargrpcode == what.gear & tdata$month < 13 & tdata$year == what.year & tdata$species == what.species & tdata$flagname == what.flag & tdata$catchunit == catchunit,]
+      tdata1 <- tdata[tdata$geargrpcode == which.gear & tdata$month < 13 & tdata$year == which.year & tdata$species == which.species & tdata$flagname == which.flag & tdata$catchunit == catchunit,]
     }
     
     dd <- dim(tdata1)
@@ -105,7 +105,7 @@ function(tdata = task2.lf, what.gear = 'LL', what.year = 2005, gridx=5,gridy=5,w
       
       
       #- Add axis and title
-      title(main=paste(what.flag,what.year,what.gear,what.species,catchunit),outer=F,cex=cl)
+      title(main=paste(which.flag,which.year,which.gear,which.species,catchunit),outer=F,cex=cl)
       #mtext(xl$label,side=1,outer=T,line=-3,at=0.5,font=xl$font,cex=xl$cex)
       #mtext(yl$label,side=2,outer=T,line=-1.5,at=0.5,font=yl$font,cex=yl$cex)                                                                                       
       
@@ -115,7 +115,7 @@ function(tdata = task2.lf, what.gear = 'LL', what.year = 2005, gridx=5,gridy=5,w
       proj4string(grdPolsDF) <- CRS("+proj=longlat +ellps=WGS84")
       #dir.create("/home/doug/effdis/shp_files/")
       #setwd("/home/doug/effdis/shp_files/")
-      #layer.name <- paste(what.flag,what.year,what.gear,what.species,catchunit,sep="_")
+      #layer.name <- paste(which.flag,which.year,which.gear,which.species,catchunit,sep="_")
       #writeOGR(grdPolsDF, dsn = '.', layer = layer.name, overwrite_layer=TRUE,driver = "ESRI Shapefile")
       
       

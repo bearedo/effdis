@@ -7,7 +7,7 @@ function (input = pslf,which.species ='bft',start.year=1950, end.year=2015,which
    # g1 models the positive component of the catch as a function of location and time.
   
   
-   #input <- lllf;which.species <- 'alb';which.flag <- 'Japan';start.year <- 1970; end.year   <- 2010
+  # input <- lllf;which.species <- 'bft';which.flag <- "EU.España";start.year <- 1960; end.year   <- 2010
    
   ninput <- input[input$species == which.species & input$year >= start.year & input$year <= end.year,]
   
@@ -21,19 +21,17 @@ function (input = pslf,which.species ='bft',start.year=1950, end.year=2015,which
      ninput <- ninput[ninput$flagname == which.flag,]
    print(paste('Modeling',which.flag))
    }
-   
+  
+  ## Take out only the kgs. [NB. The flags which report only numbers have been converted.]
+  
+   ninput <- ninput[ninput$catchunit == 'kg',]
    bin <- ifelse(ninput$measured_catch==0,0,1) # Binary variable
    ninput$bin <- bin
    
    tbin <- table(ninput$bin)
-   
-   if(sum(bin) >= 50)
-   {
-  ## Take out only the kgs. [NB. The flags which report only numbers have been converted.]
-  
-   ninput <- ninput[ninput$catchunit == 'kg',]
-    
    ninput$lmeasured_catch <- log(ninput$measured_catch+1)
+   
+   if(sum(bin) >= 50) {
   
   ## Bernouilli model for probability of catch as a function of x,y,month,t from quasibinomial family
    
