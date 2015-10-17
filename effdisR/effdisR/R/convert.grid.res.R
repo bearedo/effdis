@@ -7,6 +7,26 @@ convert.grid.res <- function(input=ll1)
 res1 <- input[input$squaretypecode == '1x1',]
 res5 <- input[input$squaretypecode == '5x5',]
 
+res10   <- ll1[ll1$squaretypecode == '10x10',]
+res10$longitude   <- res10$longitude - 2.5
+res10$latitude    <- res10$latitude - 2.5
+res10$squaretypecode <- '5x5'
+
+res1020 <- ll1[ll1$squaretypecode == '10x20',]
+res1020$longitude   <- res1020$longitude + 2.5
+res1020$latitude    <- res1020$latitude + 2.5
+res1020$squaretypecode <- '5x5'
+
+res0510 <- ll1[ll1$squaretypecode == '5x10',]
+res0510$longitude <- res0510$longitude + 2.5
+res0510$squaretypecode <- '5x5' 
+
+res2020 <- ll1[ll1$squaretypecode == '20x20',]
+res2020$longitude   <- res2020$longitude + 2.5
+res2020$latitude    <- res2020$latitude + 2.5
+res2020$squaretypecode <- '5x5'
+
+
 coords5  <- SpatialPointsDataFrame(cbind(x=as.numeric(as.character(res5$longitude)),y=as.numeric(as.character(res5$latitude))),data=res5[,c(4,5)])
 coords1  <- SpatialPointsDataFrame(cbind(x=as.numeric(as.character(res1$longitude)),y=as.numeric(as.character(res1$latitude))),data=res1[,c(4,5)])
 
@@ -50,7 +70,7 @@ res1<-res1[,-25]
 res1$squaretypecode <- ifelse(res1$squaretypecode=='1x1','5x5',res1$squaretypecode)
 
 
-out<-rbind(res1,res5)
+out<-rbind(res1,res5,res10,res1020,res0510,res2020)
 out
 
 }
