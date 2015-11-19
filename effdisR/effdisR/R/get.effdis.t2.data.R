@@ -3,11 +3,11 @@ function(which.dsn="effdis-tuna-cc1",which.gear='LL',which.region='AT',which.fla
                                  which.dsettype='-w')
 {
 
-  which.gear <- "LL"
-  which.region <- "AT"
-  which.flag <- "EU.Portugal"
-  which.effort <- "NO.HOOKS"
-  which.dsettype <- 'nw'
+  #which.gear <- "LL"
+  #which.region <- "AT"
+  #which.flag <- "EU.Portugal"
+  #which.effort <- "NO.HOOKS"
+  #which.dsettype <- 'nw'
   
   # Function to extract task 2 data from effdis cloud server ()
   
