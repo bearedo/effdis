@@ -17,8 +17,9 @@ library(mapdata)
 library(RODBC)
 library(reshape2)
 library(mgcv)
-library(doMC)
+#library(doMC)
 library(effdisR)
+
 
 
 #########################
