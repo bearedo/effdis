@@ -78,7 +78,7 @@ ninput <- dat1
 #     {
 #     #Fit the GAM using Simon Wood's Generalized Cross-validation
      print('Fitting MGCV to binary data')
-     registerDoMC(core=2)
+     #registerDoMC(core=2)
    b1 <- gam(bin~te(longitude,latitude,k=kk,bs=bbs)+te(trend,k=kk,bs=bbs)+sin1+cos1+sin2+cos2+sin3+cos3+sin4+cos4+sin5+cos5+cos6,data=ninput,
              family=quasibinomial(link="logit"),method="REML",select=TRUE)
 #   }
@@ -135,7 +135,7 @@ ninput <- dat1
     
     #Fit the GAM using Simon Wood's Generalized Cross-validation 
     print('Fitting MGCV to positive component')
-    registerDoMC(core=2)
+    #registerDoMC(core=2)
   
  g1 <- gam(measured_catch~te(longitude,latitude,k=kk,bs=bbs)+te(trend,k=kk,bs=bbs)+sin1+cos1+sin2+cos2+sin3+cos3+sin4+cos4+sin5+cos5+cos6,family=Gamma(link="log"),
             method="REML",select=TRUE,data=input2)
