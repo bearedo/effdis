@@ -1,8 +1,9 @@
 get.effdis.t1.data <-
-function(which.dsn="effdis-tuna-cc1",which.gear='LL',which.region='AT',which.flag='All',
-                                 which.datatype='C')
+function(which.dsn="effdis-tuna-cc1",which.gear='LL',which.region='AT',which.flag='All')
 {
 
+  #which.dsn<-"effdis-tuna-cc1"
+  
   #which.gear <- "LL"
   #which.region <- "AT"
   #which.flag <- "EU.Portugal"
@@ -17,8 +18,7 @@ if(which.flag=='All') # If which.flag is 'All' extract all data
   {
   query <- paste0("SELECT *
 FROM t1det9sp_new
-WHERE region =","'",which.region,"'","AND geargrp=","'",which.gear,"'",
-                  "AND datatype=","'",which.datatype,"'")
+WHERE region =","'",which.region,"'","AND geargrp=","'",which.gear,"'")
   }
 
 else{
@@ -26,7 +26,7 @@ query <- paste0("SELECT *
 
 FROM t1det9sp_new
 WHERE region =","'",which.region,"'","AND geargrp=","'",which.gear,"'",
-                "AND flag=","'",which.flag,"'","AND datatype=","'",which.datatype,"'")
+                "AND flag=","'",which.flag,"'")
 }
 
   out <- sqlQuery(chan,query)
