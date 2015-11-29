@@ -19,6 +19,7 @@ library(reshape2)
 library(mgcv)
 #library(doMC)
 library(effdisR)
+library(lattice)
 
 
 
@@ -191,35 +192,46 @@ llw  <- get.effdis.t2.data(which.dsn='effdis-tuna-cc1',which.gear='LL',which.fla
 
 ll1 <- rbind(lln,llnw,llw)
 
+#ll1[ll1$trend == 517 & ll1$longitude == -12.5 & ll1$latitude == -2.5 & ll1$flagname == "Japan",]
+# 
+# ven <- ll1[ll1$flagname == "Venezuela",]
+# s1 <-sort(unique(ven$longitude))
+# s2 <-sort(unique(ven$latitude))
+
+
 # Set up data for modeled estimate (have to have some spatial detail)
 ll1 <- convert.grid.res(ll1) # Some data, eg. Portugal are supplied at 1x1 but for the modeling we need to be consistent.
 data("seas")
 ll1<-find.ocean(ll1)
 ll1 <- ll1[ll1$which.ocean == 'atl',]
+#table(ll1$squaretypecode,ll1$flagname)
+
 ll1 <- ll1[ll1$squaretypecode == '5x5',]
 lllf <- convert2long.format.t2(input =ll1) # NB I do this not because it matters for the modeling but because I need to know where the data were and want to do predictions on an ordely grid?
 lllf<-prepare.effdis.data(input=lllf)
 bm <- model.nos.kgs(input=lllf,which.gear='LL')
 lllf <- kgs.from.nos(lllf) # for those fleets that supply only number
 #lllf <- lllf[lllf$eff1type=='NO.HOOKS',] # Quite a no of eff1type = '-none-' but they are important e.g. Spanish LL so leave them in here, model them and use the model to predict effort at the places where it is none or something else.
-dim(lllf) #= 2079549 (2010) 2256219 (2015)
+lllf <- lllf[lllf$catchunit == "kg",]
+lllf$species <- as.character(lllf$species)
 
-# Set up data to estimate from the raw data
-data("seas")
-ll2<-find.ocean(ll1)
-ll2 <- ll2[ll2$which.ocean == 'atl',]
-lllf2 <- convert2long.format.t2(input =ll2)
-lllf2<-prepare.effdis.data(input=lllf2)
-bm2 <- model.nos.kgs(input=lllf2,which.gear='LL')
-lllf2 <- kgs.from.nos(lllf2) # for those fleets that supply only number
-lllf2 <- lllf2[lllf2$eff1type=='NO.HOOKS',]
-dim(lllf2) #= 2139498
+dim(lllf) #= 2079549 (2010) 1690155 (2015)
 
-esp<-lllf2[lllf2$flagname == 'EU.España', ]
+
+# # Set up data to estimate from the raw data
+# data("seas")
+# ll2<-find.ocean(ll1)
+# ll2 <- ll2[ll2$which.ocean == 'atl',]
+# lllf2 <- convert2long.format.t2(input =ll2)
+# lllf2<-prepare.effdis.data(input=lllf2)
+# bm2 <- model.nos.kgs(input=lllf2,which.gear='LL')
+# lllf2 <- kgs.from.nos(lllf2) # for those fleets that supply only number
+# lllf2 <- lllf2[lllf2$eff1type=='NO.HOOKS',]
+# dim(lllf2) #= 2139498
 
 us <- sort(as.character(unique(lllf$species)))
 uf <- sort(as.character(unique(lllf$flagname)))
-#uf <- uf[-c(7,10,15,17,18,19,21)]
+
 
 #     "Angola"                        "Argentina"                     "Barbados"                      "Belize"                       
 # [5] "Brazil"                        "Canada"                        "Cape Verde"                    "China (ICCAT program)"        
@@ -235,7 +247,6 @@ uf <- sort(as.character(unique(lllf$flagname)))
 # [45] "Uruguay"                       "Vanuatu"                       "Venezuela"                    
 
 
-
 #setwd('/home/doug/effdis/data')
 setwd("c:/Users/DBeare/effdis/effdis/data/effdis-estimates")
 
@@ -245,41 +256,45 @@ oth <-c("Argentina", "Angola", "Barbados", "Cape Verde","China (ICCAT program)",
         "Chinese Taipei (foreign obs.)", "Cuba (ICCAT program)" ,"Dominica","EU.United.Kingdom","Faroe Islands",
         "FR.St Pierre et Miquelon","Grenada","Guinea Ecuatorial","Honduras","Iceland","Japan (foreign obs.)",
         "Maroc","Sierra Leone","Trinidad and Tobago","UK.Sta Helena","UK.Turks and Caicos")
+
 idx <- (1:length(lllf[,1]))[lllf$flagname %in% oth]
 
 lllf$flagname[idx] <- "Other"
 
+bra <- lllf[lllf$flagname == "Brazil",]
+
+plot(bra$year,bra$eff1)
 
 #Argentina
 
-emod.arg <- fitGAMtoEffort(input=lllf,which.flag='Argentina',which.effort='NO.HOOKS',start.year=1990,end.year=2015,kk=6)
-
-mod.arg <- as.list(1:9)
-for(i in 1:9)
-{
-  sp <- us[i]
-  mod.arg[[i]] <- fit2stageGAMtoCatch(input=lllf,which.flag='Argentina',which.species=sp,start.year=1990,end.year=2015,kk=3)
-  print(sp)
-}
-
-for(i in 1:9)
-{
-  if(mod.arg[[i]]=='Insufficient data to support model')
-  {print('no model')
-  }
-  else{
-    aa <- predict.effdis.t2.data(cmod=mod.arg[[i]], effmod=emod.arg,grid.res=5,start.year=1990,end.year=2015,which.flag='Argentina')
-    rm(aa)
-    gc(reset=T)
-  }
-}
+#emod.arg <- fitGAMtoEffort(input=lllf,which.flag='Argentina',which.effort='NO.HOOKS',start.year=1990,end.year=2015,kk=6)
+# 
+# mod.arg <- as.list(1:9)
+# for(i in 1:9)
+# {
+#   sp <- us[i]
+#   mod.arg[[i]] <- fit2stageGAMtoCatch(input=lllf,which.flag='Argentina',which.species=sp,start.year=1990,end.year=2015,kk=3)
+#   print(sp)
+# }
+# 
+# for(i in 1:9)
+# {
+#   if(mod.arg[[i]]=='Insufficient data to support model')
+#   {print('no model')
+#   }
+#   else{
+#     aa <- predict.effdis.t2.data(cmod=mod.arg[[i]], effmod=emod.arg,grid.res=5,start.year=1990,end.year=2015,which.flag='Argentina')
+#     rm(aa)
+#     gc(reset=T)
+#   }
+# }
 
 # Not enough data for Argentina
 
 
 #Japan
 
-emod.jap <- fitGAMtoEffort(input=lllf,which.flag='Japan',which.effort='NO.HOOKS',start.year=1990,end.year=2015)
+emod.jap <- fitGAMtoEffort(input=lllf,which.flag='Japan',which.effort='NO.HOOKS',start.year=1990,end.year=2015,kk=6)
 
 mod.jap <- as.list(1:9)
 for(i in 1:9)
@@ -377,9 +392,6 @@ for(i in c(1,2,4:7,9))
 }
 
 
-
-
-
 #China P.R
 
 
@@ -464,7 +476,11 @@ for(i in c(1:6,8:9))
 }
 
 ### Spain
-emod.spain <- fitGAMtoEffort(input=lllf,which.flag='EU.España',which.effort='NO.HOOKS',start.year=1990,end.year=2015)
+
+esp <- lllf[lllf$flagname == 'EU.España',]
+esp <- esp[esp$year > 1989,]
+
+emod.spain <- fitGAMtoEffort(input=esp,which.flag='EU.España',which.effort='NO.HOOKS',start.year=1990,end.year=2015,kk=9)
 
 mod.spain <- as.list(1:9)
 
@@ -472,7 +488,7 @@ for(i in 1:9)
 {
   sp<-us[i]
   print(sp)
-  mod.spain[[i]] <- fit2stageGAMtoCatch(input=lllf,which.flag="EU.España",which.species=sp,start.year=1990,end.year=2015)
+  mod.spain[[i]] <- fit2stageGAMtoCatch(input=lllf,which.flag="EU.España",which.species=sp,start.year=1990,end.year=2015,kk=9)
 }
 
 for(i in 1:9)
@@ -487,8 +503,6 @@ for(i in 1:9)
     gc(reset=T)
   }
 }
-
-
 
 
 ### Portugal
@@ -545,30 +559,30 @@ for(i in c(1,2,4:9))
 
 # Mexico
 
-emod.mex <- fitGAMtoEffort(input=lllf,which.flag='Mexico',which.effort='NO.HOOKS',start.year=1990,end.year=2015,kk=3)
-
-mod.mex <- as.list(1:9)
-
-for(i in c(1,4,5,7:9))
-{
-  sp <- us[i]
-  print(sp)
-  mod.mex[[i]] <- fit2stageGAMtoCatch(input=lllf,which.flag='Mexico',which.species=sp,start.year=1990,end.year=2015,kk=3)
-}
-
-for(i in c(1,4,5,7:9))
-{
-  if(mod.mex[[i]]=='Insufficient data to support model')
-  {
-    print('no model')
-  }
-  else{
-    aa <- predict.effdis.t2.data(cmod=mod.mex[[i]], effmod=emod.mex,grid.res=5,start.year=1990,end.year=2015,which.flag='Mexico')
-    rm(aa)
-    gc(reset=T)
-  }
-}
-
+# emod.mex <- fitGAMtoEffort(input=lllf,which.flag='Mexico',which.effort='NO.HOOKS',start.year=1990,end.year=2015,kk=3)
+# 
+# mod.mex <- as.list(1:9)
+# 
+# for(i in c(1,4,5,7:9))
+# {
+#   sp <- us[i]
+#   print(sp)
+#   mod.mex[[i]] <- fit2stageGAMtoCatch(input=lllf,which.flag='Mexico',which.species=sp,start.year=1990,end.year=2015,kk=3)
+# }
+# 
+# for(i in c(1,4,5,7:9))
+# {
+#   if(mod.mex[[i]]=='Insufficient data to support model')
+#   {
+#     print('no model')
+#   }
+#   else{
+#     aa <- predict.effdis.t2.data(cmod=mod.mex[[i]], effmod=emod.mex,grid.res=5,start.year=1990,end.year=2015,which.flag='Mexico')
+#     rm(aa)
+#     gc(reset=T)
+#   }
+# }
+# 
 
 
 
@@ -631,18 +645,22 @@ for(i in c(1,2,3,4,5:9))
 
 # Philippines
 
-emod.phi <- fitGAMtoEffort(input=lllf,which.flag='Philippines',which.effort='NO.HOOKS',start.year=1990,end.year=2015,kk=6)
+emod.phi <- fitGAMtoEffort(input=lllf,which.flag='Philippines',which.effort='NO.HOOKS',start.year=1990,end.year=2015,kk=3)
 
 mod.phi <- as.list(1:9)
 
-for(i in c(1,2,3,4,5:9))
+for(i in c(1,2,3,4,5,6,9))
 {
   sp <- us[i]
   print(sp)
-  mod.phi[[i]] <- fit2stageGAMtoCatch(input=lllf,which.flag='Philippines',which.species=sp,start.year=1990,end.year=2015,kk=6)
+  mod.phi[[i]] <- fit2stageGAMtoCatch(input=lllf,which.flag='Philippines',which.species=sp,start.year=1990,end.year=2015,kk=3)
 }
 
-for(i in c(1,2,3,4,5,7:9))
+mod.phi[[7]] <- "Insufficient data to support model"
+mod.phi[[8]] <- "Insufficient data to support model"
+
+
+for(i in c(1:9))
 {
   if(mod.phi[[i]]=='Insufficient data to support model')
   {
@@ -660,7 +678,7 @@ for(i in c(1,2,3,4,5,7:9))
 
 # Other
 
-emod.oth <- fitGAMtoEffort(input=lllf,which.flag='Other',which.effort='NO.HOOKS',start.year=1990,end.year=2015,kk=3)
+emod.oth <- fitGAMtoEffort(input=lllf,which.flag='Other',which.effort='NO.HOOKS',start.year=1990,end.year=2015,kk=6)
 
 mod.oth <- as.list(1:9)
 for(i in c(1,2,3,4,5:9))
@@ -685,7 +703,7 @@ for(i in c(1,2,3,4:9))
 
 # South Africa
 
-emod.sa <- fitGAMtoEffort(input=lllf,which.flag='South Africa',which.effort='NO.HOOKS',start.year=1990,end.year=2015,kk=6)
+emod.sa <- fitGAMtoEffort(input=lllf,which.flag='South Africa',which.effort='NO.HOOKS',start.year=1990,end.year=2015,kk=3)
 
 mod.sa <- as.list(1:9)
 for(i in c(1,2,3,4,5:9))
@@ -708,29 +726,30 @@ for(i in c(1,2,3,4:9))
 
 # Senegal
 
-emod.sen <- fitGAMtoEffort(input=lllf,which.flag='Senegal',which.effort='NO.HOOKS',start.year=1990,end.year=2015,kk=6)
 
-mod.sen <- as.list(1:9)
-for(i in c(1,2,3,4,5:9))
-{
-  sp <- us[i]
-  print(sp)
-  mod.sen[[i]] <- fit2stageGAMtoCatch(input=lllf,which.flag='Senegal',which.species=sp,start.year=1990,end.year=2015,kk=6)
-}
-
-for(i in c(1,2,3,4:9))
-{
-  if(mod.sen[[i]]=='Insufficient data to support model')
-  {print('no model')}
-  else{
-    aa <- predict.effdis.t2.data(cmod=mod.sen[[i]], effmod=emod.sen,grid.res=5,start.year=1990,end.year=2015,which.flag='Senegal')
-    rm(aa)
-    gc(reset=T)
-  }
-}
-
-
-
+# senegal <- lllf[lllf$flagname == "Senegal",]
+# 
+# emod.sen <- fitGAMtoEffort(input=lllf,which.flag='Senegal',which.effort='NO.HOOKS',start.year=1990,end.year=2015,kk=6)
+# 
+# mod.sen <- as.list(1:9)
+# for(i in c(1,2,3,4,5:9))
+# {
+#   sp <- us[i]
+#   print(sp)
+#   mod.sen[[i]] <- fit2stageGAMtoCatch(input=lllf,which.flag='Senegal',which.species=sp,start.year=1990,end.year=2015,kk=3)
+# }
+# 
+# for(i in c(1,2,3,4:9))
+# {
+#   if(mod.sen[[i]]=='Insufficient data to support model')
+#   {print('no model')}
+#   else{
+#     aa <- predict.effdis.t2.data(cmod=mod.sen[[i]], effmod=emod.sen,grid.res=5,start.year=1990,end.year=2015,which.flag='Senegal')
+#     rm(aa)
+#     gc(reset=T)
+#   }
+# }
+# 
 
 # St Vincent & Grenadines
 
@@ -788,7 +807,7 @@ for(i in c(1,2,3,4,5:8))
 {
   sp <- us[i]
   print(sp)
-  mod.uru[[i]] <- fit2stageGAMtoCatch(input=lllf,which.flag='Uruguay',which.species=sp,start.year=1990,end.year=2015,kk=6)
+  mod.uru[[i]] <- fit2stageGAMtoCatch(input=lllf,which.flag='Uruguay',which.species=sp,start.year=1990,end.year=2015,kk=3)
 }
 
 for(i in c(1,2,3,4:8))
@@ -875,9 +894,9 @@ for(i in c(1,2,3,5:9))
 
 # Venezuela.
 
-setwd('/home/doug/effdis/effdis-estimates')
+#setwd('/home/doug/effdis/effdis-estimates')
 
-emod.ven <- fitGAMtoEffort(input=lllf,which.flag='Venezuela',which.effort='NO.HOOKS',start.year=1990,end.year=2015,kk=6)
+emod.ven <- fitGAMtoEffort(input=lllf,which.flag='Venezuela',which.effort='NO.HOOKS',start.year=1990,end.year=2015,kk=3)
 
 mod.ven <- as.list(1:9)
 for(i in c(1,2,3,4,5,7:9))
@@ -918,24 +937,48 @@ print(lf[i])
 }
 
 effdis_estimates<-do.call("rbind",effdis_estimates)
-
-dim(effdis_estimates) # = 432479
+dim(effdis_estimates) # = 435031
 
 dimnames(effdis_estimates)[[2]] <- c("longitude","latitude","which.ocean","year","month","trend","flagname","geargrp","prob","prob.se.fit","measured_catch","measured_catch.se.fit",
                                      "eff","eff.se.fit","species","catch","cpue","observation")          
 
-#Try calculating effort directly from the raw data instead
+effdis_estimates <- orderBy(~trend+flagname+species,data=effdis_estimates)
 
-allt2 <- aggt2data(input=lllf[lllf$year > 1989,],which.flag='All',which.effort="NO.HOOKS")
-dimnames(allt2)[[2]][c(7,8)]<-c('raw_eff','raw_catch')
-esp<-allt2[allt2$flagname == 'EU.España',]
 
-#Merge modeled and original data
+#Check against the raw data
 
-neffdis_estimates <- merge(allt2,effdis_estimates,all.x=T)
-esp<-neffdis_estimates[neffdis_estimates$flagname == 'EU.España',]
+wf <- uf[34]
+mod <- effdis_estimates[effdis_estimates$flagname == wf,]
+par(mfrow=c(2,1),mar=c(2,2,2,2))
+effort <- aggt2data(input=lllf,which.effort="NO.HOOKS",which.flag=wf,start.year=1990, end.year=2015)
+plot(effort$trend,effort$eff1,pch=".",xlab="",ylab="")
+title(wf)
+points(mod$trend,mod$eff,col="red")
+catch <- aggt2catchdata(input=lllf,which.effort="NO.HOOKS",which.flag=wf,start.year=1990, end.year=2015)
+spp <- "alb"
+plot(catch$trend[catch$species == spp],catch$raw_measured_catch[catch$species == spp],pch=".",
+     xlab="",ylab="")
+points(mod$trend[mod$species == spp],mod$catch[mod$species == spp],col="red",pch=".")
+points(mod$trend[mod$species == spp],mod$measured_catch[mod$species == spp],col="green",pch=".")
 
-effdis_estimates <- neffdis_estimates
+       
+       
+  #Plot the raw task 2 data
+
+xyplot(sqrt(raw_eff/1000000)~year|flagname,data=effort)
+
+# Something really odd about Belize and St Vincent and Grenadine
+
+xyplot(sqrt(eff/1000000)~year|flagname,data=effdis_estimates[effdis_estimates$species == "alb",])
+
+
+#Which species do we not have by flag ?
+
+w1 <-table(effdis_estimates$flagname,as.character(effdis_estimates$species))
+w1 <- ifelse(w1==0,F,T)
+
+
+
 
 #plot(effdis_estimates$raw_eff,effdis_estimates$eff,ylim=c(0,2e+07),xlim=c(0,2e+07))
 
@@ -952,6 +995,7 @@ ll.t1 <- get.effdis.t1.data(which.dsn='effdis-tuna-cc1',which.gear = 'LL',which.
 str(ll.t1)
 for(i in c(2,5:15)){ll.t1[,i] <- as.character(ll.t1[,i])}
 
+
 # Datatype is either C (catch), L (Landings), DD (Discards), DM (?) and Landings
 
 # If catch is available use that otherwise sum landings and discards.
@@ -964,6 +1008,15 @@ ll.t1.ld <- aggregate(qty_t~rownames+species+yearc+decade+status+flag+fleet+
 
 
 ll.t1<-rbind(ll.t1.c[,-15],ll.t1.ld)
+
+
+xyplot(qty_t~yearc|species,data=ll.t1[ll.t1$flag=="Brazil" & ll.t1$yearc > 1989,])
+
+
+
+
+
+
 
 
 #Convert Task 1 to 'Other'
