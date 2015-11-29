@@ -28,8 +28,6 @@ function(input=lllf,which.flag="Japan",which.effort='NO.HOOKS',start.year=1950,e
   
   n0 <- input[input$dsettype == "n-",]
   nw <- input[input$dsettype == "nw",]
-  mm <- duplicated(nw[,c(1:11)])
-  nw <- nw[mm==TRUE,]
   w0 <- input[input$dsettype == "-w",]
   
   input1 <- rbind(n0,nw,w0)
