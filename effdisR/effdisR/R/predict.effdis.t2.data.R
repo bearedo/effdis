@@ -1,5 +1,5 @@
 predict.effdis.t2.data <-
-function (cmod=mods, effmod=emod,grid.res=5,start.year=1995,end.year=2010,which.flag='All',which.gear='LL')
+function (cmod=mods, effmod=emod,grid.res=5,start.year=1995,end.year=2010,which.flag='All',which.gear='LL',observations=T)
   {
   
   #cmod  <- alb;effmod <- emod;grid.res <-5;start.year <- 2000; end.year <- 2010;which.flag ='Japan';which.gear='LL'
@@ -129,7 +129,14 @@ function (cmod=mods, effmod=emod,grid.res=5,start.year=1995,end.year=2010,which.
   
   #print(filename)
   
+  if(observations == T){
+  
   write.table(model.data[model.data$observation == TRUE,],file=filename,sep=',',row.names=F,col.names=F)
+  }
+  else
+  {
+    write.table(model.data,file=filename,sep=',',row.names=F,col.names=F)
+  }
   
   model.data
   
