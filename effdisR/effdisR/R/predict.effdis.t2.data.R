@@ -2,7 +2,7 @@ predict.effdis.t2.data <-
 function (cmod=mods, effmod=emod,grid.res=5,start.year=1995,end.year=2010,which.flag='All',which.gear='LL',observations=T)
   {
   
-  #cmod  <- alb;effmod <- emod;grid.res <-5;start.year <- 2000; end.year <- 2010;which.flag ='Japan';which.gear='LL'
+  #cmod  <- mod.ven[[1]];effmod <- emod.ven;grid.res <-5;start.year <- 1990; end.year <- 2015;which.flag ='Japan';which.gear='LL'
   
   ## Use the GAM models fitted in the previous step to predict over a relevant-sized grid
   
@@ -112,8 +112,8 @@ function (cmod=mods, effmod=emod,grid.res=5,start.year=1995,end.year=2010,which.
   # longitude, latitude, month, and trend. So we need to make an index to tell us what numbers to use when summing the catches
   # over space and time
   
-  mm.dat <- paste(pmod.data$longitude,pmod.data$latitude,pmod.data$trend,pmod.data$month)
-  mm.grd <- paste(ngrd$longitude,ngrd$latitude,ngrd$trend,ngrd$month)
+  mm.dat <- paste(pmod.data$longitude,pmod.data$latitude,pmod.data$trend)
+  mm.grd <- paste(ngrd$longitude,ngrd$latitude,ngrd$trend)
   mm <- match(mm.grd,mm.dat)
   mm <- ifelse(is.na(mm),F,T)
   ngrd$observation <- mm 

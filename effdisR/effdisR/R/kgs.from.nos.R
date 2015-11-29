@@ -3,7 +3,7 @@ function(input=pslf)
 {
   # Use linear model from model.nos.kgs.r to estimate kgs from numbers
   
-  #input <- pslf
+  # input <- lllf
   
   ### Split data into kg and nr ###
   

@@ -2,33 +2,52 @@ fitGAMtoEffort <-
 function(input = lllf, which.flag='Japan',which.effort='NO.HOOKS',start.year=1950,end.year=2010,kk=6)
 {
   
-#input <- lllf; which.flag='Japan'; which.effort='FISH.HOUR'; start.year=1970; end.year=2010
+input <- lllf; which.flag='EU.España'; which.effort='NO.HOOKS'; start.year=1990; end.year=2015
 
-#input <- input[input$species == 'alb',] # Doesn't matter which as the Xn data are all repeated in the long format
-#input <- input[input$year >= start.year & input$year <= end.year & input$eff1type == which.effort,]
+input <- input[input$year >= start.year & input$year <= end.year & input$eff1type == which.effort,]
 
-if(which.flag=='All')
+ 
+#input[input$trend == 517 & input$longitude == -12.5 & input$latitude == -12.5 & input$flagname == "Japan",]
+#input[input$trend == 517 & input$longitude == -12.5 & input$latitude == -2.5 & input$flagname == "Korea Rep.",]
+
+
+
+  if(which.flag=='All')
 {
   input <- input; print('Modeling all data')
+  
+  ws <- sort(unique(input$species))[1]
+  
+
+  input <- input[input$species == ws,] # Doesn't matter which as the Xn data are all repeated in the long format
+  
 }
 
 else
   {
-  input <- input[input$flagname == which.flag,]
+  input <- input[input$flagname == which.flag,] 
+  ws <- sort(unique(input$species))[1]
+  input <- input[input$species == ws,] # Doesn't matter which as the Xn data are all repeated in the long format
 #print(paste('Modeling',which.flag))
 }
 
 
 n0 <- input[input$dsettype == "n-",]
 nw <- input[input$dsettype == "nw",]
-mm <- duplicated(nw[,c(1:11)])
-nw <- nw[mm==TRUE,]
 w0 <- input[input$dsettype == "-w",]
 
 input1 <- rbind(n0,nw,w0)
 
+#input1[input1$trend == 517 & input1$longitude == -17.5 & input1$latitude == -2.5 & input1$flagname == "Korea Rep.",]
+
+
 input2 <- aggregate(list(eff1=input1$eff1), 
-                  by=list(trend=input1$trend,month=input1$month,longitude=input1$longitude,latitude=input1$latitude),sum)
+                  by=list(trend=input1$trend,month=input1$month,
+                          longitude=input1$longitude,latitude=input1$latitude),sum,na.rm=T)
+
+#input2[input2$trend == 517 & input2$longitude == -17.5 & input2$latitude == -2.5,]
+
+
 
 # Set up harmonics
 
@@ -60,6 +79,8 @@ h1 <- gam(eff1~te(longitude,latitude,k=kk,bs=bbs)+te(trend,k=kk,bs=bbs)+sin1+cos
 #print(summary(h1))
 #}
 
+#plot(input2$trend,input2$eff1,pch=".")
+#points(input2$trend,fitted(h1),pch=".",col="red")
 
 # #if(which.gam == 'gam'){
 #   print('fitting GAM to effort')

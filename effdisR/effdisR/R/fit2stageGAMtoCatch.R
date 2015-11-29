@@ -11,7 +11,6 @@ function (input = pslf,which.species ='bft',start.year=1950, end.year=2015,which
    
   ninput <- input[input$species == which.species & input$year >= start.year & input$year <= end.year,]
   
-  
    if(which.flag=='All')
    {
      print('Modeling all data')
@@ -22,7 +21,7 @@ function (input = pslf,which.species ='bft',start.year=1950, end.year=2015,which
    print(paste('Modeling',which.flag))
    }
   
-  ## Take out only the kgs. [NB. The flags which report only numbers have been converted.]
+  ## Take out only the kgs. [NB. The flags which report only numbers have been converted elsewhere.]
   
    ninput <- ninput[ninput$catchunit == 'kg',]
    bin <- ifelse(ninput$measured_catch==0,0,1) # Binary variable
