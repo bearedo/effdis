@@ -2,7 +2,7 @@ fitGAMtoEffort <-
 function(input = lllf, which.flag='Japan',which.effort='NO.HOOKS',start.year=1950,end.year=2010,kk=6)
 {
   
-input <- lllf; which.flag='EU.España'; which.effort='NO.HOOKS'; start.year=1990; end.year=2015
+#input <- lllf; which.flag='EU.España'; which.effort='NO.HOOKS'; start.year=1990; end.year=2015
 
 input <- input[input$year >= start.year & input$year <= end.year & input$eff1type == which.effort,]
 

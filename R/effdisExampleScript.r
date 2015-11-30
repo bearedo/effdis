@@ -947,7 +947,7 @@ effdis_estimates <- orderBy(~trend+flagname+species,data=effdis_estimates)
 
 #Check against the raw data
 
-wf <- uf[34]
+wf <- uf[16]
 mod <- effdis_estimates[effdis_estimates$flagname == wf,]
 par(mfrow=c(2,1),mar=c(2,2,2,2))
 effort <- aggt2data(input=lllf,which.effort="NO.HOOKS",which.flag=wf,start.year=1990, end.year=2015)
@@ -955,11 +955,12 @@ plot(effort$trend,effort$eff1,pch=".",xlab="",ylab="")
 title(wf)
 points(mod$trend,mod$eff,col="red")
 catch <- aggt2catchdata(input=lllf,which.effort="NO.HOOKS",which.flag=wf,start.year=1990, end.year=2015)
-spp <- "alb"
+spp <- "bft"
 plot(catch$trend[catch$species == spp],catch$raw_measured_catch[catch$species == spp],pch=".",
      xlab="",ylab="")
 points(mod$trend[mod$species == spp],mod$catch[mod$species == spp],col="red",pch=".")
 points(mod$trend[mod$species == spp],mod$measured_catch[mod$species == spp],col="green",pch=".")
+plot(mod$trend[mod$species == spp],mod$measured_catch[mod$species == spp],col="green",pch=".")
 
        
        
