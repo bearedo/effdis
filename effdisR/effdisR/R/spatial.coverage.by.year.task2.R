@@ -19,7 +19,7 @@ function(tdata=t2ce,start.year=1950, end.year=2010, which.region = 'AT', which.g
       title(i,cex.main=cl)}
     else{
       plot(dat$longitude,dat$latitude,type='n',xaxt='n',yaxt='n',ylim=range(tdata$latitude,na.rm=T),xlim=range(tdata$longitude,na.rm=T))
-      points(dat$longitude,dat$latitude,pch='.',col='red')
+      points(dat$longitude,dat$latitude,pch='*',col='red')
       map('world',add=T,col='green',fill=T)
       title(i,cex.main=cl)
     }
