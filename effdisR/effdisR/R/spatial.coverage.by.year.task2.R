@@ -15,15 +15,19 @@ function(tdata=t2ce,start.year=1950, end.year=2010, which.region = 'AT', which.g
     #print(dim(dat))
     if(length(dat[,1])==0){
       plot(fdata$longitude,fdata$latitude,type='n',xaxt='n',yaxt='n',ylim=range(tdata$latitude,na.rm=T),xlim=range(tdata$longitude,na.rm=T))
+      data("eez");plot(eez,add=T,col="thistle")
       map('world',col='green',fill=T,add=T)
       title(i,cex.main=cl)}
     else{
       plot(dat$longitude,dat$latitude,type='n',xaxt='n',yaxt='n',ylim=range(tdata$latitude,na.rm=T),xlim=range(tdata$longitude,na.rm=T))
-      points(dat$longitude,dat$latitude,pch='*',col='red')
+      data("eez");plot(eez,add=T,col="thistle")
+       points(dat$longitude,dat$latitude,pch='*',col='red')
       map('world',add=T,col='green',fill=T)
       title(i,cex.main=cl)
     }
     mtext(side=3,outer=T,paste(which.flag,which.gear, sep=' - '))  
 
   }
+  
+  
 }
