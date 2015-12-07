@@ -117,6 +117,10 @@ cols<- c("white",colintens)[cut(grd@data[an(names(table(idx))),1]/valdiv,breaks=
 plot(grdPols,col=cols,add=T,border='transparent')
 #plot(atl.countries,add=T,col=colland)
 map("world",resolution=1,add=T,fill=TRUE,col=colland);map.axes();#box()
+data("eez");plot(eez,add=T,bg="transparent")
+map("world",c("Ghana","Senegal","Ivory Coast","South Africa","Brazil","Venezuela","Spain","France","Portugal","USA"),
+    add=T,col="darkgreen",fill=T)
+
 #axis(1);axis(2,las=1); box()
 
 

@@ -7,6 +7,7 @@ latLon<-function(x){
                         "10x10"  = 5.0,
                         "5x10"   = 2.5,
                         "20x20"  = 10.0,
+                        "LatLon" = 0.0,
                         "none"   = 0.0)
   
   x$lon<-x$lon + switch(x$square,
@@ -16,6 +17,7 @@ latLon<-function(x){
                         "10x10"  =  5.0,
                         "5x10"   =  5.0,
                         "20x20"  = 10.0,
+                        "LatLon" = 0.0,
                         "none"   =  0.0)
   
   x[x$quad %in% 3:4, "lon"]<--x[x$quad %in% 3:4, "lon"]

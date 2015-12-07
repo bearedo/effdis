@@ -1,9 +1,10 @@
 three.d.catch.by.year <-
-function(tdata = task2.lf, which.gear = 'LL', which.year = 2005, gridx=5,gridy=5,which.species='alb', which.flag = 'All',catchunit='kg', scaling.f=1000000)
+function(tdata = task2.lf, which.gear = 'LL', which.year = 2005, gridx=5,gridy=5,which.species='alb', which.flag = 'All',
+         catchunit='kg', scaling.f=1000000)
   
     {
     
-    #tdata<-alb; which.gear <- 'PS'; which.flag<- 'EU.España'; which.year <- 1994; gridx <- 1; gridy <- 1;  which.species <- 'alb'; catchunit <- 'kg'
+    #tdata<-bet; which.gear <- 'PS'; which.flag<- 'Ghana'; which.year <- 2014; gridx <- 1; gridy <- 1;  which.species <- 'alb'; catchunit <- 'kg'
     #which.flag<- 'Japan'
   
     if(which.flag == 'All'){
@@ -98,6 +99,9 @@ function(tdata = task2.lf, which.gear = 'LL', which.year = 2005, gridx=5,gridy=5
       #plot(atl.countries,add=T,col=colland)
       map("world",resolution=1,add=T,fill=TRUE,col=colland);map.axes();#box()
       #axis(1);axis(2,las=1); box()
+      data("eez");plot(eez,add=T,bg="transparent")
+      map("world",c("Ghana","Senegal","Ivory Coast","South Africa","Brazil","Venezuela","Spain","France","Portugal","USA"),
+          add=T,col="darkgreen",fill=T)
       
       
       #-Add a legend
