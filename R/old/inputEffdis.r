@@ -240,7 +240,7 @@ table(t2ce$SquareTypeCode)
 #0x10  10x20    1x1  20x20   5x10    5x5   none 
 #1235     39 403016    250    753 161986    222 
 
-df <- data.frame(quad=t2ceLL$QuadID,lat=t2ceLL$Lat5,lon=t2ceLL$Lon5,square=ac(t2ceLL$SquareTypeCode))
+df <- data.frame(quad=t2ceLL$QuadID,lat=t2ceLL$Lat5,lon=t2ceLL$Lon5,square=as.character(t2ceLL$SquareTypeCode))
 df1<- data.frame(quad=rep(NA,length(df[,1])),lat=rep(NA,length(df[,1])),lon=rep(NA,length(df[,1])),square=rep(NA,length(df[,1])))
 for(i in 1:length(df[,1]))
 {
@@ -915,6 +915,20 @@ mtext(yl$label,side=2,outer=T,line=-1.5,at=0.5,font=yl$font,cex=yl$cex)
 https://code.google.com/p/vmstools/wiki/Practicals9
 
 
+#- Read in file for EEZs
+
+
+eez <- readOGR(dsn="C:/Users/DBeare/effdis/effdis/data", layer="World_EEZ_v8_2014") # World EEZs
+
+geogWGS84 <- CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs") # Make sure proj is what we think it is.
+eez@proj4string <- geogWGS84
+
+class(eez)
+
+save(eez,file="C:/Users/DBeare/effdis/effdis/effdisR/effdisR/data/eez.rda",compress=T)
+
+eez.polys <- as.character(sort(unique(eez@data$EEZ)))
+seas.polys[1:10]
 
 
 

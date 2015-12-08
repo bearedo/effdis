@@ -42,7 +42,7 @@ library(rgeos)
 library(lattice)
 library(pander)
 library(kfigr)
-library(doMC)
+
 ```
 
 ##Install *effdisR*
@@ -113,16 +113,26 @@ pander(effort_type_by_flag_bb)
 
 
 ### Data coverage
+##Long-liners
 
 It is important to understand how the distribution of samples in the Task II database varies with respect to location and time (long-term and seasonal). The function *yr.month.coverage.task2* available in *effdisR* counts the number of samples by year and month for any strata (gear, flag etc) and displays the results as a 3D plot. This type of plot reveals non-random sampling in time.  It is possible, for example, that sampling might have concentrated on the first part of the year for a decade, and then switched to the latter part of the year. 'Trends' estimated from data collected in such a manner will clearly be spurious. Examples of the output of *yr.month.coverage.task2* are plotted in Figure 2 for longline between 1960 and 2010 for Japan, Chinese Taipei, Brasil, and U.S.A. Clearly the extent of the data available varies substantially between flags. There are no obvious seasonal biases in the data but the amount of reporting has changed with long-term time. Japan has been particularly consistent (Fig. 2, top right), while the U.S.A. has been inconsistent.  
 
 ```{r get ll data for ten most important flags,include=TRUE,echo=TRUE}
 ll <- sqlQuery(chan,"SELECT yearc AS year, trend, timeperiodid AS month, 
-flagname, region, geargrpcode,longitude,latitude, catchunit, dsettype, eff1, eff1type
+flagname, region, geargrpcode,lon,lat,longitude,latitude,quadid AS quad, squaretypecode AS square, catchunit, dsettype, eff1, eff1type
 FROM t2ce_new
 WHERE region ='AT' AND yearc > 2009 AND timeperiodid < 13 AND eff1type='NO.HOOKS' AND geargrpcode = 'LL' 
 AND flagname IN ('Japan','Chinese Taipei','Brazil','Angola','EU.España','EU.Portugal','St. Vincent and Grenadines','Vanuatu','U.S.A.','Namibia') 
 AND catchunit != '--' ;")
+df <- data.frame(quad=ll$quad,lat=ll$lat,lon=ll$lon,square=ll$square)
+df$square <- as.character(df$square)
+ldf <- length(df$square)
+df1<- data.frame(quad=rep(NA,ldf),lat=rep(NA,ldf),lon=rep(NA,ldf),square=rep(NA,ldf))
+for(i in 1:length(df[,1]))
+{df1[i,] <- latLon(x=df[i,])}
+ll$longitude<- df1$lon
+ll$latitude <- df1$lat
+
 ```
 
 
@@ -175,27 +185,200 @@ spatial.coverage.by.year.task2(tdata=ll,
 **Figure 7.** *Spatial sampling by USA long-liners between 2011 and 2014*
 
 
-
-
+## Purse-seiners
 
 ```{r get purse-seine data,include=TRUE,echo=TRUE,fig.height=5}
 ps <- sqlQuery(chan,"SELECT yearc AS year, trend, timeperiodid AS month, 
-flagname, region, geargrpcode,longitude,latitude, catchunit, dsettype, eff1, eff1type
-FROM t2ce
-WHERE region ='AT' AND yearc > 2004 AND timeperiodid < 13 AND eff1type IN ('D.FISH','FISH.HOUR') 
-AND geargrpcode = 'PS' AND flagname IN ('Belize','Côte D''Ivoire','EU.España','Guatemala','Guinée Rep.','Panama') 
+flagname, region, geargrpcode,lon,lat, longitude,latitude,quadid AS quad, squaretypecode AS square, catchunit, dsettype, eff1, eff1type
+FROM t2ce_new
+WHERE region ='AT' AND yearc > 2009 AND timeperiodid < 13 AND eff1type IN ('D.FISH','FISH.HOUR') 
+AND geargrpcode = 'PS' AND flagname IN ('Belize','Côte D''Ivoire','EU.España','Guatemala','Guinée Rep.','Panama','Venezuela','Panama','EU.France','EU.Portugal','U.S.A.', 'Curaçao','EU.Netherlands','Maroc','Namibia' ) 
 AND catchunit != '--' ;")
+df <- data.frame(quad=ps$quad,lat=ps$lat,lon=ps$lon,square=ps$square)
+df$square <- as.character(df$square)
+ldf <- length(df$square)
+df1<- data.frame(quad=rep(NA,ldf),lat=rep(NA,ldf),lon=rep(NA,ldf),square=rep(NA,ldf))
+for(i in 1:length(df[,1]))
+{df1[i,] <- latLon(x=df[i,])}
+ps$longitude<- df1$lon
+ps$latitude <- df1$lat
 ```
+
+
+
 
 ```{r plot distribution of spanish purse-seine data,include=TRUE,echo=TRUE,fig.height=5}
 par(mfrow=c(2,2),mar=c(1,1,2,1),oma=c(3,3,3,3))
-spatial.coverage.by.year.task2(tdata=ps,start.year=2005,end.year=2008,
+spatial.coverage.by.year.task2(tdata=ps,start.year=2011,end.year=2014,
                                  which.gear='PS',which.flag='EU.España')
 ```
 
-**Figure 5.** *Spatial sampling by Spanish purse-seiners between 1995 and 2010*
+**Figure 8.** *Spatial sampling by Spanish purse-seiners between 2011 and 2014*
+
+
+```{r plot distribution of belize purse-seine data,include=TRUE,echo=TRUE,fig.height=5}
+par(mfrow=c(2,2),mar=c(1,1,2,1),oma=c(3,3,3,3))
+spatial.coverage.by.year.task2(tdata=ps,start.year=2011,end.year=2014,
+                                 which.gear='PS',which.flag='Belize')
+```
+
+**Figure 9.** *Spatial sampling by Belize purse-seiners between 2011 and 2014*
+
+
+
+```{r plot distribution of cote d ivoire purse-seine data,include=TRUE,echo=TRUE,fig.height=5}
+par(mfrow=c(2,2),mar=c(1,1,2,1),oma=c(3,3,3,3))
+spatial.coverage.by.year.task2(tdata=ps,start.year=2011,end.year=2014,
+                                 which.gear='PS',which.flag="Côte D'Ivoire")
+```
+
+**Figure 10.** *Spatial sampling by Ivorian purse-seiners between 2011 and 2014*
+
+
+```{r plot distribution of cote d ivoire purse-seine data,include=TRUE,echo=TRUE,fig.height=5}
+par(mfrow=c(2,2),mar=c(1,1,2,1),oma=c(3,3,3,3))
+spatial.coverage.by.year.task2(tdata=ps,start.year=2011,end.year=2014,
+                                 which.gear='PS',which.flag="Guatemala")
+```
+
+**Figure 11.** *Spatial sampling by Guatemalan purse-seiners between 2011 and 2014*
+
+
+```{r plot distribution of guinean purse-seine data,include=TRUE,echo=TRUE,fig.height=5}
+par(mfrow=c(2,2),mar=c(1,1,2,1),oma=c(3,3,3,3))
+spatial.coverage.by.year.task2(tdata=ps,start.year=2011,end.year=2014,
+                                 which.gear='PS',which.flag="Guinée Rep.")
+```
+
+**Figure 12.** *Spatial sampling by Rep Guinean purse-seiners between 2011 and 2014*
+
+
+```{r plot distribution of panama purse-seine data,include=TRUE,echo=TRUE,fig.height=5}
+par(mfrow=c(2,2),mar=c(1,1,2,1),oma=c(3,3,3,3))
+spatial.coverage.by.year.task2(tdata=ps,start.year=2011,end.year=2014,
+                                 which.gear='PS',which.flag="Panama")
+```
+
+**Figure 13.** *Spatial sampling by Panama purse-seiners between 2011 and 2014*
+
+
+
+```{r plot distribution of french purse-seine data,include=TRUE,echo=TRUE,fig.height=5}
+par(mfrow=c(2,2),mar=c(1,1,2,1),oma=c(3,3,3,3))
+spatial.coverage.by.year.task2(tdata=ps,start.year=2011,end.year=2014,
+                                 which.gear='PS',which.flag="EU.France")
+```
+
+**Figure 13.** *Spatial sampling by French purse-seiners between 2011 and 2014*
+
+
+
+```{r plot distribution of portuguese purse-seine data,include=TRUE,echo=TRUE,fig.height=5}
+par(mfrow=c(2,2),mar=c(1,1,2,1),oma=c(3,3,3,3))
+spatial.coverage.by.year.task2(tdata=ps,start.year=2011,end.year=2014,
+                                 which.gear='PS',which.flag="Venezuela")
+```
+
+**Figure 13.** *Spatial sampling by Venezuelan purse-seiners between 2011 and 2014*
+
 
 Most of the purse-seining data have been supplied at a higher spatial resolution (1x1) than is available for the long-liners. This is illustrated in Figure 5 which shows the distribution of Spanish purse-seining activity off the West Coast of Africa between 2005 and 2010.
+
+## Bait-boats
+
+
+```{r get purse-seine data,include=TRUE,echo=TRUE,fig.height=5}
+bb <- sqlQuery(chan,"SELECT yearc AS year, trend, timeperiodid AS month, 
+flagname, region, geargrpcode,lon,lat,longitude,latitude,quadid AS quad, squaretypecode AS square, catchunit, dsettype, eff1, eff1type
+FROM t2ce_new
+WHERE region ='AT' AND yearc > 2004 AND timeperiodid < 13 
+AND geargrpcode = 'BB';")
+df <- data.frame(quad=bb$quad,lat=bb$lat,lon=bb$lon,square=bb$square)
+df$square <- as.character(df$square)
+ldf <- length(df$square)
+df1<- data.frame(quad=rep(NA,ldf),lat=rep(NA,ldf),lon=rep(NA,ldf),square=rep(NA,ldf))
+for(i in 1:length(df[,1]))
+{df1[i,] <- latLon(x=df[i,])}
+bb$longitude<- df1$lon
+bb$latitude <- df1$lat
+
+```
+
+
+
+```{r plot distribution of spanish bait-boat data,include=TRUE,echo=TRUE,fig.height=5}
+par(mfrow=c(2,2),mar=c(1,1,2,1),oma=c(3,3,3,3))
+spatial.coverage.by.year.task2(tdata=bb,start.year=2011,end.year=2014,
+                                 which.gear='BB',which.flag='EU.España')
+```
+
+**Figure 14.** *Spatial sampling by Spanish registered baitboats between 2011 and 2014*
+
+
+```{r plot distribution of Brazil bait-boat data,include=TRUE,echo=TRUE,fig.height=5}
+par(mfrow=c(2,2),mar=c(1,1,2,1),oma=c(3,3,3,3))
+spatial.coverage.by.year.task2(tdata=bb
+                               ,start.year=2011,end.year=2014,
+                                 which.gear='BB',which.flag='Brazil')
+```
+**Figure 15.** *Spatial sampling by Brazilian bait-boats between 2011 and 2014*
+
+
+```{r plot distribution of french baitboat data,include=TRUE,echo=TRUE,fig.height=5}
+par(mfrow=c(2,2),mar=c(1,1,2,1),oma=c(3,3,3,3))
+spatial.coverage.by.year.task2(tdata=bb,start.year=2011,end.year=2014,
+                                 which.gear='BB',which.flag="EU.France")
+```
+
+**Figure 16.** *Spatial sampling by French bait-boats between 2011 and 2014*
+
+```{r plot distribution of portuguese baitboat data,include=TRUE,echo=TRUE,fig.height=5}
+par(mfrow=c(2,2),mar=c(1,1,2,1),oma=c(3,3,3,3))
+spatial.coverage.by.year.task2(tdata=bb,start.year=2011,end.year=2014,
+                                 which.gear='BB',which.flag="EU.Portugal")
+```
+
+**Figure 17.** *Spatial sampling by Portuguese bait-boats between 2011 and 2014*
+
+
+```{r plot distribution of senegalese bait-boat data,include=TRUE,echo=TRUE,fig.height=5}
+par(mfrow=c(2,2),mar=c(1,1,2,1),oma=c(3,3,3,3))
+spatial.coverage.by.year.task2(tdata=bb,start.year=2011,end.year=2014,
+                                 which.gear='BB',which.flag="Senegal")
+
+```
+
+**Figure 18.** *Spatial sampling by Senegalese bait-boats between 2011 and 2014*
+
+
+```{r plot distribution of south african bait-boat data,include=TRUE,echo=TRUE,fig.height=5}
+par(mfrow=c(2,2),mar=c(1,1,2,1),oma=c(3,3,3,3))
+spatial.coverage.by.year.task2(tdata=bb,start.year=2011,end.year=2014,
+                                 which.gear='BB',which.flag="South Africa")
+```
+
+**Figure 19.** *Spatial sampling by South African bait-boats between 2011 and 2014*
+
+
+```{r plot distribution of ghanaian bait-boats data,include=TRUE,echo=TRUE,fig.height=5}
+par(mfrow=c(2,2),mar=c(1,1,2,1),oma=c(3,3,3,3))
+spatial.coverage.by.year.task2(tdata=bb,start.year=2011,end.year=2014,
+                                 which.gear='BB',which.flag="Ghana")
+```
+
+**Figure 20.** *Spatial sampling by Ghanaian bait-boats between 2011 and 2014*
+
+
+```{r plot distribution of Venezuelan bait-boat data,include=TRUE,echo=TRUE,fig.height=5}
+par(mfrow=c(2,2),mar=c(1,1,2,1),oma=c(3,3,3,3))
+spatial.coverage.by.year.task2(tdata=bb,start.year=2011,end.year=2014,
+                                 which.gear='BB',which.flag="Venezuela")
+```
+
+**Figure 21.** *Spatial sampling by Venezuelan bait boats between 2011 and 2011*
+
+
+
 
 ### Effort by year and location (raw data, no modeling)
 
@@ -203,37 +386,91 @@ Given that we can now determine the timing and location of fishing activities (F
 
 In 2006, for example, longlining effort by Japan focused on the North and Eastern Atlantic (Fig. 6). Chinese Taipei flagged long-liners, on the other hand also worked in the North Atlantic but their effort appears greater in the South Atlantic (Fig. 7). Purse-seining data are submitted to ICCAT at a higher spatial resolution (1x1 grid) and examples for Spain and Panama in 2009 are plotted in Figures 8 and 9. Both fleets focus their activity along the West Coast of Africa but the Panamanian fleet tends not to venture as far inshore as the Spanish fleet (Figs 8 & 9).
 
+
+## Long-lining ffort by year and location
+
+
 ```{r no of hooks shot by Japan in 2006 from task 2,include=TRUE,echo=TRUE,message = FALSE, error=FALSE, warnings=FALSE}
 par(mfrow=c(1,1))
-three.d.effort.by.year(tdata=ll,what.year=2006,
-                         what.flag='Japan',scaling.f=10000,effort.type='NO.HOOKS')  
+three.d.effort.by.year(tdata=ll,which.year=2014,
+                         which.flag='Japan',scaling.f=10000,effort.type='NO.HOOKS')  
 ```
 
-**Figure 6.** *Total number of hooks set by Japanese fleet (Task II only) in 2006*
+**Figure 22.** *Total number of hooks set by Japanese fleet (Task II only) in 2014*
 
 ```{r no of hooks shot by Chinese Taipei in 2006 from task 2,include=TRUE,echo=TRUE,message = FALSE, error=FALSE, warnings=FALSE}
-three.d.effort.by.year(tdata=ll,what.year=2006,
-                         what.flag="Chinese Taipei",scaling.f=10000,gridx=5,gridy=5,
-                         effort.type='NO.HOOKS',what.gear='LL')  
+three.d.effort.by.year(tdata=ll,which.year=2014,
+                         which.flag="Chinese Taipei",scaling.f=10000,gridx=5,gridy=5,
+                         effort.type='NO.HOOKS',which.gear='LL')  
 ```
 
-**Figure 7.** *Total number of hooks set by Chinese Taipei (Task II only) in 2006*
+**Figure 23.** *Total number of hooks set by Chinese Taipei (Task II only) in 2014*
 
-```{r no of fishing hours by Spain in 2009 from task 2,include=TRUE,echo=TRUE,message = FALSE, error=FALSE, warnings=FALSE}
-three.d.effort.by.year(tdata=ps,what.year=2009,
-                         what.flag='EU.España',gridx=1,gridy=1,
-                         scaling.f=2,effort.type='FISH.HOUR',what.gear='PS')  
+
+
+## Purse-seining effort by year and location
+
+
+```{r no of fishing hours by Spain in 2014 from task 2,include=TRUE,echo=TRUE,message = FALSE, error=FALSE, warnings=FALSE}
+three.d.effort.by.year(tdata=ps,which.year=2014,
+                         which.flag='EU.España',gridx=1,gridy=1,
+                         scaling.f=2,effort.type='FISH.HOUR',which.gear='PS')  
 ```
 
-**Figure 8.** *Total fishing hours reported by Spanish purse-seiners (Task II only)  in 2009*
+**Figure 24.** *Total fishing hours reported by Spanish purse-seiners (Task II only)  in 2014*
 
-```{r no of fishing hours by Other in 2009 from task 2,include=TRUE,echo=TRUE,message = FALSE, error=FALSE, warnings=FALSE}
-three.d.effort.by.year(tdata=ps,what.year=2009,
-                         what.flag='Panama',
-                         gridx=1,gridy=1,scaling.f=1,effort.type='FISH.HOUR',what.gear='PS')  
+```{r no of fishing hours by Panama in 2014 from task 2,include=TRUE,echo=TRUE,message = FALSE, error=FALSE, warnings=FALSE}
+three.d.effort.by.year(tdata=ps,which.year=2014,
+                         which.flag='Panama',
+                         gridx=1,gridy=1,scaling.f=1,effort.type='FISH.HOUR',which.gear='PS')  
 ```
 
-**Figure 9.** *Total fishing hours reported by Panamanian purse-seiners (Task II only) 2009*
+**Figure 25.** *Total fishing hours reported by Panamanian purse-seiners (Task II only) 2009*
+
+
+```{r no of fishing hours by Belize in 2014 from task 2,include=TRUE,echo=TRUE,message = FALSE, error=FALSE, warnings=FALSE}
+three.d.effort.by.year(tdata=ps,which.year=2014,
+                         which.flag='Belize',
+                         gridx=1,gridy=1,scaling.f=1,effort.type='D.FISH',which.gear='PS')  
+```
+
+**Figure 26.** *Total fishing hours reported by Belize purse-seiners (Task II only) 2009*
+
+
+```{r no of fishing hours by Guatemala in 2014 from task 2,include=TRUE,echo=TRUE,message = FALSE, error=FALSE, warnings=FALSE}
+three.d.effort.by.year(tdata=ps,which.year=2014,
+                         which.flag='Guatemala',
+                         gridx=1,gridy=1,scaling.f=1,effort.type='FISH.HOUR',which.gear='PS')  
+```
+
+**Figure 25.** *Total fishing hours reported by Belize purse-seiners (Task II only) 2009*
+
+```{r no of fishing hours by Ivory Coast in 2014 from task 2,include=TRUE,echo=TRUE,message = FALSE, error=FALSE, warnings=FALSE}
+three.d.effort.by.year(tdata=ps,which.year=2014,
+                         which.flag="Côte D'Ivoire",
+                         gridx=1,gridy=1,scaling.f=1,effort.type='FISH.HOUR',which.gear='PS')  
+```
+
+
+```{r no of fishing hours by Venezuela in 2014 from task 2,include=TRUE,echo=TRUE,message = FALSE, error=FALSE, warnings=FALSE}
+three.d.effort.by.year(tdata=ps,which.year=2014,
+                         which.flag="Venezuela",
+                         gridx=1,gridy=1,scaling.f=1,effort.type='D.FISH',which.gear='PS')  
+```
+
+```{r no of fishing hours by Curucao in 2014 from task 2,include=TRUE,echo=TRUE,message = FALSE, error=FALSE, warnings=FALSE}
+three.d.effort.by.year(tdata=ps,which.year=2014,
+                         which.flag="Curaçao",
+                         gridx=1,gridy=1,scaling.f=1,effort.type='FISH.HOUR',which.gear='PS')  
+```
+
+```{r no of fishing hours by Guinee in 2014 from task 2,include=TRUE,echo=TRUE,message = FALSE, error=FALSE, warnings=FALSE}
+three.d.effort.by.year(tdata=ps,which.year=2014,
+                         which.flag="Guinée Rep.",
+                         gridx=1,gridy=1,scaling.f=1,effort.type='FISH.HOUR',which.gear='PS')  
+```
+
+
 
 
 ### Catch weights by year and location - Japanese longliners, and Spanish Purse-seiners
@@ -241,29 +478,66 @@ three.d.effort.by.year(tdata=ps,what.year=2009,
 With *circa* 27 flags, multiple species, 12 months, 61 years, and different effort submissions (e.g. days at sea, number of hooks set) there is a large number of possible combinations for examining the catches. Examples are illustrated in Figure 10 using the R function, *three.d.catch.by.year* linked to the PostgreSQL database via an SQL script (see below). In this example we extracted data for albacore tuna caught by long-line for Japan, and by purse-seine for Spain. [Note that observations were ignored where the catchunit is unknown ('--'). Numbers or kilograms caught can be selected depending on availability].
 
 
-```{r extract kg tunas caught by selected flags in 2006 from task 2,include=TRUE,echo=TRUE,message = FALSE, error=FALSE, warnings=FALSE}
-alb <- sqlQuery(chan,"SELECT yearc AS year, trend, 
-timeperiodid AS month, flagname, region, geargrpcode,longitude,latitude, 
-catchunit, dsettype, eff1, eff1type, alb as measured_catch
-FROM t2ce
-WHERE region ='AT' AND timeperiodid < 13 AND eff1type IN ('NO.HOOKS','FISH.HOUR') AND 
-geargrpcode IN ('LL','PS') AND flagname IN ('Japan','EU.España') AND catchunit != '--' ;")
-alb$species <- 'alb'
+```{r extract kg tropical tunas caught by selected flags from task 2,include=TRUE,echo=TRUE,message = FALSE, error=FALSE, warnings=FALSE}
+bet <- sqlQuery(chan,"SELECT yearc AS year, trend,quadid as quad, squaretypecode AS square,
+timeperiodid AS month, flagname, region, geargrpcode,lon,lat,longitude,latitude, 
+catchunit, dsettype, eff1, eff1type, bet as measured_catch
+FROM t2ce_new
+WHERE region ='AT' AND timeperiodid < 13 AND yearc > 2009 AND 
+geargrpcode IN ('LL','PS','BB') AND catchunit != '--' ;")
+bet$species <- 'bet'
+
+df <- data.frame(quad=bet$quad,lat=bet$lat,lon=bet$lon,square=bet$square)
+df$square <- as.character(df$square)
+ldf <- length(df$square)
+df1<- data.frame(quad=rep(NA,ldf),lat=rep(NA,ldf),lon=rep(NA,ldf),square=rep(NA,ldf))
+for(i in 1:ldf){df1[i,] <- latLon(x=df[i,])}
+bet$longitude<- df1$lon
+bet$latitude <- df1$lat
+
+
 ```
 
 
-```{r weight of albacore caught by location in 2006 from task 2,include=TRUE,echo=TRUE,message = FALSE, error=FALSE, warnings=FALSE}
+```{r weight of bigeye caught by location in 2013 from task 2,include=TRUE,echo=TRUE,message = FALSE, error=FALSE, warnings=FALSE}
 par(mfrow=c(2,2),mar=c(2,1,2,1))
-three.d.catch.by.year(tdata=alb,what.year=2006,what.gear='LL',what.species='alb',what.flag='Japan',scaling.f=10,catchunit='nr')  
-three.d.catch.by.year(tdata=alb,what.year=2009,
-                        what.gear='LL',what.species='alb',what.flag='Japan',scaling.f=10,catchunit='nr')
-three.d.catch.by.year(tdata=alb,what.year=1992,
-                        what.gear='PS',what.species='alb',gridx=1,gridy=1,what.flag='EU.España',scaling.f=25,catchunit='kg')  
-three.d.catch.by.year(tdata=alb,what.year=1995,
-                        what.gear='PS',what.species='alb',gridx=1,gridy=1,what.flag='EU.España',scaling.f=25,catchunit='kg')
+three.d.catch.by.year(tdata=bet,which.year=2014,which.gear='LL',which.species='bet',which.flag='Chinese Taipei',scaling.f=10,catchunit='kg')  
+three.d.catch.by.year(tdata=bet,which.year=2014,
+                        which.gear='LL',which.species='bet',which.flag='Japan',scaling.f=10,catchunit='nr')
+three.d.catch.by.year(tdata=bet,which.year=2014,
+                        which.gear='LL',which.species='bet',gridx=5,gridy=5,which.flag='EU.Portugal',scaling.f=10,catchunit='kg')  
+three.d.catch.by.year(tdata=bet,which.year=2014,
+                        which.gear='LL',which.species='bet',gridx=5,gridy=5,which.flag='Korea Rep.',scaling.f=10,catchunit='kg')
 ```
 
-**Figure 10.** *Weight of albacore tuna caught by longline by Japan (2006 & 2009) and purse-seine by Spain (1992 & 1995)*
+**Figure .** *Abundance of bigeye tuna caught by longline by Chinese Taipei, Japan, EU. Portugal, and Korean*
+
+
+```{r weight of bigeye caught by location in 2014 from task 2,include=TRUE,echo=TRUE,message = FALSE, error=FALSE, warnings=FALSE}
+par(mfrow=c(2,2),mar=c(2,1,2,1))
+three.d.catch.by.year(tdata=bet,which.year=2014,which.gear='PS',gridx=1,gridy=1,which.species='bet',which.flag='EU.France',scaling.f=10,catchunit='kg')  
+three.d.catch.by.year(tdata=bet,which.year=2014,
+                        which.gear='PS',which.species='bet',gridx=1,gridy=1,which.flag='EU.España',scaling.f=10,catchunit='kg')
+three.d.catch.by.year(tdata=bet,which.year=2014,
+                        which.gear='PS',which.species='bet',gridx=1,gridy=1,which.flag='Venezuela',scaling.f=10,catchunit='kg')  
+three.d.catch.by.year(tdata=bet,which.year=2014,
+                        which.gear='PS',which.species='bet',gridx=1,gridy=1,which.flag='Panama',scaling.f=10,catchunit='kg')
+```
+
+**Figure .** *Abundance of bigeye tuna caught by purse seine by France, Spain, Venezuela, and Panama *
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 # EFFDIS effort estimation with *effdisR*: worked example (Japanese longline)
 
