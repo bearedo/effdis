@@ -4,9 +4,9 @@ function(tdata = task2.lf, which.gear = 'LL', which.year = 2005, gridx=5,gridy=5
   
     {
     
-    #tdata<-bet; which.gear <- 'PS'; which.flag<- 'Ghana'; which.year <- 2014; gridx <- 1; gridy <- 1;  which.species <- 'alb'; catchunit <- 'kg'
-    #which.flag<- 'Japan'
-  
+#        tdata<-skj; which.gear <- 'PS'; which.year <- 2014; gridx <- 5; gridy <- 5; which.species = "skj"; catchunit <- 'kg'
+#        which.flag<- 'EU.France'
+# # #   
     if(which.flag == 'All'){
       tdata1 <- tdata[tdata$geargrpcode == which.gear & tdata$month < 13 & tdata$year == which.year & tdata$species == which.species & tdata$catchunit == catchunit,]
     }
@@ -17,7 +17,7 @@ function(tdata = task2.lf, which.gear = 'LL', which.year = 2005, gridx=5,gridy=5
     
     dd <- dim(tdata1)
     ulocs <- length(unique(tdata1$longitude))
-    if (dd[1] < 1  | ulocs < 6)
+    if (dd[1] < 1  | ulocs < 2)
       {
       print('No Data')
     }
@@ -76,8 +76,11 @@ function(tdata = task2.lf, which.gear = 'LL', which.year = 2005, gridx=5,gridy=5
       #Look at value ranges:
       rr <- range(grd@data[an(names(table(idx))),1])
       
-      cutbreaksval  <- list(ALL = c(-1,0,10,25,50,100,150,200))
-      legval        <- list(ALL = c("0","1 <= 10","10 <= 25", "25 <= 50","50 <= 100","100 <= 200","200 <= 400"))
+       cutbreaksval  <- list(ALL = c(-1,0,10,25,50,100,500,1000))
+       legval        <- list(ALL = c("0","1 <= 10","10 <= 25", "25 <= 50","50 <= 100","100 <= 500","500 <= 1000"))
+       
+       
+      
       #- Potentially, divide your data by a certain constant and add this constant to the legend title
       valdiv        <- scaling.f # scaling the data
       unitval       <- paste('x',valdiv,catchunit)
@@ -94,18 +97,24 @@ function(tdata = task2.lf, which.gear = 'LL', which.year = 2005, gridx=5,gridy=5
         lonLat2SpatialPolygons(lst=lapply(as.list(1:nrow(coordGrd)),function(x){data.frame(SI_LONG=c(coordGrd[x,"s1"]-resx/2,rep(coordGrd[x,"s1"]+resx/2,2),coordGrd[x,"s1"]-resx/2),
                                                                                            SI_LATI=c(rep(coordGrd[x,"s2"]-resy/2,2),rep(coordGrd[x,"s2"]+resy/2,2)))}))
       
-      cols<- c("white",colintens)[cut(grd@data[as.numeric(names(table(idx))),1]/valdiv,breaks=cutbreaksval$ALL)]
+      
+      dat <- grd@data[as.numeric(names(table(idx))),1]
+      # cols<- c("white",colintens)[cut(grd@data[as.numeric(names(table(idx))),1]/valdiv,breaks=cutbreaksval$ALL)]
+      cols<- c("white",colintens)[cut(dat/valdiv,breaks=cutbreaksval$ALL)]
+      
       plot(grdPols,col=cols,add=T,border='transparent')
+      #plot(grdPols,col=cols,add=T)
+      
       #plot(atl.countries,add=T,col=colland)
       map("world",resolution=1,add=T,fill=TRUE,col=colland);map.axes();#box()
       #axis(1);axis(2,las=1); box()
       data("eez");plot(eez,add=T,bg="transparent")
       map("world",c("Ghana","Senegal","Ivory Coast","South Africa","Brazil","Venezuela","Spain","France","Portugal","USA"),
           add=T,col="darkgreen",fill=T)
-      
+      points(tdata1$longitude,tdata1$latitude,pch=".")
       
       #-Add a legend
-      legend(x='topright',fill=c('white',colintens),legend=legval$ALL,bg='white',title=unitval,box.lty=1)
+      #legend(x='bottomleft',fill=c('white',colintens),legend=legval$ALL,bg='white',title=unitval,box.lty=1)
       
       
       #- Add axis and title
@@ -114,14 +123,19 @@ function(tdata = task2.lf, which.gear = 'LL', which.year = 2005, gridx=5,gridy=5
       #mtext(yl$label,side=2,outer=T,line=-1.5,at=0.5,font=yl$font,cex=yl$cex)                                                                                       
       
       
-      grdPolsDF              <- as(grdPols,"SpatialPolygonsDataFrame")
-      grdPolsDF@data         <- data.frame(value=grd@data[as.numeric(names(table(idx))),1],color=cols)
-      proj4string(grdPolsDF) <- CRS("+proj=longlat +ellps=WGS84")
-      #dir.create("/home/doug/effdis/shp_files/")
-      #setwd("/home/doug/effdis/shp_files/")
-      #layer.name <- paste(which.flag,which.year,which.gear,which.species,catchunit,sep="_")
-      #writeOGR(grdPolsDF, dsn = '.', layer = layer.name, overwrite_layer=TRUE,driver = "ESRI Shapefile")
-      
-      
+#       grdPolsDF              <- as(grdPols,"SpatialPolygonsDataFrame")
+#       grdPolsDF@data         <- data.frame(value=grd@data[as.numeric(names(table(idx))),1],color=cols)
+#       proj4string(grdPolsDF) <- CRS("+proj=longlat +ellps=WGS84")
+#       #dir.create("/home/doug/effdis/shp_files/")
+#       #setwd("/home/doug/effdis/shp_files/")
+#       layer.name <- paste(which.flag,which.year,which.gear,which.species,catchunit,sep="_")
+#       grdPolsDFll <- spTransform(grdPolsDF,CRS("+proj=longlat +ellps=WGS84"))
+#       writeOGR(grdPolsDF, dsn = '.', layer = layer.name, overwrite_layer=TRUE,driver = "ESRI Shapefile")
+#       polygon <- readOGR(".",layer.name)
+#       polygonWGS <- spTransform(polygon, CRS("+proj=longlat +ellps=WGS84 +datum=WGS84"))  
+#       writeOGR(polygonWGS, dsn="polygonWGS.kml", layer="polygonWGS", driver="KML")
+#       writeOGR(grdPolsDFll, dsn = '.', layer = layer.name, overwrite_layer=TRUE,driver = "KML")
+#       
+#       
     }
   }
