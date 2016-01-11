@@ -15,7 +15,7 @@ function(which.dsn="effdis-tuna-cc1",which.gear='LL',which.region='AT',which.fla
   
 if(which.flag=='All') # If which.flag is 'All' extract all data
   {
-  query <- paste0("SELECT yearc AS year, trend, timeperiodid AS month, flagname, fleetcode,region, squaretypecode,
+  query <- paste0("SELECT yearc AS year, trend, timeperiodid AS month, flagname, fleetcode,region, squaretypecode,quadid,
 geargrpcode,longitude,latitude, catchunit, dsettype, eff1, eff1type,
 alb,bft,bet,skj,yft,swo,bum,sai,whm,totsp9
 FROM t2ce_new
@@ -24,7 +24,7 @@ WHERE region =","'",which.region,"'","AND timeperiodid < 13 AND geargrpcode=","'
   }
 
 else{
-query <- paste0("SELECT yearc AS year, trend, timeperiodid AS month, flagname, fleetcode,region,squaretypecode,
+query <- paste0("SELECT yearc AS year, trend, timeperiodid AS month, flagname, fleetcode,region,squaretypecode,quadid,
 geargrpcode,longitude,latitude, catchunit, dsettype, eff1, eff1type,
 alb,bft,bet,skj,yft,swo,bum,sai,whm,totsp9
 
