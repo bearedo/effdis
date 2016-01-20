@@ -2,7 +2,7 @@ fitGAMtoEffort <-
 function(input = lllf, which.flag='Japan',which.effort='NO.HOOKS',start.year=1950,end.year=2010,kk=6)
 {
   
-#input <- lllf; which.flag='EU.España'; which.effort='NO.HOOKS'; start.year=1990; end.year=2015
+#input <- pslf; which.flag='Japan'; which.effort='FISH.HOUR'; start.year=1980; end.year=2015
 
 input <- input[input$year >= start.year & input$year <= end.year & input$eff1type == which.effort,]
 
@@ -76,6 +76,10 @@ input2 <- dat1
 #  print('fitting MGCV to effort')
 bbs <- 'cr'
 h1 <- gam(eff1~te(longitude,latitude,k=kk,bs=bbs)+te(trend,k=kk,bs=bbs)+sin1+cos1+sin2+cos2+sin3+cos3+sin4+cos4+sin5+cos5+cos6,family=quasipoisson(link="log"),method="REML",data=input2)
+
+
+
+
 #print(summary(h1))
 #}
 
