@@ -24,7 +24,7 @@ function(input=bft.aa,cmod=bft,which.year=1995,which.month=1,grid.res=5,which.va
     input[,which.value][input$observation == F] <-NA
      }
      
-    image(lonnie,lattie,matrix(input[,which.value][input$year==which.year & input$month == which.month],lo,la),col=topo.colors(100))
+    image(lonnie,lattie,matrix(input[,which.value][input$year==which.year & input$month == which.month],lo,la),col=topo.colors(100),xlab="",ylab="")
     contour(lonnie,lattie,matrix(input[,which.value][input$year==which.year & input$month == which.month],lo,la),add=T)
     map('worldHires',add=T,fill=T);
     title(paste(toupper(which.species),'-', which.value ,month.abb[which.month],which.year,which.gear))
@@ -38,7 +38,7 @@ function(input=bft.aa,cmod=bft,which.year=1995,which.month=1,grid.res=5,which.va
       {
     input[,which.value][input$observation == F] <-NA
     }
-    image(lonnie,lattie,matrix(log(input[,which.value])[input$year==which.year & input$month == which.month],lo,la),col=topo.colors(100))
+    image(lonnie,lattie,matrix(log(input[,which.value])[input$year==which.year & input$month == which.month],lo,la),col=topo.colors(100),xlab="",ylab="")
     contour(lonnie,lattie,matrix(log(input[,which.value])[input$year==which.year & input$month == which.month],lo,la),add=T)
     map('worldHires',add=T,fill=T);
     title(paste(toupper(which.species),'-', which.value ,month.abb[which.month],which.year,which.gear))
