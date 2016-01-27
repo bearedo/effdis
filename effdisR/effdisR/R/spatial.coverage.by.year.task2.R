@@ -20,8 +20,8 @@ function(tdata=t2ce,start.year=1950, end.year=2010, which.region = 'AT', which.g
       map('world',col='green',fill=T,add=T)
       title(i,cex.main=cl)
       # map.scale(-18,-49,relwidth = 0.15, metric = TRUE, ratio = TRUE)
-      map("world",c("Ghana","Senegal","Côte D'Ivoire","South Africa","Brazil","Venezuela","Spain","France","Portugal","USA"),
-          add=T,col="darkgreen",fill=T)
+      #map("world",c("Ghana","Senegal","Côte D'Ivoire","South Africa","Brazil","Venezuela","Spain","France","Portugal","USA"),
+       #   add=T,col="darkgreen",fill=T)
       
       
       }
@@ -33,8 +33,8 @@ function(tdata=t2ce,start.year=1950, end.year=2010, which.region = 'AT', which.g
       map('world',add=T,col='green',fill=T)
       title(i,cex.main=cl)
       # map.scale(-18,-49,relwidth = 0.15, metric = TRUE, ratio = TRUE)
-      map("world",c("Ghana","Senegal","Côte D'Ivoire","South Africa","Brazil","Venezuela","Spain","France","Portugal","USA"),
-          add=T,col="darkgreen",fill=T)
+     # map("world",c("Ghana","Senegal","Côte D'Ivoire","South Africa","Brazil","Venezuela","Spain","France","Portugal","USA"),
+      #    add=T,col="darkgreen",fill=T)
       
     }
     mtext(side=3,outer=T,paste(which.flag,which.gear, sep=' - '))  
