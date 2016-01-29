@@ -1,0 +1,279 @@
+---
+title: Task 2 bait-boat catch and effort data atlas for the AOTTP (bigeye, skipjack
+  and yellowfin)
+author: "Doug Beare"
+date: "11 December 2015"
+output: word_document
+header-includes: \usepackage{tabularx}
+force_captions: yes
+subtitle: null
+Grmd::docx_document:
+  fig_caption: yes
+---
+```{r global_options, include=FALSE}
+knitr::opts_chunk$set(fig.width=9, fig.height=10, fig.path='Figs/',
+                      echo=FALSE, warning=FALSE, message=FALSE)
+```
+
+
+```{r attach libraries and connect to DB, include =F, echo=F,eval=T, message=FALSE,error=FALSE,warning=FALSE}
+library(spatial)
+library(sp)
+library(doBy)
+library(rgdal)
+library(RODBC)
+library(RColorBrewer)
+library(ggplot2)
+library(vmstools)
+library(mgcv)
+library(maps)
+library(mapdata)
+library(reshape2)
+library(rgeos)
+library(lattice)
+library(pander)
+library(kfigr)
+library(effdisR)
+chan <- odbcConnect("effdis-tuna-cc1", case="postgresql", believeNRows=FALSE)
+```
+
+
+
+```{r get bb data by flag,include=TRUE,echo=F,eval=T}
+effort_type_by_flag_bb <- sqlQuery(chan, "SELECT flagname AS Flag, 
+eff1type AS Effort_type, count(eff1type) as No_records
+                 FROM t2ce_new
+                 WHERE region ='AT' AND geargrpcode = 'BB' AND yearc = 2014
+                 GROUP BY flagname, eff1type
+                 ORDER BY flagname, eff1type, No_records;")
+```
+
+
+```{r get bait-boat data,include=TRUE,echo=F,eval=T}
+bb <- sqlQuery(chan,"SELECT yearc AS year, trend, timeperiodid AS month, 
+flagname, region, geargrpcode,lon,lat,longitude,latitude,quadid AS quad, squaretypecode AS square, catchunit, dsettype, eff1, eff1type
+FROM t2ce_new
+WHERE region ='AT' AND yearc > 2009 AND timeperiodid < 13 
+AND geargrpcode = 'BB';")
+df <- data.frame(quad=bb$quad,lat=bb$lat,lon=bb$lon,square=bb$square)
+df$square <- as.character(df$square)
+ldf <- length(df$square)
+df1<- data.frame(quad=rep(NA,ldf),lat=rep(NA,ldf),lon=rep(NA,ldf),square=rep(NA,ldf))
+for(i in 1:length(df[,1]))
+{df1[i,] <- latLon(x=df[i,])}
+bb$longitude<- df1$lon
+bb$latitude <- df1$lat
+
+```
+
+
+```{r extract kg bigeye caught by selected flags from task 2,include=TRUE,echo=F,message = FALSE, error=FALSE, warnings=FALSE,eval=T}
+bet <- sqlQuery(chan,"SELECT yearc AS year, trend,quadid as quad, squaretypecode AS square,
+timeperiodid AS month, flagname, region, geargrpcode,lon,lat,longitude,latitude, 
+catchunit, dsettype, eff1, eff1type, bet as measured_catch
+FROM t2ce_new
+WHERE region ='AT' AND timeperiodid < 13 AND yearc > 2009 AND 
+geargrpcode IN ('LL','PS','BB') AND catchunit != '--' ;")
+bet$species <- 'bet'
+df <- data.frame(quad=bet$quad,lat=bet$lat,lon=bet$lon,square=bet$square)
+df$square <- as.character(df$square)
+ldf <- length(df$square)
+df1<- data.frame(quad=rep(NA,ldf),lat=rep(NA,ldf),lon=rep(NA,ldf),square=rep(NA,ldf))
+for(i in 1:ldf){df1[i,] <- latLon(x=df[i,])}
+bet$longitude<- df1$lon
+bet$latitude <- df1$lat
+
+```
+
+
+
+```{r extract kg skipjack caught by selected flags from task 2,include=TRUE,echo=F,message = FALSE, error=FALSE, warnings=FALSE,eval=T}
+skj<- sqlQuery(chan,"SELECT yearc AS year, trend,quadid as quad, squaretypecode AS square,
+timeperiodid AS month, flagname, region, geargrpcode,lon,lat,longitude,latitude, 
+catchunit, dsettype, eff1, eff1type, skj as measured_catch
+FROM t2ce_new
+WHERE region ='AT' AND timeperiodid < 13 AND yearc > 2009 AND 
+geargrpcode IN ('LL','PS','BB') AND catchunit != '--' ;")
+skj$species <- 'skj'
+
+df <- data.frame(quad=skj$quad,lat=skj$lat,lon=skj$lon,square=skj$square)
+df$square <- as.character(df$square)
+ldf <- length(df$square)
+df1<- data.frame(quad=rep(NA,ldf),lat=rep(NA,ldf),lon=rep(NA,ldf),square=rep(NA,ldf))
+for(i in 1:ldf){df1[i,] <- latLon(x=df[i,])}
+skj$longitude<- df1$lon
+skj$latitude <- df1$lat
+
+```
+
+
+```{r extract kg yellowfin caught by selected flags from task 2,include=TRUE,echo=F,message = FALSE, error=FALSE, warnings=FALSE,eval=T}
+yft<- sqlQuery(chan,"SELECT yearc AS year, trend,quadid as quad, squaretypecode AS square,
+timeperiodid AS month, flagname, region, geargrpcode,lon,lat,longitude,latitude, 
+catchunit, dsettype, eff1, eff1type, yft as measured_catch
+FROM t2ce_new
+WHERE region ='AT' AND timeperiodid < 13 AND yearc > 2009 AND 
+geargrpcode IN ('LL','PS','BB') AND catchunit != '--' ;")
+yft$species <- 'yft'
+df <- data.frame(quad=yft$quad,lat=yft$lat,lon=yft$lon,square=yft$square)
+df$square <- as.character(df$square)
+ldf <- length(df$square)
+df1<- data.frame(quad=rep(NA,ldf),lat=rep(NA,ldf),lon=rep(NA,ldf),square=rep(NA,ldf))
+for(i in 1:ldf){df1[i,] <- latLon(x=df[i,])}
+yft$longitude<- df1$lon
+yft$latitude <- df1$lat
+
+```
+
+
+#Task 2 bait-boat data for The Atlantic
+
+
+*Table 1. Effort type sampling by flag for purse-seiners in EFFDIS Task II database in 2014*
+```{r make table for bb data by flag,include=TRUE,echo=FALSE}
+pander(effort_type_by_flag_bb)
+```
+
+##Distribution of Task 2 bait-boat data
+
+
+```{r plot distribution of spanish bait-boat data,include=TRUE,echo=F}
+par(mfrow=c(2,2),mar=c(1,1,2,1),oma=c(3,3,3,3))
+spatial.coverage.by.year.task2(tdata=bb,start.year=2011,end.year=2014,
+                                 which.gear='BB',which.flag='EU.España')
+```
+
+**Figure 1.** *Distribution of data: Spanish registered bait-boats between 2011 and 2014*
+
+
+```{r plot distribution of Brazil bait-boat data,include=TRUE,echo=F}
+par(mfrow=c(2,2),mar=c(1,1,2,1),oma=c(3,3,3,3))
+spatial.coverage.by.year.task2(tdata=bb
+                               ,start.year=2011,end.year=2014,
+                                 which.gear='BB',which.flag='Brazil')
+```
+**Figure 2.** *Distribution of data: Brazilian bait-boats between 2011 and 2014*
+
+
+```{r plot distribution of french baitboat data,include=TRUE,echo=F}
+par(mfrow=c(2,2),mar=c(1,1,2,1),oma=c(3,3,3,3))
+spatial.coverage.by.year.task2(tdata=bb,start.year=2011,end.year=2014,
+                                 which.gear='BB',which.flag="EU.France")
+```
+
+**Figure 3.** *Distribution of data: French bait-boats between 2011 and 2014*
+
+```{r plot distribution of portuguese baitboat data,include=TRUE,echo=F}
+par(mfrow=c(2,2),mar=c(1,1,2,1),oma=c(3,3,3,3))
+spatial.coverage.by.year.task2(tdata=bb,start.year=2011,end.year=2014,
+                                 which.gear='BB',which.flag="EU.Portugal")
+```
+
+**Figure 4.** *Distribution of data: Portuguese bait-boats between 2011 and 2014*
+
+
+```{r plot distribution of senegalese bait-boat data,include=TRUE,echo=F}
+par(mfrow=c(2,2),mar=c(1,1,2,1),oma=c(3,3,3,3))
+spatial.coverage.by.year.task2(tdata=bb,start.year=2011,end.year=2014,
+                                 which.gear='BB',which.flag="Senegal")
+
+```
+
+**Figure 5.** *Distribution of data: Senegalese bait-boats between 2011 and 2014*
+
+
+```{r plot distribution of south african bait-boat data,include=TRUE,echo=F}
+par(mfrow=c(2,2),mar=c(2,2,2,2),oma=c(3,3,3,3))
+spatial.coverage.by.year.task2(tdata=bb,start.year=2011,end.year=2014,
+                                 which.gear='BB',which.flag="South Africa")
+```
+
+**Figure 6.** *Distribution of data: South African bait-boats between 2011 and 2014*
+
+
+```{r plot distribution of ghanaian bait-boats data,include=TRUE,echo=F}
+par(mfrow=c(2,2),mar=c(2,2,2,2),oma=c(3,3,3,3))
+spatial.coverage.by.year.task2(tdata=bb,start.year=2011,end.year=2014,
+                                 which.gear='BB',which.flag="Ghana")
+```
+
+**Figure 7.** *Distribution of data: Ghanaian bait-boats between 2011 and 2014*
+
+
+```{r plot distribution of Venezuelan bait-boat data,include=TRUE,echo=F}
+par(mfrow=c(2,2),mar=c(2,2,2,2),oma=c(3,3,3,3))
+spatial.coverage.by.year.task2(tdata=bb,start.year=2011,end.year=2014,
+                                 which.gear='BB',which.flag="Venezuela")
+```
+
+**Figure 8.** *Distribution of data: Venezuelan bait-boats between 2011 and 2014*
+
+
+##Bigeye caught by bait-boat (2014).
+
+
+```{r weight of bigeye caught by location in 2014 from task 2,include=TRUE,echo=F,message = FALSE, error=FALSE, warnings=FALSE}
+par(mfrow=c(2,3),mar=c(2,2,2,2))
+three.d.catch.by.year(tdata=bet,which.year=2014,which.gear='BB',gridx=1,gridy=1,which.species='bet',which.flag='EU.France',scaling.f=10,catchunit='kg')  
+three.d.catch.by.year(tdata=bet,which.year=2014,
+                        which.gear='BB',which.species='bet',gridx=1,gridy=1,which.flag='EU.España',scaling.f=10,catchunit='kg')
+three.d.catch.by.year(tdata=bet,which.year=2014,
+                        which.gear='BB',which.species='bet',gridx=1,gridy=1,which.flag='Venezuela',scaling.f=10,catchunit='kg')  
+three.d.catch.by.year(tdata=bet,which.year=2014,which.gear='BB',which.species='bet',gridx=1,gridy=1,which.flag='South Africa',scaling.f=10,catchunit='kg')
+
+three.d.catch.by.year(tdata=bet,which.year=2014,which.gear='BB',which.species='bet',gridx=1,gridy=1,which.flag='Senegal',scaling.f=10,catchunit='kg')
+
+```
+
+**Figure 9.** *Bigeye caught by selected nations by bait-boat in 2014*
+
+
+##Skipjack caught by bait-boat in 2014.
+
+
+
+```{r skipjack caught by location in 2014 from task 2,include=TRUE,echo=F,message = FALSE, error=FALSE, warnings=FALSE}
+par(mfrow=c(2,3),mar=c(2,2,2,2))
+three.d.catch.by.year(tdata=skj,which.year=2014,which.gear='BB',gridx=1,gridy=1,which.species='skj',which.flag='EU.France',scaling.f=100,catchunit='kg')  
+three.d.catch.by.year(tdata=skj,which.year=2014,
+                        which.gear='BB',which.species='skj',gridx=1,gridy=1,which.flag='EU.España',scaling.f=100,catchunit='kg')
+three.d.catch.by.year(tdata=skj,which.year=2014,
+                        which.gear='BB',which.species='skj',gridx=1,gridy=1,which.flag='Senegal',scaling.f=100,catchunit='kg')  
+three.d.catch.by.year(tdata=skj,which.year=2014,which.gear='BB',which.species='skj',gridx=1,gridy=1,which.flag='South Africa',scaling.f=10,catchunit='kg')
+
+three.d.catch.by.year(tdata=skj,which.year=2014,which.gear='BB',which.species='skj',gridx=1,gridy=1,which.flag='Venezuela',scaling.f=10,catchunit='kg')
+
+three.d.catch.by.year(tdata=skj,which.year=2014,which.gear='BB',which.species='skj',gridx=1,gridy=1,which.flag='Brazil',scaling.f=10,catchunit='kg')
+
+```
+
+**Figure 10.** *Skipjack caught by bait-boat by 6 nations in 2014*
+
+
+##Yellowfin caught by bait-boat in 2014.
+
+```{r yellowfin caught by baitboat by location in 2014 from task 2,include=TRUE,echo=F,message = FALSE, error=FALSE, warnings=FALSE}
+par(mfrow=c(2,3),mar=c(2,2,2,2))
+three.d.catch.by.year(tdata=yft,which.year=2014,which.gear='BB',gridx=1,gridy=1,which.species='yft',which.flag='EU.France',scaling.f=100,catchunit='kg')  
+three.d.catch.by.year(tdata=yft,which.year=2014,
+                        which.gear='BB',which.species='yft',gridx=1,gridy=1,which.flag='EU.España',scaling.f=100,catchunit='kg')
+three.d.catch.by.year(tdata=yft,which.year=2014,
+                        which.gear='BB',which.species='yft',gridx=1,gridy=1,which.flag='Senegal',scaling.f=100,catchunit='kg')  
+three.d.catch.by.year(tdata=yft,which.year=2014,which.gear='BB',which.species='yft',gridx=1,gridy=1,which.flag='South Africa',scaling.f=100,catchunit='kg')
+
+three.d.catch.by.year(tdata=yft,which.year=2014,which.gear='BB',which.species='yft',gridx=1,gridy=1,which.flag='Venezuela',scaling.f=100,catchunit='kg')
+
+three.d.catch.by.year(tdata=yft,which.year=2014,which.gear='BB',which.species='yft',gridx=1,gridy=1,which.flag='Brazil',scaling.f=100,catchunit='kg')
+
+
+```
+
+**Figure 11.** *Yellowfin tuna caught by bait-boat by 6 nations*
+
+
+
+
+
+
+
+
