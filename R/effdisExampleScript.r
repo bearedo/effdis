@@ -246,6 +246,22 @@ for(i in 1:9)
 }
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ##########################################
 ######## Longliners  #####################
 ##########################################
@@ -938,7 +954,7 @@ for(i in c(1,2,3,4:5,7:9))
   #system('cat *csv > effdis-estimates.csv')
 #effdis_estimates <- read.table('effdis-estimates.csv',sep=',')
 
-setwd("c:/Users/DBeare/effdis/effdis/data/effdis-estimates")
+setwd("/home/dbeare/effdis/effdis/data/effdis-estimates")
 lf <- list.files()
 
 effdis_estimates <- as.list(length(lf))
@@ -1005,13 +1021,24 @@ n1 <-table(effdis_estimates$flagname,as.character(effdis_estimates$species))
 n1 <- ifelse(n1==0,F,T)
 
 # Get Task 1 data
-
+# For Long-line
 ll.t1 <- get.effdis.t1.data(which.dsn='effdis-tuna-cc1',which.gear = 'LL',which.region='AT',which.flag='All')
 str(ll.t1)
 for(i in c(2,5:15)){ll.t1[,i] <- as.character(ll.t1[,i])}
 
+#For bait boat
+# bb.t1 <- get.effdis.t1.data(which.dsn='effdis-tuna-cc1',which.gear = 'BB',which.region='AT',which.flag='All')
+# str(bb.t1)
+# for(i in c(2,5:15)){bb.t1[,i] <- as.character(bb.t1[,i])}
+# 
+# bb.t1.rsa <- bb.t1[bb.t1$flag == 'South Africa',]
+# 
+# tapply(bb.t1.rsa$qty_t,list(bb.t1.rsa$year,bb.t1.rsa$species),sum,na.rm=T)
+# 
 
-# Datatype is either C (catch), L (Landings), DD (Discards), DM (?) and Landings
+
+
+1350# Datatype is either C (catch), L (Landings), DD (Discards), DM (?) and Landings
 
 # If catch is available use that otherwise sum landings and discards.
 
