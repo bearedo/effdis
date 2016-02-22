@@ -7,7 +7,7 @@ function (input = pslf,which.species ='bft',start.year=1950, end.year=2015,which
    # g1 models the positive component of the catch as a function of location and time.
   
   
-   #input <- lllf;which.species <- 'alb';which.flag <- "EU.España";start.year <- 1960; end.year   <- 2010
+   #input <- pslf;which.species <- 'alb';which.flag <- "EU.España";start.year <- 1960; end.year   <- 2010
    
   ninput <- input[input$species == which.species & input$year >= start.year & input$year <= end.year,]
   

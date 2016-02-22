@@ -3,7 +3,7 @@ title: Task 2 bait-boat catch and effort data atlas for the AOTTP (bigeye, skipj
   and yellowfin)
 author: "Doug Beare"
 date: "11 December 2015"
-output: word_document
+output: pdf_document
 header-includes: \usepackage{tabularx}
 force_captions: yes
 subtitle: null

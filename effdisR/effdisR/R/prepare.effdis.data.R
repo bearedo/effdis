@@ -13,6 +13,7 @@ function(input=data)
   input$flagname  <- as.character(input$flagname)
   input$fleetcode  <- as.character(input$fleetcode)
   input$geargrpcode  <- as.character(input$geargrpcode)
+  input$squaretypecode <- as.character(input$squaretypecode)
   input$region  <- as.character(input$region)
   input$eff1type  <- as.character(input$eff1type)
   
