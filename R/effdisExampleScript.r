@@ -61,6 +61,7 @@ data("seas")
 ps1<-find.ocean(ps1)
 ps1 <- ps1[ps1$which.ocean == 'atl',]
 ps1<-prepare.effdis.data(input=ps1)
+
 ps1<-ps1[ps1$squaretypecode == '1x1',]
 
 library(reshape2)
@@ -100,19 +101,19 @@ uf <- sort(as.character(unique(pslf$flagname)))
 #  
  
  
-  #setwd('/home/doug/effdis/data')
+setwd('/home/dbeare/effdis/effdis/data/effdis-estimates')
 setwd("c:/Users/DBeare/effdis/effdis/data/effdis-estimates")
 
 #Flags to add to "others"- 
 
-oth <-c("Argentina", "Angola", "Barbados", "Cape Verde","China (ICCAT program)", "Côte D'Ivoire","EU.France",
-        "Chinese Taipei (foreign obs.)", "Cuba (ICCAT program)" ,"Dominica","EU.United.Kingdom","Faroe Islands",
-        "FR.St Pierre et Miquelon","Grenada","Guinea Ecuatorial","Honduras","Iceland","Japan (foreign obs.)",
-        "Maroc","Mexico","Panama","Philippines","Sierra Leone","Trinidad and Tobago","UK.Sta Helena","UK.Turks and Caicos","Uruguay","U.S.S.R.")
-
-idx <- (1:length(lllf[,1]))[lllf$flagname %in% oth]
-
-lllf$flagname[idx] <- "Other"
+# oth <-c("Argentina", "Angola", "Barbados", "Cape Verde","China (ICCAT program)", "Côte D'Ivoire","EU.France",
+#         "Chinese Taipei (foreign obs.)", "Cuba (ICCAT program)" ,"Dominica","EU.United.Kingdom","Faroe Islands",
+#         "FR.St Pierre et Miquelon","Grenada","Guinea Ecuatorial","Honduras","Iceland","Japan (foreign obs.)",
+#         "Maroc","Mexico","Panama","Philippines","Sierra Leone","Trinidad and Tobago","UK.Sta Helena","UK.Turks and Caicos","Uruguay","U.S.S.R.")
+# 
+# idx <- (1:length(pslf[,1]))[pslf$flagname %in% oth]
+# 
+# pslf$flagname[idx] <- "Other"
 
 
 #Japan
