@@ -239,7 +239,7 @@ for(i in 1:9)
   {print('no model')
   }
   else{
-    aa <- predict.effdis.t2.data(cmod=mod.esp[[i]],which.gear="PS", effmod=emod.esp,grid.res=1,start.year=1980,end.year=2015,which.flag="EU.España")
+    aa <- predict.effdis.t2.data(cmod=mod.esp[[i]],which.gear="PS", effmod=emod.esp,grid.res=1,start.year=1980,end.year=2015,which.flag="EU.France")
     rm(aa)
     gc(reset=T)
   }
