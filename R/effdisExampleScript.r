@@ -10,7 +10,6 @@ library(RODBC)
 library(RColorBrewer)
 library(ggplot2)
 library(vmstools)
-library(gam)
 library(maps)
 library(mapdata)
 #library(COZIGAM)
@@ -21,6 +20,7 @@ library(mgcv)
 library(effdisR)
 library(lattice)
 
+setwd('/home/dbeare/effdis/effdis/data/effdis-estimates/PS')
 
 
 #########################
@@ -82,38 +82,27 @@ pslf$eff1type <- 'FISH.HOUR'
 
 w0 <- (1:length(pslf$year))[pslf$catchunit == 'kg']
 
-round(tapply(pslf$measured_catch[w0],list(pslf$flagname[w0],pslf$species[w0]),sum,na.rm=T))/1000
+round(tapply(pslf$measured_catch[w0],list(pslf$flagname[w0],pslf$species[w0]),sum,na.rm=T)/1000)
 
 pslf <- pslf[pslf$catchunit == "kg",]
 pslf$species <- as.character(pslf$species)
 
 dim(pslf) #=  768672 (2015)
 
+pslf$flagname <- as.character(pslf$flagname)
+
+
+
 us <- sort(as.character(unique(pslf$species)))
 uf <- sort(as.character(unique(pslf$flagname)))
 
  uf
 
-#  [1] "Belize"                "Brazil"                "Canada"                "Cape Verde"            "Congo"                 "Côte D'Ivoire"        
-#  [7] "Curaçao"               "EU.España"             "EU.France"             "EU.Portugal"           "Ghana"                 "Ghana (ICCAT program)"
-#  [13] "Guatemala"             "Guinée Rep."           "Japan"                 "Mixed flags (FIS)"     "NEI (ETRO)"            "Panama"               
-#  [19] "Russian Federation"    "U.S.A."                "Venezuela"            
-#  
- 
- 
-setwd('/home/dbeare/effdis/effdis/data/effdis-estimates')
-setwd("c:/Users/DBeare/effdis/effdis/data/effdis-estimates")
+# [1] "Cape Verde"  "Curaçao"     "EU.España"   "EU.France"   "Ghana"       "Guatemala"   "Guinée Rep." "Japan"       "Panama"      "U.S.A."      "Venezuela"  
+
+ #  dim(pslf) #=  768672 (2015)
 
 #Flags to add to "others"- 
-
-# oth <-c("Argentina", "Angola", "Barbados", "Cape Verde","China (ICCAT program)", "Côte D'Ivoire","EU.France",
-#         "Chinese Taipei (foreign obs.)", "Cuba (ICCAT program)" ,"Dominica","EU.United.Kingdom","Faroe Islands",
-#         "FR.St Pierre et Miquelon","Grenada","Guinea Ecuatorial","Honduras","Iceland","Japan (foreign obs.)",
-#         "Maroc","Mexico","Panama","Philippines","Sierra Leone","Trinidad and Tobago","UK.Sta Helena","UK.Turks and Caicos","Uruguay","U.S.S.R.")
-# 
-# idx <- (1:length(pslf[,1]))[pslf$flagname %in% oth]
-# 
-# pslf$flagname[idx] <- "Other"
 
 
 #Japan
@@ -187,7 +176,8 @@ for(i in 1:9)
 for(i in 1:9)
 {
   if(mod.cur[[i]]=='Insufficient data to support model')
-  {print('no model')
+  {print('no model')h1 <- gam(eff1~te(longitude,latitude)+te(trend)+sin1+cos1+sin2+cos2+sin3+cos3+sin4+cos4+sin5+cos5+cos6,family=quasipoisson(link="log"),method="REML",data=input2)
+
   }
   else{
     aa <- predict.effdis.t2.data(cmod=mod.cur[[i]],which.gear="PS", effmod=emod.cur,grid.res=1,start.year=1980,end.year=2015,which.flag="Curaçao")
@@ -239,11 +229,474 @@ for(i in 1:9)
   {print('no model')
   }
   else{
-    aa <- predict.effdis.t2.data(cmod=mod.esp[[i]],which.gear="PS", effmod=emod.esp,grid.res=1,start.year=1980,end.year=2015,which.flag="EU.France")
+    aa <- predict.effdis.t2.data(cmod=mod.fra[[i]],which.gear="PS", effmod=emod.fra,grid.res=1,start.year=1980,end.year=2015,which.flag="EU.France")
     rm(aa)
     gc(reset=T)
   }
 }
+
+
+#Ghana
+
+emod.gha <- fitGAMtoEffort(input=pslf,which.flag="Ghana",which.effort='FISH.HOUR',start.year=1980,end.year=2015,kk=9)
+
+mod.gha <- as.list(1:9)
+for(i in 1:9)
+{
+  sp <- us[i]
+  mod.gha[[i]] <- fit2stageGAMtoCatch(input=pslf,which.flag="Ghana",which.species=sp,start.year=1980,end.year=2015,kk=9)
+  print(sp)
+}
+
+for(i in 1:9)
+{
+  if(mod.gha[[i]]=='Insufficient data to support model')
+  {print('no model')
+  }
+  else{
+    aa <- predict.effdis.t2.data(cmod=mod.gha[[i]],which.gear="PS", effmod=emod.gha,grid.res=1,start.year=1980,end.year=2015,which.flag="Ghana")
+    rm(aa)
+    gc(reset=T)
+  }
+}
+
+
+
+#Guatemala
+
+emod.gua <- fitGAMtoEffort(input=pslf,which.flag="Guatemala",which.effort='FISH.HOUR',start.year=1980,end.year=2015,kk=9)
+
+mod.gua <- as.list(1:9)
+for(i in 1:9)
+{
+  sp <- us[i]
+  mod.gua[[i]] <- fit2stageGAMtoCatch(input=pslf,which.flag="Guatemala",which.species=sp,start.year=1980,end.year=2015,kk=9)
+  print(sp)
+}
+
+for(i in 1:9)
+{
+  if(mod.gua[[i]]=='Insufficient data to support model')
+  {print('no model')
+  }
+  else{
+    aa <- predict.effdis.t2.data(cmod=mod.gua[[i]],which.gear="PS", effmod=emod.gua,grid.res=1,start.year=1980,end.year=2015,which.flag="Guatemala")
+    rm(aa)
+    gc(reset=T)
+  }
+}
+
+##Guinee Rep.
+
+emod.gui <- fitGAMtoEffort(input=pslf,which.flag="Guinée Rep.",which.effort='FISH.HOUR',start.year=1980,end.year=2015,kk=9)
+
+mod.gui <- as.list(1:9)
+for(i in 1:9)
+{
+  sp <- us[i]
+  mod.gui[[i]] <- fit2stageGAMtoCatch(input=pslf,which.flag="Guinée Rep.",which.species=sp,start.year=1980,end.year=2015,kk=9)
+  print(sp)
+}
+
+for(i in 1:9)
+{
+  if(mod.gui[[i]]=='Insufficient data to support model')
+  {print('no model')
+  }
+  else{
+    aa <- predict.effdis.t2.data(cmod=mod.gui[[i]],which.gear="PS", effmod=emod.gui,grid.res=1,start.year=1980,end.year=2015,which.flag="Guinée Rep.")
+    rm(aa)
+    gc(reset=T)
+  }
+}
+
+##Panama
+
+emod.pan <- fitGAMtoEffort(input=pslf,which.flag="Panama",which.effort='FISH.HOUR',start.year=1980,end.year=2015,kk=9)
+
+mod.pan <- as.list(1:9)
+for(i in 1:9)
+{
+  sp <- us[i]
+  mod.pan[[i]] <- fit2stageGAMtoCatch(input=pslf,which.flag="Panama",which.species=sp,start.year=1980,end.year=2015,kk=9)
+  print(sp)
+}
+
+for(i in 1:9)
+{
+  if(mod.pan[[i]]=='Insufficient data to support model')
+  {print('no model')
+  }
+  else{
+    aa <- predict.effdis.t2.data(cmod=mod.pan[[i]],which.gear="PS", effmod=emod.pan,grid.res=1,start.year=1980,end.year=2015,which.flag="Panama")
+    rm(aa)
+    gc(reset=T)
+  }
+}
+
+
+##U.S.A.
+
+emod.usa <- fitGAMtoEffort(input=pslf,which.flag="U.S.A.",which.effort='FISH.HOUR',start.year=1980,end.year=2015,kk=9)
+
+mod.usa <- as.list(1:9)
+for(i in 1:9)
+{
+  sp <- us[i]
+  mod.usa[[i]] <- fit2stageGAMtoCatch(input=pslf,which.flag="U.S.A.",which.species=sp,start.year=1980,end.year=2015,kk=9)
+  print(sp)
+}
+
+for(i in 1:9)
+{
+  if(mod.usa[[i]]=='Insufficient data to support model')
+  {print('no model')
+  }
+  else{
+    aa <- predict.effdis.t2.data(cmod=mod.usa[[i]],which.gear="PS", effmod=emod.usa,grid.res=1,start.year=1980,end.year=2015,which.flag="U.S.A.")
+    rm(aa)
+    gc(reset=T)
+  }
+}
+
+
+##Venezuela
+
+emod.ven <- fitGAMtoEffort(input=pslf,which.flag="Venezuela",which.effort='FISH.HOUR',start.year=1980,end.year=2015,kk=9)
+
+mod.ven <- as.list(1:9)
+for(i in 1:9)
+{
+  sp <- us[i]
+  mod.ven[[i]] <- fit2stageGAMtoCatch(input=pslf,which.flag="Venezuela",which.species=sp,start.year=1980,end.year=2015,kk=9)
+  print(sp)
+}
+
+for(i in 1:9)
+{
+  if(mod.ven[[i]]=='Insufficient data to support model')
+  {print('no model')
+  }
+  else{
+    aa <- predict.effdis.t2.data(cmod=mod.ven[[i]],which.gear="PS", effmod=emod.ven,grid.res=1,start.year=1980,end.year=2015,which.flag="Venezuela")
+    rm(aa)
+    gc(reset=T)
+  }
+}
+
+
+################# Raise the data to Task I ####################################################
+
+#setwd('/home/doug/effdis/effdis-estimates')
+# system('rm effdis-estimates.csv')
+#system('cat *csv > effdis-estimates.csv')
+#effdis_estimates <- read.table('effdis-estimates.csv',sep=',')
+
+setwd("/home/dbeare/effdis/effdis/data/effdis-estimates/PS")
+lf <- list.files()
+
+effdis_estimates <- as.list(length(lf))
+for( i in 1: length(lf)){
+  effdis_estimates[[i]] <- read.table(lf[i],sep=",")
+  print(lf[i])
+}
+
+effdis_estimates<-do.call("rbind",effdis_estimates)
+dim(effdis_estimates) # = 336149
+
+dimnames(effdis_estimates)[[2]] <- c("longitude","latitude","which.ocean","year","month","trend","flagname","geargrp","prob","prob.se.fit","measured_catch","measured_catch.se.fit",
+                                     "eff","eff.se.fit","species","catch","cpue","observation")          
+
+effdis_estimates <- orderBy(~trend+flagname+species,data=effdis_estimates)
+
+#nidx <- (1:length(effdis_estimates$year))[effdis_estimates$species == "skj" & effdis_estimates$catch > 7000000]
+
+# Exclude these as they are way too big
+
+#effdis_estimates <- effdis_estimates[-nidx,]
+
+
+ufe <- sort(unique(as.character(effdis_estimates$flagname)))
+
+#Check against the raw data
+
+wf <- ufe[3]
+print(wf)
+mod1 <- effdis_estimates[effdis_estimates$flagname == wf & effdis_estimates$species == "bet",]
+par(mfrow=c(2,1),mar=c(2,2,2,2))
+#Effort
+effort <- aggt2data(input=pslf,which.effort="FISH.HOUR",which.flag=wf,start.year=1980, end.year=2015)
+plot(effort$trend,effort$eff1,pch=".",xlab="",ylab="")
+title(wf)
+points(mod1$trend,mod1$eff,col="red",pch="*")
+
+te <- tapply(effort$eff1,effort$year,sum)
+tm <- tapply(mod1$eff,mod1$year,sum)
+tem <-cbind(te,tm)
+
+plot(te/1000000)
+lines(tm/1000000)
+
+
+catch <- aggt2catchdata(input=pslf,which.effort="FISH.HOUR",which.flag=wf,start.year=1980, end.year=2015)
+spp <- "bet"
+par(mfrow=c(1,1))
+plot(catch$trend[catch$species == spp],catch$raw_measured_catch[catch$species == spp],pch=".",
+     xlab="",ylab="")
+
+
+mod2 <- effdis_estimates[effdis_estimates$flagname == wf ,]
+points(mod2$trend[mod2$species == spp],mod2$catch[mod2$species == spp],col="red",pch=".")
+
+plot(mod2$trend[mod2$species == spp],mod2$catch[mod2$species == spp],col="green",pch="*")
+
+xyplot(eff/1000000~trend|flagname,data=effdis_estimates[effdis_estimates$species == "bet",],pch=".")
+
+
+#Which species do we not have by flag ?
+
+n1 <-table(effdis_estimates$flagname,as.character(effdis_estimates$species))
+n1 <- ifelse(n1==0,F,T)
+
+# Get Task 1 data
+# For Long-line
+ps.t1 <- get.effdis.t1.data(which.dsn='effdis-tuna-cc1',which.gear = 'PS',which.region='AT',which.flag='All')
+str(ps.t1)
+for(i in c(2,5:15)){ps.t1[,i] <- as.character(ps.t1[,i])}
+
+# Datatype is either C (catch), L (Landings), DD (Discards), DM (?) and Landings
+
+# If catch is available use that otherwise sum landings and discards.
+
+ps.t1.c <- ps.t1[ps.t1$datatype == "C",]
+
+ps.t1.ld <- ps.t1[ps.t1$datatype %in% c("DD","DM","L"),]
+ps.t1.ld <- aggregate(qty_t~rownames+species+yearc+decade+status+flag+fleet+
+                        stock+region+area+geargrp2+spcgeargrp+geargrp+gearcode,data=ps.t1.ld,sum,na.rm=T)
+ps.t1<-rbind(ps.t1.c[,-15],ps.t1.ld)
+
+ps.t1 <- orderBy(~yearc,data=ps.t1)
+
+# Plot Task 1 data for selected flags
+
+xyplot(qty_t~yearc|species,groups=fleet,data=ps.t1[ps.t1$flag=="Brazil",],type="p")
+xyplot(qty_t~yearc|species,groups=fleet,data=ps.t1[ps.t1$flag=="Belize",],type="p",pch="*")
+xyplot(qty_t~yearc|species,groups=fleet,data=ps.t1[ps.t1$flag=="EU.España",],type="p",pch="*")
+
+xyplot(qty_t~yearc|species,groups=fleet,data=ps.t1[ps.t1$flag=="EU.Portugal",],type="p",pch="*")
+xyplot(qty_t~yearc|species,groups=fleet,data=ps.t1[ps.t1$flag=="Japan",],type="p",pch="*")
+xyplot(qty_t~yearc|species,groups=fleet,data=ps.t1[ps.t1$flag=="Panama",],type="p",pch="*")
+xyplot(qty_t~yearc|species,groups=fleet,data=ps.t1[ps.t1$flag=="South Africa",],type="p",pch="*")
+xyplot(qty_t~yearc|species,groups=fleet,data=ps.t1[ps.t1$flag=="U.S.A.",],type="p",pch="*")
+xyplot(qty_t~yearc|species,groups=fleet,data=ps.t1[ps.t1$flag== "Vanuatu",],type="p",pch="*")
+xyplot(qty_t~yearc|species,groups=fleet,data=ps.t1[ps.t1$flag=="Venezuela",],type="p",pch="*")
+
+
+#Convert Task 1 to 'Other
+
+uf<-sort(unique(pslf$flagname))
+uf2 <- uf
+
+uf1 <- as.character(sort(unique(ps.t1$flag)))
+
+# [1] "Angola"              "Argentina"           "Belize"              "Brazil"              "Canada"              "Cape Verde"          "Cayman Islands"     
+# [8] "Colombia"            "Congo"               "Côte D'Ivoire"       "Cuba"                "Curaçao"             "EU.España"           "EU.France"          
+# [15] "EU.Portugal"         "EU.United Kingdom"   "Ghana"               "Guatemala"           "Guinea Ecuatorial"   "Guinée Rep."         "Japan"              
+# [22] "Korea Rep."          "Libya"               "Maroc"               "Mixed flags (FR+ES)" "NEI (ETRO)"          "NEI (Flag related)"  "Norway"             
+# [29] "Panama"              "Russian Federation"  "Senegal"             "South Africa"        "S. Tomé e Príncipe"  "U.S.A."              "U.S.S.R."           
+# [36] "Venezuela"          
+
+
+ps.t1$flag <- as.character(ps.t1$flag)
+
+ussr <- ps.t1[ps.t1$flag %in% c("U.S.S.R.","Russian Federation"),]
+
+
+mm <- match(ps.t1$flag,uf2)
+ps.t1$flag[is.na(mm)] <- 'Other'
+
+w1 <- (1:length(ps.t1[,1]))[ps.t1$yearc == 2014]
+round(tapply(ps.t1$qty_t[w1],list(ps.t1$flag[w1],ps.t1$species[w1]),sum,na.rm=T))
+
+# See task 1 totals by species
+
+t1x <- aggregate(list(qty_t=ps.t1$qty_t),list(year=ps.t1$yearc,species = ps.t1$species),sum,na.rm=T)
+t1x[t1x$species == 'bft',]
+t1x[t1x$species == 'bet',]
+t1x[t1x$species == 'yft',]
+
+
+# effdis_estimates<- effdis_estimates[effdis_estimates$which.ocean == "atl",]
+# 
+# effdis_estimates$catch[effdis_estimates$observation == FALSE] <- NA
+# effdis_estimates$prob[effdis_estimates$observation == FALSE] <- NA
+# effdis_estimates$measured_catch[effdis_estimates$observation == FALSE] <- NA
+# effdis_estimates$eff[big$observation == FALSE]  <- NA
+
+#xxx <- aggregate(list(measured_catch=big$measured_catch,catch=big$catch,eff=big$eff), 
+#by=list(year=big$year,species=big$species),sum,na.rm=T)
+
+#xxx.90 <- xxx[xxx$year == 1990 & xxx$species == 'bft',]
+#sum(xxx.90$catch)/1000
+
+
+#Convert catch to tonnes from kgs
+head(effdis_estimates)
+effdis_estimates$catch <- effdis_estimates$catch/1000
+
+effdis_estimates$measured_catch <- effdis_estimates$measured_catch/1000
+effdis_estimates$measured_catch.se.fit <- effdis_estimates$measured_catch.se.fit/1000
+effdis_estimates$cpue <- effdis_estimates$catch/effdis_estimates$eff # Re-calculate by tonne
+
+# Start combining Task 1 and 2
+
+# Catch
+
+catch_by_year_flag <- aggregate(list(measured_catch=effdis_estimates$measured_catch,catch=effdis_estimates$catch), 
+                                by=list(year=effdis_estimates$year,flagname=effdis_estimates$flagname),sum,na.rm=T)
+
+# Create modeled effort file - we have this problem that effort is repeated in the long format. Only Spain doesnt report Bigeye.
+
+z1 <- effdis_estimates[effdis_estimates$flagname != "EU.España",]
+z2 <- z1[z1$species == "bet",]
+z3 <- effdis_estimates[effdis_estimates$flagname == "EU.España",]
+z4 <- rbind(z2,z3)
+z5 <- data.frame(eff=z4$eff,longitude=z4$longitude,latitude=z4$latitude,year=z4$year,
+                 month=z4$month,trend=z4$trend,flagname =z4$flagname) 
+
+effort_by_year_flag <- aggregate(list(eff=z5$eff), 
+                                 by=list(year=z5$year,flagname=z5$flagname),sum,na.rm=T)
+
+# Total catches of tunas
+
+xyplot(catch~year|flagname,data=catch_by_year_flag,type="l",
+       scales= list(relation="free"))
+
+# Total modeled effort
+
+xyplot(eff/1000000~year|flagname,data=effort_by_year_flag,type="l",
+       scales= list(relation="free"))
+
+
+# Sum Task 1 over year and flag
+
+sum.t1 <- aggregate(list(qty_t=ps.t1$qty_t),list(year=ps.t1$yearc,flagname=ps.t1$flag),sum,na.rm=T)
+
+## Merge task1 and task 2
+# Put on modeled catch
+
+sum.t1.t2 <-merge(sum.t1,catch_by_year_flag)
+
+# Put on effort
+
+
+all.t1.t2 <- merge(effort_by_year_flag,sum.t1.t2)
+
+all.t1.t2$cpue <- all.t1.t2$catch/all.t1.t2$eff
+
+plot(all.t1.t2$year,log(all.t1.t2$cpue),type="n")
+text(all.t1.t2$year,log(all.t1.t2$cpue),as.character(all.t1.t2$flagname),cex=.5)
+
+all.t1.t2$raised_effort <- all.t1.t2$qty_t/all.t1.t2$cpue
+
+all.t1.t2$rf <- all.t1.t2$raised_effort/all.t1.t2$eff
+
+
+# Put the raising factor on effdis estimates
+
+m1 <- paste(effdis_estimates$year,effdis_estimates$flagname)
+m2 <- paste(all.t1.t2$year,all.t1.t2$flagname)
+
+nrf <- all.t1.t2$rf[match(m1,m2)]
+effdis_estimates$rf <- nrf
+
+effdis_estimates$hooksEst <- effdis_estimates$eff*effdis_estimates$rf
+
+effdis_estimates$hooksObs <- effdis_estimates$eff
+
+# Put the raising factor on effdis EFFORT only estimates
+
+m1 <- paste(z5$year,z5$flagname)
+m2 <- paste(z5$year,z5$flagname)
+
+nrf <- all.t1.t2$rf[match(m1,m2)]
+z5$rf <- nrf
+
+z5$hooksEst <- z5$eff*z5$rf
+
+z5$hooksObs <- z5$eff
+z5 <- z5[,-1]
+
+library(lattice)
+
+xyplot(raised_effort/1000000~year|flagname,data=all.t1.t2,type='b',
+       scales= list(relation="free"))
+
+
+# #write.table(big2,'/home/doug/effdis/data/japan-effdis-estimate.csv',sep=',',row.names=F)
+# 
+# xxx <- read.table('/home/doug/effdis/data/japan-effdis-estimate.csv',sep=',',header=T)
+# xxx1 <- effdis_estimates2[effdis_estimates2$flagname == 'Japan',]
+# 
+# par(mfrow=c(2,1))
+# plot(effdis_estimates2$year[effdis_estimates2$flagname == 'Japan'],
+#      effdis_estimates2$raised.effort[effdis_estimates2$flagname == 'Japan']/1000000/9,type='l',ylim=c(0,120))
+# 
+# plot(effdis_estimates2$year[effdis_estimates2$flagname == 'Japan'],
+#      effdis_estimates2$raw_raised.effort[effdis_estimates2$flagname == 'Japan']/1000000,type='l',ylim=c(0,120))
+
+
+
+
+p1 <- ggplot(data = all.t1.t2, aes(x = year, y = raised_effort/1000000)) +
+  geom_line() +
+  facet_wrap(~ flagname, scales = "free_y") +
+  theme(axis.text.x  = element_text(angle = 45, vjust = 1, hjust = 1))
+
+p1
+
+ggsave(p1,file="EffdisEffortEstimatesByCountry.png",dpi=500,w=10,h=6,unit="in",type="cairo-png")
+
+
+
+all.t1.t2.sum <- aggregate(list(raised_effort=all.t1.t2$raised_effort),
+                           by=list(year=all.t1.t2$year),sum,na.rm=T)
+
+
+p <- ggplot() + 
+  geom_line(data = all.t1.t2.sum, aes(x = year, y = raised_effort/1000000)) +
+  ggtitle("Total number of hooks raised with Task I data\n")+
+  xlab('Year') +
+  ylab('No Hooks (millions)')+
+  
+  
+  theme(axis.text.x = element_text(angle = -30, hjust =0,size=15),
+        
+        
+        plot.title = element_text(lineheight=1.2, face="bold",size = 17, colour = "grey20"),
+        panel.border = element_rect(colour = "black",fill=F,size=0.5),
+        panel.grid.major = element_line(colour = "grey",size=0.75,linetype='longdash'),
+        panel.grid.minor = element_blank(),
+        axis.title.y=element_text(size=15,colour="grey20"),
+        axis.title.x=element_text(size=15,colour="grey20"),
+        axis.text.y=element_text(size=15,colour="grey20"),
+        panel.background = element_rect(fill = NA,colour = "black"))
+
+p
+
+ggsave(p,file="GlobalEffdisEstimates.png",dpi=500,w=10,h=6,unit="in",type="cairo-png")
+
+
+z5$geargrp <- "LL"
+
+write.table(z5,file="effdis_ll.1990.2014.csv",sep=",",row.names=F)
+z5<-read.table("effdis_ll.1990.2014.csv",sep=",",header=T)
+
+chan <- odbcConnect("effdis-tuna-cc1", case="postgresql", believeNRows=FALSE)
+sqlQuery(chan,'drop table effdis_ll_1990_2014')
+sqlSave(chan,z5,tablename='effdis_ll_1990_2014')
+
+
 
 
 
@@ -487,7 +940,15 @@ for(i in c(1,2,4:7,9))
   else{
     aa <- predict.effdis.t2.data(cmod=mod.can[[i]], effmod=emod.canada,grid.res=5,start.year=1990,end.year=2015,which.flag='Canada')
     rm(aa)
-    gc(reset=T)
+    gc(reset=T)oth <-c("Belize","Brazil", "Canada", "Congo", "Côte D'Ivoire","EU.Portugal","Ghana (ICCAT program)","Mixed flags (FIS)","NEI (ETRO)","Russian Federation")
+    # 
+    idx <- (1:length(pslf[,1]))[pslf$flagname %in% oth]
+    pslf$flagname[idx] <- "Other"
+    oth <-c("Belize","Brazil", "Canada", "Congo", "Côte D'Ivoire","EU.Portugal","Ghana (ICCAT program)","Mixed flags (FIS)","NEI (ETRO)","Russian Federation")
+    # 
+    idx <- (1:length(pslf[,1]))[pslf$flagname %in% oth]
+    pslf$flagname[idx] <- "Other"
+    
   }
 }
 
@@ -950,8 +1411,8 @@ for(i in c(1,2,3,4:5,7:9))
 
 
 #setwd('/home/doug/effdis/effdis-estimates')
- # system('rm effdis-estimates.csv')
-  #system('cat *csv > effdis-estimates.csv')
+# system('rm effdis-estimates.csv')
+#system('cat *csv > effdis-estimates.csv')
 #effdis_estimates <- read.table('effdis-estimates.csv',sep=',')
 
 setwd("/home/dbeare/effdis/effdis/data/effdis-estimates")
@@ -959,8 +1420,8 @@ lf <- list.files()
 
 effdis_estimates <- as.list(length(lf))
 for( i in 1: length(lf)){
-effdis_estimates[[i]] <- read.table(lf[i],sep=",")
-print(lf[i])
+  effdis_estimates[[i]] <- read.table(lf[i],sep=",")
+  print(lf[i])
 }
 
 effdis_estimates<-do.call("rbind",effdis_estimates)
@@ -1046,7 +1507,7 @@ ll.t1.c <- ll.t1[ll.t1$datatype == "C",]
 
 ll.t1.ld <- ll.t1[ll.t1$datatype %in% c("DD","DM","L"),]
 ll.t1.ld <- aggregate(qty_t~rownames+species+yearc+decade+status+flag+fleet+
-                 stock+region+area+geargrp2+spcgeargrp+geargrp+gearcode,data=ll.t1.ld,sum,na.rm=T)
+                        stock+region+area+geargrp2+spcgeargrp+geargrp+gearcode,data=ll.t1.ld,sum,na.rm=T)
 ll.t1<-rbind(ll.t1.c[,-15],ll.t1.ld)
 
 ll.t1 <- orderBy(~yearc,data=ll.t1)
@@ -1126,7 +1587,7 @@ t1x[t1x$species == 'yft',]
 # effdis_estimates$eff[big$observation == FALSE]  <- NA
 
 #xxx <- aggregate(list(measured_catch=big$measured_catch,catch=big$catch,eff=big$eff), 
-                  #by=list(year=big$year,species=big$species),sum,na.rm=T)
+#by=list(year=big$year,species=big$species),sum,na.rm=T)
 
 #xxx.90 <- xxx[xxx$year == 1990 & xxx$species == 'bft',]
 #sum(xxx.90$catch)/1000
@@ -1145,7 +1606,7 @@ effdis_estimates$cpue <- effdis_estimates$catch/effdis_estimates$eff # Re-calcul
 # Catch
 
 catch_by_year_flag <- aggregate(list(measured_catch=effdis_estimates$measured_catch,catch=effdis_estimates$catch), 
-                  by=list(year=effdis_estimates$year,flagname=effdis_estimates$flagname),sum,na.rm=T)
+                                by=list(year=effdis_estimates$year,flagname=effdis_estimates$flagname),sum,na.rm=T)
 
 # Create modeled effort file - we have this problem that effort is repeated in the long format. Only Spain doesnt report Bigeye.
 
@@ -1154,10 +1615,10 @@ z2 <- z1[z1$species == "bet",]
 z3 <- effdis_estimates[effdis_estimates$flagname == "EU.España",]
 z4 <- rbind(z2,z3)
 z5 <- data.frame(eff=z4$eff,longitude=z4$longitude,latitude=z4$latitude,year=z4$year,
-                                  month=z4$month,trend=z4$trend,flagname =z4$flagname) 
+                 month=z4$month,trend=z4$trend,flagname =z4$flagname) 
 
 effort_by_year_flag <- aggregate(list(eff=z5$eff), 
-                                by=list(year=z5$year,flagname=z5$flagname),sum,na.rm=T)
+                                 by=list(year=z5$year,flagname=z5$flagname),sum,na.rm=T)
 
 # Total catches of tunas
 
@@ -1223,7 +1684,7 @@ library(lattice)
 
 xyplot(raised_effort/1000000~year|flagname,data=all.t1.t2,type='b',
        scales= list(relation="free"))
-       
+
 
 # #write.table(big2,'/home/doug/effdis/data/japan-effdis-estimate.csv',sep=',',row.names=F)
 # 
@@ -1252,7 +1713,7 @@ ggsave(p1,file="EffdisEffortEstimatesByCountry.png",dpi=500,w=10,h=6,unit="in",t
 
 
 all.t1.t2.sum <- aggregate(list(raised_effort=all.t1.t2$raised_effort),
-                               by=list(year=all.t1.t2$year),sum,na.rm=T)
+                           by=list(year=all.t1.t2$year),sum,na.rm=T)
 
 
 p <- ggplot() + 
@@ -1261,18 +1722,358 @@ p <- ggplot() +
   xlab('Year') +
   ylab('No Hooks (millions)')+
   
-
-  theme(axis.text.x = element_text(angle = -30, hjust =0,size=15),
   
+  theme(axis.text.x = element_text(angle = -30, hjust =0,size=15),
+        
         
         plot.title = element_text(lineheight=1.2, face="bold",size = 17, colour = "grey20"),
-panel.border = element_rect(colour = "black",fill=F,size=0.5),
-panel.grid.major = element_line(colour = "grey",size=0.75,linetype='longdash'),
-panel.grid.minor = element_blank(),
-axis.title.y=element_text(size=15,colour="grey20"),
-axis.title.x=element_text(size=15,colour="grey20"),
-axis.text.y=element_text(size=15,colour="grey20"),
-panel.background = element_rect(fill = NA,colour = "black"))
+        panel.border = element_rect(colour = "black",fill=F,size=0.5),
+        panel.grid.major = element_line(colour = "grey",size=0.75,linetype='longdash'),
+        panel.grid.minor = element_blank(),
+        axis.title.y=element_text(size=15,colour="grey20"),
+        axis.title.x=element_text(size=15,colour="grey20"),
+        axis.text.y=element_text(size=15,colour="grey20"),
+        panel.background = element_rect(fill = NA,colour = "black"))
+
+p
+
+ggsave(p,file="GlobalEffdisEstimates.png",dpi=500,w=10,h=6,unit="in",type="cairo-png")
+
+
+z5$geargrp <- "LL"
+
+write.table(z5,file="effdis_ll.1990.2014.csv",sep=",",row.names=F)
+z5<-read.table("effdis_ll.1990.2014.csv",sep=",",header=T)
+
+chan <- odbcConnect("effdis-tuna-cc1", case="postgresql", believeNRows=FALSE)
+sqlQuery(chan,'drop table effdis_ll_1990_2014')
+sqlSave(chan,z5,tablename='effdis_ll_1990_2014')################# Raise the data to Task I ####################################################
+
+
+#setwd('/home/doug/effdis/effdis-estimates')
+# system('rm effdis-estimates.csv')
+#system('cat *csv > effdis-estimates.csv')
+#effdis_estimates <- read.table('effdis-estimates.csv',sep=',')
+
+setwd("/home/dbeare/effdis/effdis/data/effdis-estimates")
+lf <- list.files()
+
+effdis_estimates <- as.list(length(lf))
+for( i in 1: length(lf)){
+  effdis_estimates[[i]] <- read.table(lf[i],sep=",")
+  print(lf[i])
+}
+
+effdis_estimates<-do.call("rbind",effdis_estimates)
+dim(effdis_estimates) # = 490513
+
+dimnames(effdis_estimates)[[2]] <- c("longitude","latitude","which.ocean","year","month","trend","flagname","geargrp","prob","prob.se.fit","measured_catch","measured_catch.se.fit",
+                                     "eff","eff.se.fit","species","catch","cpue","observation")          
+
+effdis_estimates <- orderBy(~trend+flagname+species,data=effdis_estimates)
+
+nidx <- (1:length(effdis_estimates$year))[effdis_estimates$flagname == "Other" & effdis_estimates$species == "skj" & effdis_estimates$catch > 150000 ]
+
+# Exclude these as they are way too big
+
+effdis_estimates <- effdis_estimates[-nidx,]
+
+
+ufe <- sort(unique(as.character(effdis_estimates$flagname)))
+
+#Check against the raw data
+
+wf <- ufe[14]
+print(wf)
+mod1 <- effdis_estimates[effdis_estimates$flagname == wf & effdis_estimates$species == "bet",]
+par(mfrow=c(2,1),mar=c(2,2,2,2))
+#Effort
+effort <- aggt2data(input=lllf,which.effort="NO.HOOKS",which.flag=wf,start.year=1990, end.year=2015)
+plot(effort$trend,effort$eff1,pch=".",xlab="",ylab="")
+title(wf)
+points(mod1$trend,mod1$eff,col="red",pch="*")
+
+te <- tapply(effort$eff1,effort$year,sum)
+tm <- tapply(mod1$eff,mod1$year,sum)
+tem <-cbind(te,tm)
+
+plot(te/1000000)
+lines(tm/1000000)
+
+
+catch <- aggt2catchdata(input=lllf,which.effort="NO.HOOKS",which.flag=wf,start.year=1990, end.year=2015)
+spp <- "alb"
+par(mfrow=c(1,1))
+plot(catch$trend[catch$species == spp],catch$raw_measured_catch[catch$species == spp],pch=".",
+     xlab="",ylab="")
+
+
+mod2 <- effdis_estimates[effdis_estimates$flagname == wf ,]
+points(mod2$trend[mod2$species == spp],mod2$catch[mod2$species == spp],col="red",pch=".")
+
+plot(mod2$trend[mod2$species == spp],mod2$catch[mod2$species == spp],col="green",pch="*")
+
+xyplot(eff/1000000~trend|flagname,data=effdis_estimates[effdis_estimates$species == "yft",],pch=".")
+
+
+#Which species do we not have by flag ?
+
+n1 <-table(effdis_estimates$flagname,as.character(effdis_estimates$species))
+n1 <- ifelse(n1==0,F,T)
+
+# Get Task 1 data
+# For Long-line
+ll.t1 <- get.effdis.t1.data(which.dsn='effdis-tuna-cc1',which.gear = 'LL',which.region='AT',which.flag='All')
+str(ll.t1)
+for(i in c(2,5:15)){ll.t1[,i] <- as.character(ll.t1[,i])}
+
+#For bait boat
+# bb.t1 <- get.effdis.t1.data(which.dsn='effdis-tuna-cc1',which.gear = 'BB',which.region='AT',which.flag='All')
+# str(bb.t1)
+# for(i in c(2,5:15)){bb.t1[,i] <- as.character(bb.t1[,i])}
+# 
+# bb.t1.rsa <- bb.t1[bb.t1$flag == 'South Africa',]
+# 
+# tapply(bb.t1.rsa$qty_t,list(bb.t1.rsa$year,bb.t1.rsa$species),sum,na.rm=T)
+# 
+
+
+
+1350# Datatype is either C (catch), L (Landings), DD (Discards), DM (?) and Landings
+
+# If catch is available use that otherwise sum landings and discards.
+
+ll.t1.c <- ll.t1[ll.t1$datatype == "C",]
+
+ll.t1.ld <- ll.t1[ll.t1$datatype %in% c("DD","DM","L"),]
+ll.t1.ld <- aggregate(qty_t~rownames+species+yearc+decade+status+flag+fleet+
+                        stock+region+area+geargrp2+spcgeargrp+geargrp+gearcode,data=ll.t1.ld,sum,na.rm=T)
+ll.t1<-rbind(ll.t1.c[,-15],ll.t1.ld)
+
+ll.t1 <- orderBy(~yearc,data=ll.t1)
+
+# Plot Task 1 data for selected flags
+
+xyplot(qty_t~yearc|species,groups=fleet,data=ll.t1[ll.t1$flag=="Brazil",],type="p")
+xyplot(qty_t~yearc|species,groups=fleet,data=ll.t1[ll.t1$flag=="Belize",],type="p",pch="*")
+xyplot(qty_t~yearc|species,groups=fleet,data=ll.t1[ll.t1$flag=="China PR",],type="p",pch="*")
+xyplot(qty_t~yearc|species,groups=fleet,data=ll.t1[ll.t1$flag=="Chinese Taipei",],type="p",pch="*")
+xyplot(qty_t~yearc|species,groups=fleet,data=ll.t1[ll.t1$flag=="Cuba",],type="p",pch="*")
+xyplot(qty_t~yearc|species,groups=fleet,data=ll.t1[ll.t1$flag=="EU.España",],type="p",pch="*")
+
+xyplot(qty_t~yearc|species,groups=fleet,data=ll.t1[ll.t1$flag=="EU.Portugal",],type="p",pch="*")
+xyplot(qty_t~yearc|species,groups=fleet,data=ll.t1[ll.t1$flag=="Japan",],type="p",pch="*")
+xyplot(qty_t~yearc|species,groups=fleet,data=ll.t1[ll.t1$flag=="Korea Rep.",],type="p",pch="*")
+xyplot(qty_t~yearc|species,groups=fleet,data=ll.t1[ll.t1$flag=="Namibia",],type="p",pch="*")
+xyplot(qty_t~yearc|species,groups=fleet,data=ll.t1[ll.t1$flag=="Panama",],type="p",pch="*")
+xyplot(qty_t~yearc|species,groups=fleet,data=ll.t1[ll.t1$flag=="Philippines",],type="p",pch="*")
+
+xyplot(qty_t~yearc|species,groups=fleet,data=ll.t1[ll.t1$flag=="South Africa",],type="p",pch="*")
+xyplot(qty_t~yearc|species,groups=fleet,data=ll.t1[ll.t1$flag== "St. Vincent and Grenadines",],type="p",pch="*")
+xyplot(qty_t~yearc|species,groups=fleet,data=ll.t1[ll.t1$flag=="U.S.A.",],type="p",pch="*")
+xyplot(qty_t~yearc|species,groups=fleet,data=ll.t1[ll.t1$flag== "Vanuatu",],type="p",pch="*")
+xyplot(qty_t~yearc|species,groups=fleet,data=ll.t1[ll.t1$flag=="Venezuela",],type="p",pch="*")
+
+
+#Convert Task 1 to 'Other
+
+uf<-sort(unique(lllf$flagname))
+uf2 <- uf
+
+uf1 <- as.character(sort(unique(ll.t1$flag)))
+
+# "Angola"                     "Barbados"                   "Belize"                    
+# [4] "Brazil"                     "Cambodia"                   "Canada"                    
+# [7] "Cape Verde"                 "China PR"                   "Chinese Taipei"            
+# [10] "Côte D'Ivoire"              "Cuba"                       "Dominica"                  
+# [13] "EU.España"                  "EU.France"                  "EU.Ireland"                
+# [16] "EU.Portugal"                "EU.United Kingdom"          "Faroe Islands"             
+# [19] "FR.St Pierre et Miquelon"   "Grenada"                    "Guinea Ecuatorial"         
+# [22] "Honduras"                   "Iceland"                    "Japan"                     
+# [25] "Korea Rep."                 "Libya"                      "Maroc"                     
+# [28] "Mexico"                     "Namibia"                    "NEI (BIL)"                 
+# [31] "NEI (ETRO)"                 "NEI (Flag related)"         "Panama"                    
+# [34] "Philippines"                "Russian Federation"         "Senegal"                   
+# [37] "Seychelles"                 "Sierra Leone"               "South Africa"              
+# [40] "St. Vincent and Grenadines" "Suriname"                   "Trinidad and Tobago"       
+# [43] "U.S.A."                     "U.S.S.R."                   "UK.Bermuda"                
+# [46] "UK.British Virgin Islands"  "UK.Sta Helena"              "UK.Turks and Caicos"       
+# [49] "Uruguay"                    "Vanuatu"                    "Venezuela"                      
+
+ll.t1$flag <- as.character(ll.t1$flag)
+
+ussr <- ll.t1[ll.t1$flag %in% c("U.S.S.R.","Russian Federation"),]
+
+
+mm <- match(ll.t1$flag,uf2)
+ll.t1$flag[is.na(mm)] <- 'Other'
+
+w1 <- (1:length(ll.t1[,1]))[ll.t1$yearc == 2014]
+round(tapply(ll.t1$qty_t[w1],list(ll.t1$flag[w1],ll.t1$species[w1]),sum,na.rm=T))
+
+# See task 1 totals by species
+
+t1x <- aggregate(list(qty_t=ll.t1$qty_t),list(year=ll.t1$yearc,species = ll.t1$species),sum,na.rm=T)
+t1x[t1x$species == 'bft',]
+t1x[t1x$species == 'bet',]
+t1x[t1x$species == 'yft',]
+
+
+# effdis_estimates<- effdis_estimates[effdis_estimates$which.ocean == "atl",]
+# 
+# effdis_estimates$catch[effdis_estimates$observation == FALSE] <- NA
+# effdis_estimates$prob[effdis_estimates$observation == FALSE] <- NA
+# effdis_estimates$measured_catch[effdis_estimates$observation == FALSE] <- NA
+# effdis_estimates$eff[big$observation == FALSE]  <- NA
+
+#xxx <- aggregate(list(measured_catch=big$measured_catch,catch=big$catch,eff=big$eff), 
+#by=list(year=big$year,species=big$species),sum,na.rm=T)
+
+#xxx.90 <- xxx[xxx$year == 1990 & xxx$species == 'bft',]
+#sum(xxx.90$catch)/1000
+
+
+#Convert catch to tonnes from kgs
+head(effdis_estimates)
+effdis_estimates$catch <- effdis_estimates$catch/1000
+
+effdis_estimates$measured_catch <- effdis_estimates$measured_catch/1000
+effdis_estimates$measured_catch.se.fit <- effdis_estimates$measured_catch.se.fit/1000
+effdis_estimates$cpue <- effdis_estimates$catch/effdis_estimates$eff # Re-calculate by tonne
+
+# Start combining Task 1 and 2
+
+# Catch
+
+catch_by_year_flag <- aggregate(list(measured_catch=effdis_estimates$measured_catch,catch=effdis_estimates$catch), 
+                                by=list(year=effdis_estimates$year,flagname=effdis_estimates$flagname),sum,na.rm=T)
+
+# Create modeled effort file - we have this problem that effort is repeated in the long format. Only Spain doesnt report Bigeye.
+
+z1 <- effdis_estimates[effdis_estimates$flagname != "EU.España",]
+z2 <- z1[z1$species == "bet",]
+z3 <- effdis_estimates[effdis_estimates$flagname == "EU.España",]
+z4 <- rbind(z2,z3)
+z5 <- data.frame(eff=z4$eff,longitude=z4$longitude,latitude=z4$latitude,year=z4$year,
+                 month=z4$month,trend=z4$trend,flagname =z4$flagname) 
+
+effort_by_year_flag <- aggregate(list(eff=z5$eff), 
+                                 by=list(year=z5$year,flagname=z5$flagname),sum,na.rm=T)
+
+# Total catches of tunas
+
+xyplot(catch~year|flagname,data=catch_by_year_flag,type="l",
+       scales= list(relation="free"))
+
+# Total modeled effort
+
+xyplot(eff/1000000~year|flagname,data=effort_by_year_flag,type="l",
+       scales= list(relation="free"))
+
+
+# Sum Task 1 over year and flag
+
+sum.t1 <- aggregate(list(qty_t=ll.t1$qty_t),list(year=ll.t1$yearc,flagname=ll.t1$flag),sum,na.rm=T)
+
+## Merge task1 and task 2
+# Put on modeled catch
+
+sum.t1.t2 <-merge(sum.t1,catch_by_year_flag)
+
+# Put on effort
+
+
+all.t1.t2 <- merge(effort_by_year_flag,sum.t1.t2)
+
+all.t1.t2$cpue <- all.t1.t2$catch/all.t1.t2$eff
+
+plot(all.t1.t2$year,log(all.t1.t2$cpue),type="n")
+text(all.t1.t2$year,log(all.t1.t2$cpue),as.character(all.t1.t2$flagname),cex=.5)
+
+all.t1.t2$raised_effort <- all.t1.t2$qty_t/all.t1.t2$cpue
+
+all.t1.t2$rf <- all.t1.t2$raised_effort/all.t1.t2$eff
+
+
+# Put the raising factor on effdis estimates
+
+m1 <- paste(effdis_estimates$year,effdis_estimates$flagname)
+m2 <- paste(all.t1.t2$year,all.t1.t2$flagname)
+
+nrf <- all.t1.t2$rf[match(m1,m2)]
+effdis_estimates$rf <- nrf
+
+effdis_estimates$hooksEst <- effdis_estimates$eff*effdis_estimates$rf
+
+effdis_estimates$hooksObs <- effdis_estimates$eff
+
+# Put the raising factor on effdis EFFORT only estimates
+
+m1 <- paste(z5$year,z5$flagname)
+m2 <- paste(z5$year,z5$flagname)
+
+nrf <- all.t1.t2$rf[match(m1,m2)]
+z5$rf <- nrf
+
+z5$hooksEst <- z5$eff*z5$rf
+
+z5$hooksObs <- z5$eff
+z5 <- z5[,-1]
+
+library(lattice)
+
+xyplot(raised_effort/1000000~year|flagname,data=all.t1.t2,type='b',
+       scales= list(relation="free"))
+
+
+# #write.table(big2,'/home/doug/effdis/data/japan-effdis-estimate.csv',sep=',',row.names=F)
+# 
+# xxx <- read.table('/home/doug/effdis/data/japan-effdis-estimate.csv',sep=',',header=T)
+# xxx1 <- effdis_estimates2[effdis_estimates2$flagname == 'Japan',]
+# 
+# par(mfrow=c(2,1))
+# plot(effdis_estimates2$year[effdis_estimates2$flagname == 'Japan'],
+#      effdis_estimates2$raised.effort[effdis_estimates2$flagname == 'Japan']/1000000/9,type='l',ylim=c(0,120))
+# 
+# plot(effdis_estimates2$year[effdis_estimates2$flagname == 'Japan'],
+#      effdis_estimates2$raw_raised.effort[effdis_estimates2$flagname == 'Japan']/1000000,type='l',ylim=c(0,120))
+
+
+
+
+p1 <- ggplot(data = all.t1.t2, aes(x = year, y = raised_effort/1000000)) +
+  geom_line() +
+  facet_wrap(~ flagname, scales = "free_y") +
+  theme(axis.text.x  = element_text(angle = 45, vjust = 1, hjust = 1))
+
+p1
+
+ggsave(p1,file="EffdisEffortEstimatesByCountry.png",dpi=500,w=10,h=6,unit="in",type="cairo-png")
+
+
+
+all.t1.t2.sum <- aggregate(list(raised_effort=all.t1.t2$raised_effort),
+                           by=list(year=all.t1.t2$year),sum,na.rm=T)
+
+
+p <- ggplot() + 
+  geom_line(data = all.t1.t2.sum, aes(x = year, y = raised_effort/1000000)) +
+  ggtitle("Total number of hooks raised with Task I data\n")+
+  xlab('Year') +
+  ylab('No Hooks (millions)')+
+  
+  
+  theme(axis.text.x = element_text(angle = -30, hjust =0,size=15),
+        
+        
+        plot.title = element_text(lineheight=1.2, face="bold",size = 17, colour = "grey20"),
+        panel.border = element_rect(colour = "black",fill=F,size=0.5),
+        panel.grid.major = element_line(colour = "grey",size=0.75,linetype='longdash'),
+        panel.grid.minor = element_blank(),
+        axis.title.y=element_text(size=15,colour="grey20"),
+        axis.title.x=element_text(size=15,colour="grey20"),
+        axis.text.y=element_text(size=15,colour="grey20"),
+        panel.background = element_rect(fill = NA,colour = "black"))
 
 p
 
@@ -1290,6 +2091,341 @@ sqlSave(chan,z5,tablename='effdis_ll_1990_2014')
 
 
 
+
+
+setwd("/home/dbeare/effdis/effdis/data/effdis-estimates")
+lf <- list.files()
+
+effdis_estimates <- as.list(length(lf))
+for( i in 1: length(lf)){
+  effdis_estimates[[i]] <- read.table(lf[i],sep=",")
+  print(lf[i])
+}
+
+effdis_estimates<-do.call("rbind",effdis_estimates)
+dim(effdis_estimates) # = 490513
+
+dimnames(effdis_estimates)[[2]] <- c("longitude","latitude","which.ocean","year","month","trend","flagname","geargrp","prob","prob.se.fit","measured_catch","measured_catch.se.fit",
+                                     "eff","eff.se.fit","species","catch","cpue","observation")          
+
+effdis_estimates <- orderBy(~trend+flagname+species,data=effdis_estimates)
+
+nidx <- (1:length(effdis_estimates$year))[effdis_estimates$flagname == "Other" & effdis_estimates$species == "skj" & effdis_estimates$catch > 150000 ]
+
+# Exclude these as they are way too big
+
+effdis_estimates <- effdis_estimates[-nidx,]
+
+
+ufe <- sort(unique(as.character(effdis_estimates$flagname)))
+
+#Check against the raw data
+
+wf <- ufe[14]
+print(wf)
+mod1 <- effdis_estimates[effdis_estimates$flagname == wf & effdis_estimates$species == "bet",]
+par(mfrow=c(2,1),mar=c(2,2,2,2))
+#Effort
+effort <- aggt2data(input=lllf,which.effort="NO.HOOKS",which.flag=wf,start.year=1990, end.year=2015)
+plot(effort$trend,effort$eff1,pch=".",xlab="",ylab="")
+title(wf)
+points(mod1$trend,mod1$eff,col="red",pch="*")
+
+te <- tapply(effort$eff1,effort$year,sum)
+tm <- tapply(mod1$eff,mod1$year,sum)
+tem <-cbind(te,tm)
+
+plot(te/1000000)
+lines(tm/1000000)
+
+
+catch <- aggt2catchdata(input=lllf,which.effort="NO.HOOKS",which.flag=wf,start.year=1990, end.year=2015)
+spp <- "alb"
+par(mfrow=c(1,1))
+plot(catch$trend[catch$species == spp],catch$raw_measured_catch[catch$species == spp],pch=".",
+     xlab="",ylab="")
+
+
+mod2 <- effdis_estimates[effdis_estimates$flagname == wf ,]
+points(mod2$trend[mod2$species == spp],mod2$catch[mod2$species == spp],col="red",pch=".")
+
+plot(mod2$trend[mod2$species == spp],mod2$catch[mod2$species == spp],col="green",pch="*")
+
+xyplot(eff/1000000~trend|flagname,data=effdis_estimates[effdis_estimates$species == "yft",],pch=".")
+
+
+#Which species do we not have by flag ?
+
+n1 <-table(effdis_estimates$flagname,as.character(effdis_estimates$species))
+n1 <- ifelse(n1==0,F,T)
+
+# Get Task 1 data
+# For Long-line
+ll.t1 <- get.effdis.t1.data(which.dsn='effdis-tuna-cc1',which.gear = 'LL',which.region='AT',which.flag='All')
+str(ll.t1)
+for(i in c(2,5:15)){ll.t1[,i] <- as.character(ll.t1[,i])}
+
+#For bait boat
+# bb.t1 <- get.effdis.t1.data(which.dsn='effdis-tuna-cc1',which.gear = 'BB',which.region='AT',which.flag='All')
+# str(bb.t1)
+# for(i in c(2,5:15)){bb.t1[,i] <- as.character(bb.t1[,i])}
+# 
+# bb.t1.rsa <- bb.t1[bb.t1$flag == 'South Africa',]
+# 
+# tapply(bb.t1.rsa$qty_t,list(bb.t1.rsa$year,bb.t1.rsa$species),sum,na.rm=T)
+# 
+
+
+
+1350# Datatype is either C (catch), L (Landings), DD (Discards), DM (?) and Landings
+
+# If catch is available use that otherwise sum landings and discards.
+
+ll.t1.c <- ll.t1[ll.t1$datatype == "C",]
+
+ll.t1.ld <- ll.t1[ll.t1$datatype %in% c("DD","DM","L"),]
+ll.t1.ld <- aggregate(qty_t~rownames+species+yearc+decade+status+flag+fleet+
+                        stock+region+area+geargrp2+spcgeargrp+geargrp+gearcode,data=ll.t1.ld,sum,na.rm=T)
+ll.t1<-rbind(ll.t1.c[,-15],ll.t1.ld)
+
+ll.t1 <- orderBy(~yearc,data=ll.t1)
+
+# Plot Task 1 data for selected flags
+
+xyplot(qty_t~yearc|species,groups=fleet,data=ll.t1[ll.t1$flag=="Brazil",],type="p")
+xyplot(qty_t~yearc|species,groups=fleet,data=ll.t1[ll.t1$flag=="Belize",],type="p",pch="*")
+xyplot(qty_t~yearc|species,groups=fleet,data=ll.t1[ll.t1$flag=="China PR",],type="p",pch="*")
+xyplot(qty_t~yearc|species,groups=fleet,data=ll.t1[ll.t1$flag=="Chinese Taipei",],type="p",pch="*")
+xyplot(qty_t~yearc|species,groups=fleet,data=ll.t1[ll.t1$flag=="Cuba",],type="p",pch="*")
+xyplot(qty_t~yearc|species,groups=fleet,data=ll.t1[ll.t1$flag=="EU.España",],type="p",pch="*")
+
+xyplot(qty_t~yearc|species,groups=fleet,data=ll.t1[ll.t1$flag=="EU.Portugal",],type="p",pch="*")
+xyplot(qty_t~yearc|species,groups=fleet,data=ll.t1[ll.t1$flag=="Japan",],type="p",pch="*")
+xyplot(qty_t~yearc|species,groups=fleet,data=ll.t1[ll.t1$flag=="Korea Rep.",],type="p",pch="*")
+xyplot(qty_t~yearc|species,groups=fleet,data=ll.t1[ll.t1$flag=="Namibia",],type="p",pch="*")
+xyplot(qty_t~yearc|species,groups=fleet,data=ll.t1[ll.t1$flag=="Panama",],type="p",pch="*")
+xyplot(qty_t~yearc|species,groups=fleet,data=ll.t1[ll.t1$flag=="Philippines",],type="p",pch="*")
+
+xyplot(qty_t~yearc|species,groups=fleet,data=ll.t1[ll.t1$flag=="South Africa",],type="p",pch="*")
+xyplot(qty_t~yearc|species,groups=fleet,data=ll.t1[ll.t1$flag== "St. Vincent and Grenadines",],type="p",pch="*")
+xyplot(qty_t~yearc|species,groups=fleet,data=ll.t1[ll.t1$flag=="U.S.A.",],type="p",pch="*")
+xyplot(qty_t~yearc|species,groups=fleet,data=ll.t1[ll.t1$flag== "Vanuatu",],type="p",pch="*")
+xyplot(qty_t~yearc|species,groups=fleet,data=ll.t1[ll.t1$flag=="Venezuela",],type="p",pch="*")
+
+
+#Convert Task 1 to 'Other
+
+uf<-sort(unique(lllf$flagname))
+uf2 <- uf
+
+uf1 <- as.character(sort(unique(ll.t1$flag)))
+
+# "Angola"                     "Barbados"                   "Belize"                    
+# [4] "Brazil"                     "Cambodia"                   "Canada"                    
+# [7] "Cape Verde"                 "China PR"                   "Chinese Taipei"            
+# [10] "Côte D'Ivoire"              "Cuba"                       "Dominica"                  
+# [13] "EU.España"                  "EU.France"                  "EU.Ireland"                
+# [16] "EU.Portugal"                "EU.United Kingdom"          "Faroe Islands"             
+# [19] "FR.St Pierre et Miquelon"   "Grenada"                    "Guinea Ecuatorial"         
+# [22] "Honduras"                   "Iceland"                    "Japan"                     
+# [25] "Korea Rep."                 "Libya"                      "Maroc"                     
+# [28] "Mexico"                     "Namibia"                    "NEI (BIL)"                 
+# [31] "NEI (ETRO)"                 "NEI (Flag related)"         "Panama"                    
+# [34] "Philippines"                "Russian Federation"         "Senegal"                   
+# [37] "Seychelles"                 "Sierra Leone"               "South Africa"              
+# [40] "St. Vincent and Grenadines" "Suriname"                   "Trinidad and Tobago"       
+# [43] "U.S.A."                     "U.S.S.R."                   "UK.Bermuda"                
+# [46] "UK.British Virgin Islands"  "UK.Sta Helena"              "UK.Turks and Caicos"       
+# [49] "Uruguay"                    "Vanuatu"                    "Venezuela"                      
+
+ll.t1$flag <- as.character(ll.t1$flag)
+
+ussr <- ll.t1[ll.t1$flag %in% c("U.S.S.R.","Russian Federation"),]
+
+
+mm <- match(ll.t1$flag,uf2)
+ll.t1$flag[is.na(mm)] <- 'Other'
+
+w1 <- (1:length(ll.t1[,1]))[ll.t1$yearc == 2014]
+round(tapply(ll.t1$qty_t[w1],list(ll.t1$flag[w1],ll.t1$species[w1]),sum,na.rm=T))
+
+# See task 1 totals by species
+
+t1x <- aggregate(list(qty_t=ll.t1$qty_t),list(year=ll.t1$yearc,species = ll.t1$species),sum,na.rm=T)
+t1x[t1x$species == 'bft',]
+t1x[t1x$species == 'bet',]
+t1x[t1x$species == 'yft',]
+
+
+# effdis_estimates<- effdis_estimates[effdis_estimates$which.ocean == "atl",]
+# 
+# effdis_estimates$catch[effdis_estimates$observation == FALSE] <- NA
+# effdis_estimates$prob[effdis_estimates$observation == FALSE] <- NA
+# effdis_estimates$measured_catch[effdis_estimates$observation == FALSE] <- NA
+# effdis_estimates$eff[big$observation == FALSE]  <- NA
+
+#xxx <- aggregate(list(measured_catch=big$measured_catch,catch=big$catch,eff=big$eff), 
+#by=list(year=big$year,species=big$species),sum,na.rm=T)
+
+#xxx.90 <- xxx[xxx$year == 1990 & xxx$species == 'bft',]
+#sum(xxx.90$catch)/1000
+
+
+#Convert catch to tonnes from kgs
+head(effdis_estimates)
+effdis_estimates$catch <- effdis_estimates$catch/1000
+
+effdis_estimates$measured_catch <- effdis_estimates$measured_catch/1000
+effdis_estimates$measured_catch.se.fit <- effdis_estimates$measured_catch.se.fit/1000
+effdis_estimates$cpue <- effdis_estimates$catch/effdis_estimates$eff # Re-calculate by tonne
+
+# Start combining Task 1 and 2
+
+# Catch
+
+catch_by_year_flag <- aggregate(list(measured_catch=effdis_estimates$measured_catch,catch=effdis_estimates$catch), 
+                                by=list(year=effdis_estimates$year,flagname=effdis_estimates$flagname),sum,na.rm=T)
+
+# Create modeled effort file - we have this problem that effort is repeated in the long format. Only Spain doesnt report Bigeye.
+
+z1 <- effdis_estimates[effdis_estimates$flagname != "EU.España",]
+z2 <- z1[z1$species == "bet",]
+z3 <- effdis_estimates[effdis_estimates$flagname == "EU.España",]
+z4 <- rbind(z2,z3)
+z5 <- data.frame(eff=z4$eff,longitude=z4$longitude,latitude=z4$latitude,year=z4$year,
+                 month=z4$month,trend=z4$trend,flagname =z4$flagname) 
+
+effort_by_year_flag <- aggregate(list(eff=z5$eff), 
+                                 by=list(year=z5$year,flagname=z5$flagname),sum,na.rm=T)
+
+# Total catches of tunas
+
+xyplot(catch~year|flagname,data=catch_by_year_flag,type="l",
+       scales= list(relation="free"))
+
+# Total modeled effort
+
+xyplot(eff/1000000~year|flagname,data=effort_by_year_flag,type="l",
+       scales= list(relation="free"))
+
+
+# Sum Task 1 over year and flag
+
+sum.t1 <- aggregate(list(qty_t=ll.t1$qty_t),list(year=ll.t1$yearc,flagname=ll.t1$flag),sum,na.rm=T)
+
+## Merge task1 and task 2
+# Put on modeled catch
+
+sum.t1.t2 <-merge(sum.t1,catch_by_year_flag)
+
+# Put on effort
+
+
+all.t1.t2 <- merge(effort_by_year_flag,sum.t1.t2)
+
+all.t1.t2$cpue <- all.t1.t2$catch/all.t1.t2$eff
+
+plot(all.t1.t2$year,log(all.t1.t2$cpue),type="n")
+text(all.t1.t2$year,log(all.t1.t2$cpue),as.character(all.t1.t2$flagname),cex=.5)
+
+all.t1.t2$raised_effort <- all.t1.t2$qty_t/all.t1.t2$cpue
+
+all.t1.t2$rf <- all.t1.t2$raised_effort/all.t1.t2$eff
+
+
+# Put the raising factor on effdis estimates
+
+m1 <- paste(effdis_estimates$year,effdis_estimates$flagname)
+m2 <- paste(all.t1.t2$year,all.t1.t2$flagname)
+
+nrf <- all.t1.t2$rf[match(m1,m2)]
+effdis_estimates$rf <- nrf
+
+effdis_estimates$hooksEst <- effdis_estimates$eff*effdis_estimates$rf
+
+effdis_estimates$hooksObs <- effdis_estimates$eff
+
+# Put the raising factor on effdis EFFORT only estimates
+
+m1 <- paste(z5$year,z5$flagname)
+m2 <- paste(z5$year,z5$flagname)
+
+nrf <- all.t1.t2$rf[match(m1,m2)]
+z5$rf <- nrf
+
+z5$hooksEst <- z5$eff*z5$rf
+
+z5$hooksObs <- z5$eff
+z5 <- z5[,-1]
+
+library(lattice)
+
+xyplot(raised_effort/1000000~year|flagname,data=all.t1.t2,type='b',
+       scales= list(relation="free"))
+
+
+# #write.table(big2,'/home/doug/effdis/data/japan-effdis-estimate.csv',sep=',',row.names=F)
+# 
+# xxx <- read.table('/home/doug/effdis/data/japan-effdis-estimate.csv',sep=',',header=T)
+# xxx1 <- effdis_estimates2[effdis_estimates2$flagname == 'Japan',]
+# 
+# par(mfrow=c(2,1))
+# plot(effdis_estimates2$year[effdis_estimates2$flagname == 'Japan'],
+#      effdis_estimates2$raised.effort[effdis_estimates2$flagname == 'Japan']/1000000/9,type='l',ylim=c(0,120))
+# 
+# plot(effdis_estimates2$year[effdis_estimates2$flagname == 'Japan'],
+#      effdis_estimates2$raw_raised.effort[effdis_estimates2$flagname == 'Japan']/1000000,type='l',ylim=c(0,120))
+
+
+
+
+p1 <- ggplot(data = all.t1.t2, aes(x = year, y = raised_effort/1000000)) +
+  geom_line() +
+  facet_wrap(~ flagname, scales = "free_y") +
+  theme(axis.text.x  = element_text(angle = 45, vjust = 1, hjust = 1))
+
+p1
+
+ggsave(p1,file="EffdisEffortEstimatesByCountry.png",dpi=500,w=10,h=6,unit="in",type="cairo-png")
+
+
+
+all.t1.t2.sum <- aggregate(list(raised_effort=all.t1.t2$raised_effort),
+                           by=list(year=all.t1.t2$year),sum,na.rm=T)
+
+
+p <- ggplot() + 
+  geom_line(data = all.t1.t2.sum, aes(x = year, y = raised_effort/1000000)) +
+  ggtitle("Total number of hooks raised with Task I data\n")+
+  xlab('Year') +
+  ylab('No Hooks (millions)')+
+  
+  
+  theme(axis.text.x = element_text(angle = -30, hjust =0,size=15),
+        
+        
+        plot.title = element_text(lineheight=1.2, face="bold",size = 17, colour = "grey20"),
+        panel.border = element_rect(colour = "black",fill=F,size=0.5),
+        panel.grid.major = element_line(colour = "grey",size=0.75,linetype='longdash'),
+        panel.grid.minor = element_blank(),
+        axis.title.y=element_text(size=15,colour="grey20"),
+        axis.title.x=element_text(size=15,colour="grey20"),
+        axis.text.y=element_text(size=15,colour="grey20"),
+        panel.background = element_rect(fill = NA,colour = "black"))
+
+p
+
+ggsave(p,file="GlobalEffdisEstimates.png",dpi=500,w=10,h=6,unit="in",type="cairo-png")
+
+
+z5$geargrp <- "LL"
+
+write.table(z5,file="effdis_ll.1990.2014.csv",sep=",",row.names=F)
+z5<-read.table("effdis_ll.1990.2014.csv",sep=",",header=T)
+
+chan <- odbcConnect("effdis-tuna-cc1", case="postgresql", believeNRows=FALSE)
+sqlQuery(chan,'drop table effdis_ll_1990_2014')
+sqlSave(chan,z5,tablename='effdis_ll_1990_2014')
 
 
 

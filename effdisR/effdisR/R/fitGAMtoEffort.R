@@ -2,23 +2,18 @@ fitGAMtoEffort <-
 function(input = lllf, which.flag='Japan',which.effort='NO.HOOKS',start.year=1950,end.year=2010,kk=6)
 {
   
-#input <- pslf; which.flag='Japan'; which.effort='FISH.HOUR'; start.year=1980; end.year=2015
+#input <- pslf; which.flag='Ghana'; which.effort='FISH.HOUR'; start.year=1980; end.year=2015
 
 input <- input[input$year >= start.year & input$year <= end.year & input$eff1type == which.effort,]
 
- 
 #input[input$trend == 517 & input$longitude == -12.5 & input$latitude == -12.5 & input$flagname == "Japan",]
 #input[input$trend == 517 & input$longitude == -12.5 & input$latitude == -2.5 & input$flagname == "Korea Rep.",]
-
-
 
   if(which.flag=='All')
 {
   input <- input; print('Modeling all data')
   
   ws <- sort(unique(input$species))[1]
-  
-
   input <- input[input$species == ws,] # Doesn't matter which as the Xn data are all repeated in the long format
   
 }
