@@ -6,9 +6,8 @@ convert.grid.res <- function(input=ll1)
 #input <- ll1
 res1 <- input[input$squaretypecode == '1x1',]
 res5 <- input[input$squaretypecode == '5x5',]
-
 res10   <- input[input$squaretypecode == '10x10',]
-
+# 
 res10$longitude   <- res10$longitude - 2.5
 res10$latitude    <- res10$latitude - 2.5
 res10$squaretypecode <- '5x5'
