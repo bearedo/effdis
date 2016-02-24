@@ -71,8 +71,9 @@ res1$gridID                 <- idx
 res1$longitude <- coordGrd[,1][res1$gridID]
 res1$latitude  <- coordGrd[,2][res1$gridID]
 
-# Get rid ofgridID
-res1<-res1[,-25]
+# Get rid of gridID
+dp <- c('gridID')
+res1<-res1[,!names(res1) %in% dp]
 # Change squaretypecode
 res1$squaretypecode <- ifelse(res1$squaretypecode=='1x1','5x5',res1$squaretypecode)
 # 
