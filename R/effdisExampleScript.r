@@ -37,7 +37,7 @@ psw  <- get.effdis.t2.data(which.dsn='effdis-tuna-cc1',which.gear='PS',which.fla
 
 ps1 <- rbind(psn,psnw,psw)
 
-# dim(ps1) = 199774
+dim(ps1) # = 199774
 
 # Double-check that lat and long conversions have been done properly #
 df <- data.frame(quad=ps1$quadid,lat=ps1$lat,lon=ps1$lon,square=ps1$squaretypecode) # simplify data.frame
@@ -46,7 +46,7 @@ df$square <- as.character(df$square) # function requires input to be 'character'
 hl <- length(df[,1])
 ndf <- data.frame(quad=rep(NA,hl),lat=rep(NA,hl),lon=rep(NA,hl),square=rep(NA,hl))
 for(i in 1:hl){
-  ndf[i,] <- latLon(df[i,]) # calculate the central lat long of each grid looping thro' each row
+ndf[i,] <- latLon(df[i,]) # calculate the central lat long of each grid looping thro' each row
 }
 
 plot(ndf$lon,ndf$lat,pch=".")
@@ -84,7 +84,7 @@ w0 <- (1:length(pslf$year))[pslf$catchunit == 'kg']
 
 round(tapply(pslf$measured_catch[w0],list(pslf$flagname[w0],pslf$species[w0]),sum,na.rm=T)/1000)
 
-# dim(pslf) = 696528
+ dim(pslf) # = 768672
 
 pslf <- pslf[pslf$catchunit == "kg",]
 pslf$species <- as.character(pslf$species)
@@ -93,7 +93,9 @@ pslf$fleetcode <- as.character(pslf$fleetcode)
 pslf$geargrpcode <- as.character(pslf$geargrpcode)
 pslf$dsettype <- as.character(pslf$dsettype)
 pslf$catchunit <- as.character(pslf$catchunit)
-dim(pslf) #=  696528 (2015)
+dim(pslf) #=  768672 (2015)
+
+
 us <- sort(as.character(unique(pslf$species)))
 uf <- sort(as.character(unique(pslf$flagname)))
 
@@ -102,50 +104,15 @@ uf <- sort(as.character(unique(pslf$flagname)))
  # [1] "Belize"                "Brazil"                "Canada"                "Cape Verde"            "Congo"                 "Côte D'Ivoire"        
  # [7] "Curaçao"               "EU.España"             "EU.France"             "EU.Portugal"           "Ghana"                 "Ghana (ICCAT program)"
  # [13] "Guatemala"             "Guinée Rep."           "Japan"                 "Mixed flags (FIS)"     "NEI (ETRO)"            "Panama"               
- # [19] "Russian Federation"    "U.S.A."                "Venezuela"            # Double-check that lat and long conversions have been done properly #
- df <- data.frame(quad=ps1$quadid,lat=ps1$lat,lon=ps1$lon,square=ps1$squaretypecode) # simplify data.frame
- df$square <- as.character(df$square) # function requires input to be 'character'
- 
- hl <- length(df[,1])
- ndf <- data.frame(quad=rep(NA,hl),lat=rep(NA,hl),lon=rep(NA,hl),square=rep(NA,hl))
- for(i in 1:hl){
-   ndf[i,] <- latLon(df[i,]) # calculate the central lat long of each grid looping thro' each row
- }
- 
- plot(ndf$lon,ndf$lat,pch=".")
- 
- ps1$longitude <- ndf$lon # add on lat and long to main database
- ps1$latitude <- ndf$lat
- 
- 
+ # [19] "Russian Federation"    "U.S.A."                "Venezuela"            
 
- #  dim(pslf) #=  696528 (2015)
+ dim(pslf) #=  768672 (2015)
 
 #Flags to add to "others"- 
 
- #Flags to add to "others"- 
- # Double-check that lat and long conversions have been done properly #
- df <- data.frame(quad=ps1$quadid,lat=ps1$lat,lon=ps1$lon,square=ps1$squaretypecode) # simplify data.frame
- df$square <- as.character(df$square) # function requires input to be 'character'
- 
- hl <- length(df[,1])
- ndf <- data.frame(quad=rep(NA,hl),lat=rep(NA,hl),lon=rep(NA,hl),square=rep(NA,hl))
- for(i in 1:hl){
-   ndf[i,] <- latLon(df[i,]) # calculate the central lat long of each grid looping thro' each row
- }
- 
- plot(ndf$lon,ndf$lat,pch=".")
- 
- ps1$longitude <- ndf$lon # add on lat and long to main database
- ps1$latitude <- ndf$lat
- 
- oth <-c("Belize", "Brazil", "Canada","Congo","Côte D'Ivoire","EU.Portugal","Russian Federation")
- 
- idx <- (1:length(pslf[,1]))[pslf$flagname %in% oth]
- 
- pslf$flagname[idx] <- "Other"
- 
-
+oth <-c("Belize", "Brazil", "Canada","Congo","Côte D'Ivoire","EU.Portugal","Russian Federation")
+idx <- (1:length(pslf[,1]))[pslf$flagname %in% oth]
+pslf$flagname[idx] <- "Other"
 
 #Japan
 
@@ -549,10 +516,9 @@ points(mod1$trend,mod1$eff,col="red",pch="*")
 
 te <- tapply(effort$eff1,effort$year,sum)
 tm <- tapply(mod1$eff,mod1$year,sum)
-tem <-cbind(te,tm)
 
-plot(te/1000000)
-lines(tm/1000000)
+plot(as.numeric(names(te)),te/1000000)
+lines(as.numeric(names(te)),tm/1000000)
 
 
 catch <- aggt2catchdata(input=pslf,which.effort="FISH.HOUR",which.flag=wf,start.year=1980, end.year=2015)
@@ -602,13 +568,11 @@ ps.t1 <- orderBy(~yearc,data=ps.t1)
 xyplot(qty_t~yearc|species,groups=fleet,data=ps.t1[ps.t1$flag=="Brazil",],type="p")
 xyplot(qty_t~yearc|species,groups=fleet,data=ps.t1[ps.t1$flag=="Belize",],type="p",pch="*")
 xyplot(qty_t~yearc|species,groups=fleet,data=ps.t1[ps.t1$flag=="EU.España",],type="l",pch="*")
-
 xyplot(qty_t~yearc|species,groups=fleet,data=ps.t1[ps.t1$flag=="EU.Portugal",],type="p",pch="*")
 xyplot(qty_t~yearc|species,groups=fleet,data=ps.t1[ps.t1$flag=="Japan",],type="p",pch="*")
 xyplot(qty_t~yearc|species,groups=fleet,data=ps.t1[ps.t1$flag=="Panama",],type="p",pch="*")
 xyplot(qty_t~yearc|species,groups=fleet,data=ps.t1[ps.t1$flag=="South Africa",],type="p",pch="*")
 xyplot(qty_t~yearc|species,groups=fleet,data=ps.t1[ps.t1$flag=="U.S.A.",],type="p",pch="*")
-
 xyplot(qty_t~yearc|species,groups=fleet,data=ps.t1[ps.t1$flag=="Venezuela",],type="p",pch="*")
 
 
@@ -618,6 +582,7 @@ uf<-sort(unique(pslf$flagname))
 uf2 <- uf
 
 uf1 <- as.character(sort(unique(ps.t1$flag)))
+uf1
 
 # [1] "Angola"              "Argentina"           "Belize"              "Brazil"              "Canada"              "Cape Verde"          "Cayman Islands"     
 # [8] "Colombia"            "Congo"               "Côte D'Ivoire"       "Cuba"                "Curaçao"             "EU.España"           "EU.France"          
@@ -841,11 +806,13 @@ chan <- odbcConnect("effdis-tuna-cc1", case="postgresql", believeNRows=FALSE)
 sqlQuery(chan,'drop table effdis_ps_1980_2014')
 sqlSave(chan,z5,tablename='effdis_ps_1980_2014')
 
-##########################################
-######## Longliners  #####################
-##########################################
+
+######################################################################################
+######## Longliners  #################################################################
+######################################################################################
 
 setwd("/home/dbeare/effdis/effdis/data/effdis-estimates/LL")
+
 
 # Get data for each dsettype
 
@@ -918,10 +885,11 @@ uf <- sort(as.character(unique(lllf$flagname)))
 
 #Flags to add to "others"- 
 
+
 oth <-c("Argentina", "Angola", "Barbados", "Cape Verde","China (ICCAT program)", "Côte D'Ivoire","EU.France",
-        "Chinese Taipei (foreign obs.)", "Cuba (ICCAT program)" ,"Dominica","EU.United.Kingdom","Faroe Islands",
+        "Chinese Taipei (foreign obs.)", "Cuba (ICCAT program)" ,"Dominica","EU.United Kingdom","Faroe Islands",
         "FR.St Pierre et Miquelon","Grenada","Guinea Ecuatorial","Honduras","Iceland","Japan (foreign obs.)",
-        "Maroc","Mexico","Panama","Philippines","Sierra Leone","Trinidad and Tobago","UK.Sta Helena","UK.Turks and Caicos","Uruguay","U.S.S.R.")
+        "Maroc","Mexico","Panama","Philippines","Sierra Leone","Trinidad and Tobago","UK.Sta Helena","UK.Bermuda","Mixed flags (KR+PA)","UK.Turks and Caicos","Uruguay","U.S.S.R.")
 
 lllf$flagname <- as.character(lllf$flagname)
 
@@ -1534,6 +1502,7 @@ for(i in c(1,2,3,4:5,7:9))
 #system('cat *csv > effdis-estimates.csv')
 #effdis_estimates <- read.table('effdis-estimates.csv',sep=',')
 
+
 setwd("/home/dbeare/effdis/effdis/data/effdis-estimates/LL")
 lf <- list.files()
 
@@ -1544,7 +1513,7 @@ for( i in 1: length(lf)){
 }
 
 effdis_estimates<-do.call("rbind",effdis_estimates)
-dim(effdis_estimates) # = 862948
+dim(effdis_estimates) # = 882181
 
 dimnames(effdis_estimates)[[2]] <- c("longitude","latitude","which.ocean","year","month","trend","flagname","geargrp","prob","prob.se.fit","measured_catch","measured_catch.se.fit",
                                      "eff","eff.se.fit","species","catch","cpue","observation")          
@@ -1562,7 +1531,7 @@ ufe <- sort(unique(as.character(effdis_estimates$flagname)))
 
 #Check against the raw data
 
-wf <- ufe[13]
+wf <- ufe[11]
 print(wf)
 mod1 <- effdis_estimates[effdis_estimates$flagname == wf & effdis_estimates$species == "bet",]
 par(mfrow=c(2,1),mar=c(2,2,2,2))
@@ -1574,10 +1543,9 @@ points(mod1$trend,mod1$eff,col="red",pch="*")
 
 te <- tapply(effort$eff1,effort$year,sum)
 tm <- tapply(mod1$eff,mod1$year,sum)
-tem <-cbind(te,tm)
 
-plot(te/1000000)
-lines(tm/1000000)
+plot(as.numeric(names(te)),te/1000000)
+lines(as.numeric(names(tm)),                      tm/1000000)
 
 
 catch <- aggt2catchdata(input=lllf,which.effort="NO.HOOKS",which.flag=wf,start.year=1950, end.year=2015)
@@ -1585,8 +1553,6 @@ spp <- "alb"
 par(mfrow=c(1,1))
 plot(catch$trend[catch$species == spp],catch$raw_measured_catch[catch$species == spp],pch=".",
      xlab="",ylab="")
-
-
 mod2 <- effdis_estimates[effdis_estimates$flagname == wf ,]
 points(mod2$trend[mod2$species == spp],mod2$catch[mod2$species == spp],col="red",pch=".")
 
@@ -1607,19 +1573,6 @@ ll.t1 <- get.effdis.t1.data(which.dsn='effdis-tuna-cc1',which.gear = 'LL',which.
 str(ll.t1)
 for(i in c(2,5:15)){ll.t1[,i] <- as.character(ll.t1[,i])}
 
-#For bait boat
-# bb.t1 <- get.effdis.t1.data(which.dsn='effdis-tuna-cc1',which.gear = 'BB',which.region='AT',which.flag='All')
-# str(bb.t1)
-# for(i in c(2,5:15)){bb.t1[,i] <- as.character(bb.t1[,i])}
-# 
-# bb.t1.rsa <- bb.t1[bb.t1$flag == 'South Africa',]
-# 
-# tapply(bb.t1.rsa$qty_t,list(bb.t1.rsa$year,bb.t1.rsa$species),sum,na.rm=T)
-# 
-
-
-1350# Datatype is either C (catch), L (Landings), DD (Discards), DM (?) and Landings
-
 # If catch is available use that otherwise sum landings and discards.
 
 ll.t1.c <- ll.t1[ll.t1$datatype == "C",]
@@ -1639,14 +1592,12 @@ xyplot(qty_t~yearc|species,groups=fleet,data=ll.t1[ll.t1$flag=="China PR",],type
 xyplot(qty_t~yearc|species,groups=fleet,data=ll.t1[ll.t1$flag=="Chinese Taipei",],type="p",pch="*")
 xyplot(qty_t~yearc|species,groups=fleet,data=ll.t1[ll.t1$flag=="Cuba",],type="p",pch="*")
 xyplot(qty_t~yearc|species,groups=fleet,data=ll.t1[ll.t1$flag=="EU.España",],type="p",pch="*")
-
 xyplot(qty_t~yearc|species,groups=fleet,data=ll.t1[ll.t1$flag=="EU.Portugal",],type="p",pch="*")
 xyplot(qty_t~yearc|species,groups=fleet,data=ll.t1[ll.t1$flag=="Japan",],type="p",pch="*")
 xyplot(qty_t~yearc|species,groups=fleet,data=ll.t1[ll.t1$flag=="Korea Rep.",],type="p",pch="*")
 xyplot(qty_t~yearc|species,groups=fleet,data=ll.t1[ll.t1$flag=="Namibia",],type="p",pch="*")
 xyplot(qty_t~yearc|species,groups=fleet,data=ll.t1[ll.t1$flag=="Panama",],type="p",pch="*")
 xyplot(qty_t~yearc|species,groups=fleet,data=ll.t1[ll.t1$flag=="Philippines",],type="p",pch="*")
-
 xyplot(qty_t~yearc|species,groups=fleet,data=ll.t1[ll.t1$flag=="South Africa",],type="p",pch="*")
 xyplot(qty_t~yearc|species,groups=fleet,data=ll.t1[ll.t1$flag== "St. Vincent and Grenadines",],type="p",pch="*")
 xyplot(qty_t~yearc|species,groups=fleet,data=ll.t1[ll.t1$flag=="U.S.A.",],type="p",pch="*")
@@ -1657,6 +1608,7 @@ xyplot(qty_t~yearc|species,groups=fleet,data=ll.t1[ll.t1$flag=="Venezuela",],typ
 #Convert Task 1 to 'Other
 
 uf<-sort(unique(lllf$flagname))
+
 uf2 <- uf
 
 uf1 <- as.character(sort(unique(ll.t1$flag)))
@@ -1687,8 +1639,11 @@ ussr <- ll.t1[ll.t1$flag %in% c("U.S.S.R.","Russian Federation"),]
 mm <- match(ll.t1$flag,uf2)
 ll.t1$flag[is.na(mm)] <- 'Other'
 
+uf1 <- sort(unique(ll.t1$flag))
+
 w1 <- (1:length(ll.t1[,1]))[ll.t1$yearc == 2014]
 round(tapply(ll.t1$qty_t[w1],list(ll.t1$flag[w1],ll.t1$species[w1]),sum,na.rm=T))
+
 
 # See task 1 totals by species
 
@@ -1713,6 +1668,7 @@ t1x[t1x$species == 'yft',]
 
 
 #Convert catch to tonnes from kgs
+
 head(effdis_estimates)
 effdis_estimates$catch <- effdis_estimates$catch/1000
 
@@ -1720,9 +1676,11 @@ effdis_estimates$measured_catch <- effdis_estimates$measured_catch/1000
 effdis_estimates$measured_catch.se.fit <- effdis_estimates$measured_catch.se.fit/1000
 effdis_estimates$cpue <- effdis_estimates$catch/effdis_estimates$eff # Re-calculate by tonne
 
-# Start combining Task 1 and 2
+##### Start combining Task 1 and 2 #########
 
 # Catch
+
+# Sum catch over year and flag
 
 catch_by_year_flag <- aggregate(list(measured_catch=effdis_estimates$measured_catch,catch=effdis_estimates$catch), 
                                 by=list(year=effdis_estimates$year,flagname=effdis_estimates$flagname),sum,na.rm=T)
@@ -1762,37 +1720,42 @@ sum.t1 <- aggregate(list(qty_t=ll.t1$qty_t),list(year=ll.t1$yearc,flagname=ll.t1
 
 sum.t1.t2 <-merge(sum.t1,catch_by_year_flag)
 
-# Put on effort
+sum.t1.t2 <- orderBy(~flagname+year,data=sum.t1.t2)
 
+plot(sum.t1.t2$qty_t,sum.t1.t2$catch)
+
+abline(1,1)
+
+# Put on effort
 
 all.t1.t2 <- merge(effort_by_year_flag,sum.t1.t2)
 
+# Calculate CPUE (modeled cpue/modeled catch)
+
 all.t1.t2$cpue <- all.t1.t2$catch/all.t1.t2$eff
 
-plot(all.t1.t2$year,log(all.t1.t2$cpue),type="n")
-text(all.t1.t2$year,log(all.t1.t2$cpue),as.character(all.t1.t2$flagname),cex=.5)
+# plot(all.t1.t2$year,log(all.t1.t2$cpue),type="n")
+# text(all.t1.t2$year,log(all.t1.t2$cpue),as.character(all.t1.t2$flagname),cex=.5)
 
 all.t1.t2$raised_effort <- all.t1.t2$qty_t/all.t1.t2$cpue
 
 all.t1.t2$rf <- all.t1.t2$raised_effort/all.t1.t2$eff
 
 
-# Put the raising factor on effdis estimates
+# Put the raising factor on the effdis estimates
 
 m1 <- paste(effdis_estimates$year,effdis_estimates$flagname)
 m2 <- paste(all.t1.t2$year,all.t1.t2$flagname)
 
 nrf <- all.t1.t2$rf[match(m1,m2)]
 effdis_estimates$rf <- nrf
-
 effdis_estimates$hooksEst <- effdis_estimates$eff*effdis_estimates$rf
-
 effdis_estimates$hooksObs <- effdis_estimates$eff
 
 # Put the raising factor on effdis EFFORT only estimates
 
 m1 <- paste(z5$year,z5$flagname)
-m2 <- paste(z5$year,z5$flagname)
+m2 <- paste(all.t1.t2$year,all.t1.t2$flagname)
 
 nrf <- all.t1.t2$rf[match(m1,m2)]
 z5$rf <- nrf
