@@ -576,8 +576,10 @@ n1 <-table(effdis_estimates$flagname,as.character(effdis_estimates$species))
 n1 <- ifelse(n1==0,F,T)
 
 #################################
-### Get Task 1 data
-# For Purse-seine
+### Get Task 1 data##############
+#################################
+
+## For Purse-seine
 ps.t1 <- get.effdis.t1.data(which.dsn='effdis-tuna-cc1',which.gear = 'PS',which.region='AT',which.flag='All')
 str(ps.t1)
 for(i in c(2,5:15)){ps.t1[,i] <- as.character(ps.t1[,i])}
@@ -832,7 +834,8 @@ ggsave(p,file="GlobalEffdisEstimates.png",dpi=500,w=10,h=6,unit="in",type="cairo
 z5$geargrp <- "PS"
 
 write.table(z5,file="effdis_ps.1980.2014.csv",sep=",",row.names=F)
-z5<-read.table("effdis_ps.1980.2014.csv",sep=",",header=T)
+
+effdis_ps.1980.2015<-read.table("effdis_ps.1980.2014.csv",sep=",",header=T)
 
 chan <- odbcConnect("effdis-tuna-cc1", case="postgresql", believeNRows=FALSE)
 sqlQuery(chan,'drop table effdis_ps_1980_2014')
@@ -1232,10 +1235,6 @@ for(i in c(1,2,4:9))
   }
 }
 
-
-
-
-
 #Need to investigate Maroc
 
 
@@ -1330,6 +1329,8 @@ for(i in c(1,2,3,4:9))
 #   print(sp)
 #   mod.sen[[i]] <- fit2stageGAMtoCatch(input=lllf,which.flag='Senegal',which.species=sp,start.year=1950,end.year=2015,kk=3)
 # }
+
+
 # 
 # for(i in c(1,2,3,4:9))
 # {
@@ -1347,14 +1348,16 @@ for(i in c(1,2,3,4:9))
 
 #setwd('/home/doug/effdis/effdis-estimates')
 
-vg <- lllf[lllf$flagname == ufe[14] & lllf$species == "alb" ,]
-plot(vg$trend,vg$eff1)
+vg <- lllf[lllf$flagname == "St. Vincent and Grenadines" & lllf$species == "alb" ,]
+plot(vg$year,vg$eff1)
 vg.big <- vg[vg$eff1>1000000,]
 plot(vg.big$trend,vg.big$eff1)
 
 
-# 2013 is just too big for St V&G.
-s0 <- (1:length(lllf$flagname))[lllf$flagname == ufe[14] & lllf$year %in% c(2013)]
+# 2012-2013 numbers are just too big for St V&G so divide by 10.
+
+
+s0 <- (1:length(lllf$flagname))[lllf$flagname == "St. Vincent and Grenadines" & lllf$year %in% c(2012,2013,2014)]
 lllf$eff1[s0] <- lllf$eff1[s0]/10
 
 
@@ -1531,7 +1534,7 @@ for(i in c(1,2,3,4:5,7:9))
 #system('cat *csv > effdis-estimates.csv')
 #effdis_estimates <- read.table('effdis-estimates.csv',sep=',')
 
-setwd("/home/dbeare/effdis/effdis/data/effdis-estimates")
+setwd("/home/dbeare/effdis/effdis/data/effdis-estimates/LL")
 lf <- list.files()
 
 effdis_estimates <- as.list(length(lf))
@@ -1541,7 +1544,7 @@ for( i in 1: length(lf)){
 }
 
 effdis_estimates<-do.call("rbind",effdis_estimates)
-dim(effdis_estimates) # = 490513
+dim(effdis_estimates) # = 862948
 
 dimnames(effdis_estimates)[[2]] <- c("longitude","latitude","which.ocean","year","month","trend","flagname","geargrp","prob","prob.se.fit","measured_catch","measured_catch.se.fit",
                                      "eff","eff.se.fit","species","catch","cpue","observation")          
@@ -1559,7 +1562,7 @@ ufe <- sort(unique(as.character(effdis_estimates$flagname)))
 
 #Check against the raw data
 
-wf <- ufe[14]
+wf <- ufe[13]
 print(wf)
 mod1 <- effdis_estimates[effdis_estimates$flagname == wf & effdis_estimates$species == "bet",]
 par(mfrow=c(2,1),mar=c(2,2,2,2))
@@ -1596,9 +1599,10 @@ xyplot(eff/1000000~trend|flagname,data=effdis_estimates[effdis_estimates$species
 
 n1 <-table(effdis_estimates$flagname,as.character(effdis_estimates$species))
 n1 <- ifelse(n1==0,F,T)
+n1
+##### Get Task 1 data #####
+##### For Long-line #######
 
-# Get Task 1 data
-# For Long-line
 ll.t1 <- get.effdis.t1.data(which.dsn='effdis-tuna-cc1',which.gear = 'LL',which.region='AT',which.flag='All')
 str(ll.t1)
 for(i in c(2,5:15)){ll.t1[,i] <- as.character(ll.t1[,i])}
@@ -1612,7 +1616,6 @@ for(i in c(2,5:15)){ll.t1[,i] <- as.character(ll.t1[,i])}
 # 
 # tapply(bb.t1.rsa$qty_t,list(bb.t1.rsa$year,bb.t1.rsa$species),sum,na.rm=T)
 # 
-
 
 
 1350# Datatype is either C (catch), L (Landings), DD (Discards), DM (?) and Landings
@@ -1724,14 +1727,17 @@ effdis_estimates$cpue <- effdis_estimates$catch/effdis_estimates$eff # Re-calcul
 catch_by_year_flag <- aggregate(list(measured_catch=effdis_estimates$measured_catch,catch=effdis_estimates$catch), 
                                 by=list(year=effdis_estimates$year,flagname=effdis_estimates$flagname),sum,na.rm=T)
 
-# Create modeled effort file - we have this problem that effort is repeated in the long format. Only Spain doesnt report Bigeye.
+# Create modeled effort file - we have this problem that effort is repeated in the long format. All flags report Yellowfin.
 
-z1 <- effdis_estimates[effdis_estimates$flagname != "EU.España",]
-z2 <- z1[z1$species == "bet",]
-z3 <- effdis_estimates[effdis_estimates$flagname == "EU.España",]
-z4 <- rbind(z2,z3)
-z5 <- data.frame(eff=z4$eff,longitude=z4$longitude,latitude=z4$latitude,year=z4$year,
-                 month=z4$month,trend=z4$trend,flagname =z4$flagname) 
+# z1 <- effdis_estimates[effdis_estimates$flagname != "EU.España",]
+# z2 <- z1[z1$species == "bet",]
+# z3 <- effdis_estimates[effdis_estimates$flagname == "EU.España",]
+# z4 <- rbind(z2,z3)
+
+effdis_estimates.yft <- effdis_estimates[effdis_estimates$species == 'yft',] 
+
+z5 <- data.frame(eff=effdis_estimates.yft$eff,longitude=effdis_estimates.yft$longitude,latitude=effdis_estimates.yft$latitude,year=effdis_estimates.yft$year,
+                 month=effdis_estimates.yft$month,trend=effdis_estimates.yft$trend,flagname =effdis_estimates.yft$flagname) 
 
 effort_by_year_flag <- aggregate(list(eff=z5$eff), 
                                  by=list(year=z5$year,flagname=z5$flagname),sum,na.rm=T)
@@ -1815,8 +1821,6 @@ xyplot(raised_effort/1000000~year|flagname,data=all.t1.t2,type='b',
 #      effdis_estimates2$raw_raised.effort[effdis_estimates2$flagname == 'Japan']/1000000,type='l',ylim=c(0,120))
 
 
-
-
 p1 <- ggplot(data = all.t1.t2, aes(x = year, y = raised_effort/1000000)) +
   geom_line() +
   facet_wrap(~ flagname, scales = "free_y") +
@@ -1824,8 +1828,7 @@ p1 <- ggplot(data = all.t1.t2, aes(x = year, y = raised_effort/1000000)) +
 
 p1
 
-ggsave(p1,file="EffdisEffortEstimatesByCountry.png",dpi=500,w=10,h=6,unit="in",type="cairo-png")
-
+ggsave(p1,file="EffdisLLEffortEstimatesByCountry.png",dpi=500,w=10,h=6,unit="in",type="cairo-png")
 
 
 all.t1.t2.sum <- aggregate(list(raised_effort=all.t1.t2$raised_effort),
@@ -1863,7 +1866,23 @@ z5<-read.table("effdis_ll.1950.2014.csv",sep=",",header=T)
 
 chan <- odbcConnect("effdis-tuna-cc1", case="postgresql", believeNRows=FALSE)
 sqlQuery(chan,'drop table effdis_ll_1950_2014')
-sqlSave(chan,z5,tablename='effdis_ll_1950_2014')################# Raise the data to Task I ####################################################
+sqlSave(chan,z5,tablename='effdis_ll_1950_2014')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+################# Raise the data to Task I ####################################################
 
 
 #setwd('/home/doug/effdis/effdis-estimates')
