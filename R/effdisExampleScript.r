@@ -881,15 +881,20 @@ uf
 # [41] "U.S.S.R."                      "UK.Bermuda"                    "UK.Sta Helena"                 "UK.Turks and Caicos"          
 # [45] "Uruguay"                       "Vanuatu"                       "Venezuela"                    
 
+# Make Cuba and Cuba (ICCAT program) the same
+
+wic <- (1:length(lllf[,1]))[lllf$flagname == 'Cuba (ICCAT program)']
+lllf$flagname[wic] <- 'Cuba'
+
 
 #Flags to add to "others"- 
 
 
 oth <-c("Argentina", "Angola", "Barbados", "Cape Verde","China (ICCAT program)", "Côte D'Ivoire","EU.France",
-        "Chinese Taipei (foreign obs.)", "Cuba (ICCAT program)" ,"Dominica","EU.United Kingdom","Faroe Islands",
+        "Chinese Taipei (foreign obs.)" ,"Dominica","EU.United Kingdom","Faroe Islands",
         "FR.St Pierre et Miquelon","Grenada","Guinea Ecuatorial","Honduras","Iceland","Japan (foreign obs.)",
         "Maroc","Mexico","Philippines","Sierra Leone","Trinidad and Tobago","UK.Sta Helena","UK.Bermuda",
-        "Mixed flags (KR+PA)","UK.Turks and Caicos","Uruguay","U.S.S.R.")
+        "Mixed flags (KR+PA)","UK.Turks and Caicos","Uruguay")
 
 lllf$flagname <- as.character(lllf$flagname)
 
@@ -1116,7 +1121,6 @@ for(i in c(1:6,8:9))
 
 ### Spain
 
-
 emod.spain <- fitGAMtoEffort(input=lllf,which.flag='EU.España',which.effort='NO.HOOKS',start.year=1950,end.year=2015,kk=9)
 
 mod.spain <- as.list(1:9)
@@ -1336,7 +1340,6 @@ plot(vg$year,vg$eff1)
 vg.big <- vg[vg$eff1>1000000,]
 plot(vg.big$trend,vg.big$eff1)
 
-
 # 2012-2013 numbers are just too big for St V&G so divide by 10.
 
 
@@ -1436,26 +1439,26 @@ for(i in c(1,2,3,4:9))
 
 
 # # U.S.S.R.
+
+ emod.uss <- fitGAMtoEffort(input=lllf,which.flag='U.S.S.R.',which.effort='NO.HOOKS',start.year=1950,end.year=2015,kk=3)
+
+ mod.uss <- as.list(1:9)
+ for(i in c(1,2,3,4,5:9))
+ {
+   sp <- us[i]
+   print(sp)
+   mod.uss[[i]] <- fit2stageGAMtoCatch(input=lllf,which.flag='U.S.S.R.',which.species=sp,start.year=1950,end.year=2015,kk=3)
+ }
 # 
-# emod.uss <- fitGAMtoEffort(input=lllf,which.flag='U.S.S.R.',which.effort='NO.HOOKS',start.year=1950,end.year=2015,kk=3)
-# 
-# mod.uss <- as.list(1:9)
-# for(i in c(1,2,3,4,5:9))
-# {
-#   sp <- us[i]
-#   print(sp)
-#   mod.uss[[i]] <- fit2stageGAMtoCatch(input=lllf,which.flag='U.S.S.R.',which.species=sp,start.year=1950,end.year=2015,kk=3)
-# }
-# 
-# for(i in c(1,2,3,4:9))
-# {
-#   if(mod.uss[[i]]=='Insufficient data to support model')
-#   {print('no model')}
-#   else{
-#     aa <- predict.effdis.t2.data(cmod=mod.uss[[i]], effmod=emod.uss,grid.res=5,start.year=1950,end.year=2015,which.flag='U.S.S.R.')
-#     gc(reset=T)
-#   }
-# }
+ for(i in c(1,2,3,4:9))
+ {
+   if(mod.uss[[i]]=='Insufficient data to support model')
+   {print('no model')}
+   else{
+     aa <- predict.effdis.t2.data(cmod=mod.uss[[i]], effmod=emod.uss,grid.res=5,start.year=1950,end.year=2015,which.flag='U.S.S.R.')
+     gc(reset=T)
+   }
+ }
 
 # Vanuatu.
 
@@ -1526,7 +1529,7 @@ for( i in 1: length(lf)){
 }
 
 effdis_estimates<-do.call("rbind",effdis_estimates)
-dim(effdis_estimates) # = 891650
+dim(effdis_estimates) # = 891599
 
 dimnames(effdis_estimates)[[2]] <- c("longitude","latitude","which.ocean","year","month","trend","flagname","geargrp","prob","prob.se.fit","measured_catch","measured_catch.se.fit",
                                      "eff","eff.se.fit","species","catch","cpue","observation")          
@@ -1782,6 +1785,8 @@ z5$hooksEst <- z5$eff*z5$rf
 z5$hooksObs <- z5$eff
 z5 <- z5[,-1]
 
+z5$hooksEst[z5$flagname=='U.S.A.']<- z5$hooksEst[z5$flagname=='U.S.A.']*3
+
 library(lattice)
 
 xyplot(raised_effort/1000000~year|flagname,data=all.t1.t2,type='b',
@@ -1852,34 +1857,47 @@ sqlSave(chan,z5,tablename='effdis_ll_1950_2014')
 
 # Compare my estimates with Carlos' by flag
 
-effdis_v0 <- import('/home/dbeare/Dropbox/Globefish-Consultancy-Services-2015/ICCAT-Effdis-Contract-2015/Data/EffDIS_v0.xlsx')
+effdis_v0 <- import('/home/dbeare/Dropbox/Globefish-Consultancy-Services-2015/ICCAT-Effdis-Contract-2015/Data/EffDIS_v0.xlsx',sheet=2)
+headr <- as.character(effdis_v0[3,])
+dat <- effdis_v0[4:64,]
+dimnames(dat)[[2]] <- headr
+for(i in 1:25){ dat[,i] <- round(as.numeric(dat[,i]))}
+dimnames(dat)[[2]][25] <- 'Total'
+dimnames(dat)[[2]][5] <- 'Brazil'
+dimnames(dat)[[2]][24] <- 'Other'
+dimnames(dat)[[2]][15] <- 'China PR'
+dat$Total <- as.numeric(dat$Total)
+effdis_v0 <- dat
+effdis_v0 <- melt(effdis_v0,id=c("YearC"))
+dimnames(effdis_v0)[[2]] <- c('year','flagname','hooksEst0')
 
-#add trend vector to Carlos'
+effdis_v0$flagname <- as.character(effdis_v0$flagname)
+effdis_v1$flagname <- as.character(effdis_v1$flagname)
 
-effdis_v0$trend <- trend(year=effdis_v0$YearC,month=effdis_v0$TimePeriodID,start.year = 1950)
+effdis_v1 <- aggregate(list(hooksEst1=effdis_v1$hooksEst),list(year=effdis_v1$year,flagname=effdis_v1$flagname),sum)
 
-xyplot(estHooks~trend|FlagName,data=effdis_v0)
-
-# Totals
-
-
-v0 <- aggregate(list(estHooks=effdis_v0$estHooks),list(year=effdis_v0$YearC),sum,na.rm=T)
-v1 <- aggregate(list(estHooks=z5$hooksEst),list(year=z5$year),sum,na.rm=T)
-
-colnames(v0)[2] <- 'estHooks0'
-colnames(v1)[2] <- 'estHooks1'
-
-v2 <- merge(v0,v1)
-
-
-# By flag
-
-wf <- ufe[1]
-
-plot(effdis_v0$trend[effdis_v0$FlagName==wf],effdis_v0$obsHooks[effdis_v0$FlagName==wf])
+sort(unique(effdis_v1$flagname))
+sort(unique(effdis_v0$flagname))
 
 
+effdis_compare <- merge(effdis_v0,effdis_v1,all=T)
 
+par(mfrow=c(5,5))
+uuf <- sort(unique(as.character(effdis_compare$flagname)))
+
+
+
+for(i in c(1:18,20:25)){
+  rr <- range(c(effdis_compare$hooksEst0[effdis_compare$flagname == uuf[i]],effdis_compare$hooksEst1[effdis_compare$flagname == uuf[i]]),na.rm=T)
+  plot(effdis_compare$year[effdis_compare$flagname == uuf[i] ],effdis_compare$hooksEst0[effdis_compare$flagname == uuf[i]],xlim=c(1950,2015),ylim=rr,type='l')
+title(uuf[i])
+points(effdis_compare$year[effdis_compare$flagname == uuf[i] ],effdis_compare$hooksEst1[effdis_compare$flagname == uuf[i]],col='green',type='l')
+}
+
+
+
+wf <- 'Belize'
+plot(effdis$)
 
 
 
