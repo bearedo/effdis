@@ -73,8 +73,8 @@ pslf <- convert2long.format.t2(input =ps1)
 
 table(pslf$eff1type)
 
-# D.AT SEA    D.FISH FISH.HOUR    -none-   NO.SETS  NO.TRIPS  SUC.D.FI  SUC.SETS 
-# 1431    202176    494352      6129     15075       261       378       126 
+#D.AT SEA    D.FISH FISH.HOUR    -none-   NO.SETS  NO.TRIPS  SUC.D.FI  SUC.SETS 
+#1881    237051    531621      9729     24642       369        27       126 
 
 pslf <- pslf[pslf$eff1type %in% c('D.FISH','FISH.HOUR'),]
 pslf$eff1[pslf$eff1type == 'D.FISH'] <- pslf$eff1[pslf$eff1type == 'D.FISH']*24
@@ -97,32 +97,31 @@ dim(pslf) #=  768672 (2015)
 
 
 us <- sort(as.character(unique(pslf$species)))
-uf <- sort(as.character(unique(pslf$flagname)))
+uf <- sort(as.character(unique(pslf$flagname[pslf$year > 1989])))
 
  uf
  
- # [1] "Belize"                "Brazil"                "Canada"                "Cape Verde"            "Congo"                 "Côte D'Ivoire"        
- # [7] "Curaçao"               "EU.España"             "EU.France"             "EU.Portugal"           "Ghana"                 "Ghana (ICCAT program)"
- # [13] "Guatemala"             "Guinée Rep."           "Japan"                 "Mixed flags (FIS)"     "NEI (ETRO)"            "Panama"               
- # [19] "Russian Federation"    "U.S.A."                "Venezuela"            
+ # [1] "Belize"             "Brazil"             "Cape Verde"         "Côte D'Ivoire"      "Curaçao"            "EU.España"          "EU.France"         
+ # [8] "EU.Portugal"        "Ghana"              "Guatemala"          "Guinée Rep."        "Japan"              "Mixed flags (FIS)"  "NEI (ETRO)"        
+ # [15] "Panama"             "Russian Federation" "U.S.A."             "Venezuela"  
 
- dim(pslf) #=  768672 (2015)
+  dim(pslf) #=  768672 (2015)
 
-#Flags to add to "others"- 
+# Flags to add to "others"- 
 
-oth <-c("Belize", "Brazil", "Canada","Congo","Côte D'Ivoire","EU.Portugal","Russian Federation")
+oth <-c("Belize", "Brazil", "Canada","Congo","Côte D'Ivoire","EU.Portugal","Russian Federation","U.S.A.")
 idx <- (1:length(pslf[,1]))[pslf$flagname %in% oth]
 pslf$flagname[idx] <- "Other"
 
 #Japan
 
-emod.jap <- fitGAMtoEffort(input=pslf,which.flag='Japan',which.effort='FISH.HOUR',start.year=1980,end.year=2015,kk=6)
+emod.jap <- fitGAMtoEffort(input=pslf,which.flag='Japan',which.effort='FISH.HOUR',start.year=1990,end.year=2015,kk=3)
 
 mod.jap <- as.list(1:9)
 for(i in 1:9)
 {
   sp <- us[i]
-  mod.jap[[i]] <- fit2stageGAMtoCatch(input=pslf,which.flag='Japan',which.species=sp,start.year=1980,end.year=2015,kk=6)
+  mod.jap[[i]] <- fit2stageGAMtoCatch(input=pslf,which.flag='Japan',which.species=sp,start.year=1990,end.year=2015,kk=3)
   print(sp)
 }
 
@@ -146,15 +145,15 @@ plot.mods(input=aa,cmod=mod.jap[[9]],which.year=1995,which.month=1,grid.res=7,wh
 
 #Cape Verde
 
- emod<- pslf[pslf$flagname == "Cape Verde",]
+emod<- pslf[pslf$flagname == "Cape Verde",]
 
-emod.cv <- fitGAMtoEffort(input=pslf,which.flag='Cape Verde',which.effort='FISH.HOUR',start.year=1980,end.year=2015,kk=3)
+emod.cv <- fitGAMtoEffort(input=pslf,which.flag='Cape Verde',which.effort='FISH.HOUR',start.year=1990,end.year=2015,kk=3)
 
 mod.cv <- as.list(1:9)
 for(i in 1:9)
 {
   sp <- us[i]
-  mod.cv[[i]] <- fit2stageGAMtoCatch(input=pslf,which.flag='Cape Verde',which.species=sp,start.year=1980,end.year=2015,kk=3)
+  mod.cv[[i]] <- fit2stageGAMtoCatch(input=pslf,which.flag='Cape Verde',which.species=sp,start.year=1990,end.year=2015,kk=3)
   print(sp)
 }
 
@@ -164,7 +163,7 @@ for(i in 1:9)
   {print('no model')
   }
   else{
-    aa <- predict.effdis.t2.data(cmod=mod.cv[[i]],which.gear="PS", effmod=emod.cv,grid.res=1,start.year=1980,end.year=2015,which.flag='Cape Verde')
+    aa <- predict.effdis.t2.data(cmod=mod.cv[[i]],which.gear="PS", effmod=emod.cv,grid.res=1,start.year=1990,end.year=2015,which.flag='Cape Verde')
     rm(aa)
     gc(reset=T)
   }
@@ -172,24 +171,23 @@ for(i in 1:9)
 
 #Curaçao
 
-emod.cur <- fitGAMtoEffort(input=pslf,which.flag="Curaçao",which.effort='FISH.HOUR',start.year=1980,end.year=2015,kk=3)
+emod.cur <- fitGAMtoEffort(input=pslf,which.flag="Curaçao",which.effort='FISH.HOUR',start.year=1990,end.year=2015,kk=3)
 
 mod.cur <- as.list(1:9)
 for(i in 1:9)
 {
   sp <- us[i]
-  mod.cur[[i]] <- fit2stageGAMtoCatch(input=pslf,which.flag="Curaçao",which.species=sp,start.year=1980,end.year=2015,kk=3)
+  mod.cur[[i]] <- fit2stageGAMtoCatch(input=pslf,which.flag="Curaçao",which.species=sp,start.year=1990,end.year=2015,kk=3)
   print(sp)
 }
 
 for(i in 1:9)
 {
   if(mod.cur[[i]]=='Insufficient data to support model')
-  {print('no model')h1 <- gam(eff1~te(longitude,latitude)+te(trend)+sin1+cos1+sin2+cos2+sin3+cos3+sin4+cos4+sin5+cos5+cos6,family=quasipoisson(link="log"),method="REML",data=input2)
-
+  {print('no model')
   }
   else{
-    aa <- predict.effdis.t2.data(cmod=mod.cur[[i]],which.gear="PS", effmod=emod.cur,grid.res=1,start.year=1980,end.year=2015,which.flag="Curaçao")
+    aa <- predict.effdis.t2.data(cmod=mod.cur[[i]],which.gear="PS", effmod=emod.cur,grid.res=1,start.year=1990,end.year=2015,which.flag="Curaçao")
     rm(aa)
     gc(reset=T)
   }
@@ -197,13 +195,13 @@ for(i in 1:9)
 
 #EU.Espana
 
-emod.esp <- fitGAMtoEffort(input=pslf,which.flag="EU.España",which.effort='FISH.HOUR',start.year=1980,end.year=2015,kk=9)
+emod.esp <- fitGAMtoEffort(input=pslf,which.flag="EU.España",which.effort='FISH.HOUR',start.year=1990,end.year=2015,kk=9)
 
 mod.esp <- as.list(1:9)
 for(i in 1:9)
 {
   sp <- us[i]
-  mod.esp[[i]] <- fit2stageGAMtoCatch(input=pslf,which.flag="EU.España",which.species=sp,start.year=1980,end.year=2015,kk=9)
+  mod.esp[[i]] <- fit2stageGAMtoCatch(input=pslf,which.flag="EU.España",which.species=sp,start.year=1990,end.year=2015,kk=9)
   print(sp)
 }
 
@@ -213,7 +211,7 @@ for(i in 1:9)
   {print('no model')
   }
   else{
-    aa <- predict.effdis.t2.data(cmod=mod.esp[[i]],which.gear="PS", effmod=emod.esp,grid.res=1,start.year=1980,end.year=2015,which.flag="EU.España")
+    aa <- predict.effdis.t2.data(cmod=mod.esp[[i]],which.gear="PS", effmod=emod.esp,grid.res=1,start.year=1990,end.year=2015,which.flag="EU.España")
     rm(aa)
     gc(reset=T)
   }
@@ -222,13 +220,13 @@ for(i in 1:9)
 
 #EU.France
 
-emod.fra <- fitGAMtoEffort(input=pslf,which.flag="EU.France",which.effort='FISH.HOUR',start.year=1980,end.year=2015,kk=9)
+emod.fra <- fitGAMtoEffort(input=pslf,which.flag="EU.France",which.effort='FISH.HOUR',start.year=1990,end.year=2015,kk=9)
 
 mod.fra <- as.list(1:9)
 for(i in 1:9)
 {
   sp <- us[i]
-  mod.fra[[i]] <- fit2stageGAMtoCatch(input=pslf,which.flag="EU.France",which.species=sp,start.year=1980,end.year=2015,kk=9)
+  mod.fra[[i]] <- fit2stageGAMtoCatch(input=pslf,which.flag="EU.France",which.species=sp,start.year=1990,end.year=2015,kk=9)
   print(sp)
 }
 
@@ -238,7 +236,7 @@ for(i in 1:9)
   {print('no model')
   }
   else{
-    aa <- predict.effdis.t2.data(cmod=mod.fra[[i]],which.gear="PS", effmod=emod.fra,grid.res=1,start.year=1980,end.year=2015,which.flag="EU.France")
+    aa <- predict.effdis.t2.data(cmod=mod.fra[[i]],which.gear="PS", effmod=emod.fra,grid.res=1,start.year=1990,end.year=2015,which.flag="EU.France")
     rm(aa)
     gc(reset=T)
   }
@@ -247,13 +245,13 @@ for(i in 1:9)
 
 #Ghana
 
-emod.gha <- fitGAMtoEffort(input=pslf,which.flag="Ghana",which.effort='FISH.HOUR',start.year=1980,end.year=2015,kk=9)
+emod.gha <- fitGAMtoEffort(input=pslf,which.flag="Ghana",which.effort='FISH.HOUR',start.year=1990,end.year=2015,kk=9)
 
 mod.gha <- as.list(1:9)
 for(i in 1:9)
 {
   sp <- us[i]
-  mod.gha[[i]] <- fit2stageGAMtoCatch(input=pslf,which.flag="Ghana",which.species=sp,start.year=1980,end.year=2015,kk=9)
+  mod.gha[[i]] <- fit2stageGAMtoCatch(input=pslf,which.flag="Ghana",which.species=sp,start.year=1990,end.year=2015,kk=9)
   print(sp)
 }
 
@@ -263,7 +261,7 @@ for(i in 1:9)
   {print('no model')
   }
   else{
-    aa <- predict.effdis.t2.data(cmod=mod.gha[[i]],which.gear="PS", effmod=emod.gha,grid.res=1,start.year=1980,end.year=2015,which.flag="Ghana")
+    aa <- predict.effdis.t2.data(cmod=mod.gha[[i]],which.gear="PS", effmod=emod.gha,grid.res=1,start.year=1990,end.year=2015,which.flag="Ghana")
     rm(aa)
     gc(reset=T)
   }
@@ -273,13 +271,13 @@ for(i in 1:9)
 
 #Guatemala
 
-emod.gua <- fitGAMtoEffort(input=pslf,which.flag="Guatemala",which.effort='FISH.HOUR',start.year=1980,end.year=2015,kk=9)
+emod.gua <- fitGAMtoEffort(input=pslf,which.flag="Guatemala",which.effort='FISH.HOUR',start.year=1990,end.year=2015,kk=9)
 
 mod.gua <- as.list(1:9)
 for(i in 1:9)
 {
   sp <- us[i]
-  mod.gua[[i]] <- fit2stageGAMtoCatch(input=pslf,which.flag="Guatemala",which.species=sp,start.year=1980,end.year=2015,kk=9)
+  mod.gua[[i]] <- fit2stageGAMtoCatch(input=pslf,which.flag="Guatemala",which.species=sp,start.year=1990,end.year=2015,kk=9)
   print(sp)
 }
 
@@ -289,7 +287,7 @@ for(i in 1:9)
   {print('no model')
   }
   else{
-    aa <- predict.effdis.t2.data(cmod=mod.gua[[i]],which.gear="PS", effmod=emod.gua,grid.res=1,start.year=1980,end.year=2015,which.flag="Guatemala")
+    aa <- predict.effdis.t2.data(cmod=mod.gua[[i]],which.gear="PS", effmod=emod.gua,grid.res=1,start.year=1990,end.year=2015,which.flag="Guatemala")
     rm(aa)
     gc(reset=T)
   }
@@ -297,13 +295,13 @@ for(i in 1:9)
 
 ##Guinee Rep.
 
-emod.gui <- fitGAMtoEffort(input=pslf,which.flag="Guinée Rep.",which.effort='FISH.HOUR',start.year=1980,end.year=2015,kk=9)
+emod.gui <- fitGAMtoEffort(input=pslf,which.flag="Guinée Rep.",which.effort='FISH.HOUR',start.year=1990,end.year=2015,kk=9)
 
 mod.gui <- as.list(1:9)
 for(i in 1:9)
 {
   sp <- us[i]
-  mod.gui[[i]] <- fit2stageGAMtoCatch(input=pslf,which.flag="Guinée Rep.",which.species=sp,start.year=1980,end.year=2015,kk=9)
+  mod.gui[[i]] <- fit2stageGAMtoCatch(input=pslf,which.flag="Guinée Rep.",which.species=sp,start.year=1990,end.year=2015,kk=9)
   print(sp)
 }
 
@@ -313,7 +311,7 @@ for(i in 1:9)
   {print('no model')
   }
   else{
-    aa <- predict.effdis.t2.data(cmod=mod.gui[[i]],which.gear="PS", effmod=emod.gui,grid.res=1,start.year=1980,end.year=2015,which.flag="Guinée Rep.")
+    aa <- predict.effdis.t2.data(cmod=mod.gui[[i]],which.gear="PS", effmod=emod.gui,grid.res=1,start.year=1990,end.year=2015,which.flag="Guinée Rep.")
     rm(aa)
     gc(reset=T)
   }
@@ -321,13 +319,13 @@ for(i in 1:9)
 
 ##Panama
 
-emod.pan <- fitGAMtoEffort(input=pslf,which.flag="Panama",which.effort='FISH.HOUR',start.year=1980,end.year=2015,kk=6)
+emod.pan <- fitGAMtoEffort(input=pslf,which.flag="Panama",which.effort='FISH.HOUR',start.year=1990,end.year=2015,kk=6)
 
 mod.pan <- as.list(1:9)
 for(i in 1:9)
 {
   sp <- us[i]
-  mod.pan[[i]] <- fit2stageGAMtoCatch(input=pslf,which.flag="Panama",which.species=sp,start.year=1980,end.year=2015,kk=6)
+  mod.pan[[i]] <- fit2stageGAMtoCatch(input=pslf,which.flag="Panama",which.species=sp,start.year=1990,end.year=2015,kk=6)
   print(sp)
 }
 
@@ -337,7 +335,7 @@ for(i in 1:9)
   {print('no model')
   }
   else{
-    aa <- predict.effdis.t2.data(cmod=mod.pan[[i]],which.gear="PS", effmod=emod.pan,grid.res=1,start.year=1980,end.year=2015,which.flag="Panama")
+    aa <- predict.effdis.t2.data(cmod=mod.pan[[i]],which.gear="PS", effmod=emod.pan,grid.res=1,start.year=1990,end.year=2015,which.flag="Panama")
     rm(aa)
     gc(reset=T)
   }
@@ -346,38 +344,38 @@ for(i in 1:9)
 
 ##U.S.A.
 
-emod.usa <- fitGAMtoEffort(input=pslf,which.flag="U.S.A.",which.effort='FISH.HOUR',start.year=1980,end.year=2015,kk=9)
-
-mod.usa <- as.list(1:9)
-for(i in 1:9)
-{
-  sp <- us[i]
-  mod.usa[[i]] <- fit2stageGAMtoCatch(input=pslf,which.flag="U.S.A.",which.species=sp,start.year=1980,end.year=2015,kk=9)
-  print(sp)
-}
-
-for(i in 1:9)
-{
-  if(mod.usa[[i]]=='Insufficient data to support model')
-  {print('no model')
-  }
-  else{
-    aa <- predict.effdis.t2.data(cmod=mod.usa[[i]],which.gear="PS", effmod=emod.usa,grid.res=1,start.year=1980,end.year=2015,which.flag="U.S.A.")
-    rm(aa)
-    gc(reset=T)
-  }
-}
+# emod.usa <- fitGAMtoEffort(input=pslf,which.flag="U.S.A.",which.effort='FISH.HOUR',start.year=1990,end.year=2015,kk=3)
+# 
+# mod.usa <- as.list(1:9)
+# for(i in 1:9)
+# {
+#   sp <- us[i]
+#   mod.usa[[i]] <- fit2stageGAMtoCatch(input=pslf,which.flag="U.S.A.",which.species=sp,start.year=1990,end.year=2015,kk=9)
+#   print(sp)
+# }
+# 
+# for(i in 1:9)
+# {
+#   if(mod.usa[[i]]=='Insufficient data to support model')
+#   {print('no model')
+#   }
+#   else{
+#     aa <- predict.effdis.t2.data(cmod=mod.usa[[i]],which.gear="PS", effmod=emod.usa,grid.res=1,start.year=1990,end.year=2015,which.flag="U.S.A.")
+#     rm(aa)
+#     gc(reset=T)
+#   }
+# }
 
 
 ##Venezuela
 
-emod.ven <- fitGAMtoEffort(input=pslf,which.flag="Venezuela",which.effort='FISH.HOUR',start.year=1980,end.year=2015,kk=9)
+emod.ven <- fitGAMtoEffort(input=pslf,which.flag="Venezuela",which.effort='FISH.HOUR',start.year=1990,end.year=2015,kk=9)
 
 mod.ven <- as.list(1:9)
 for(i in 1:9)
 {
   sp <- us[i]
-  mod.ven[[i]] <- fit2stageGAMtoCatch(input=pslf,which.flag="Venezuela",which.species=sp,start.year=1980,end.year=2015,kk=9)
+  mod.ven[[i]] <- fit2stageGAMtoCatch(input=pslf,which.flag="Venezuela",which.species=sp,start.year=1990,end.year=2015,kk=9)
   print(sp)
 }
 
@@ -387,7 +385,7 @@ for(i in 1:9)
   {print('no model')
   }
   else{
-    aa <- predict.effdis.t2.data(cmod=mod.ven[[i]],which.gear="PS", effmod=emod.ven,grid.res=1,start.year=1980,end.year=2015,which.flag="Venezuela")
+    aa <- predict.effdis.t2.data(cmod=mod.ven[[i]],which.gear="PS", effmod=emod.ven,grid.res=1,start.year=1990,end.year=2015,which.flag="Venezuela")
     rm(aa)
     gc(reset=T)
   }
@@ -396,13 +394,13 @@ for(i in 1:9)
 
 ##Mixed flags (FIS)
 
-emod.mf <- fitGAMtoEffort(input=pslf,which.flag="Mixed flags (FIS)",which.effort='FISH.HOUR',start.year=1980,end.year=2015,kk=9)
+emod.mf <- fitGAMtoEffort(input=pslf,which.flag="Mixed flags (FIS)",which.effort='FISH.HOUR',start.year=1990,end.year=2015,kk=9)
 
 mod.mf <- as.list(1:9)
 for(i in 1:9)
 {
   sp <- us[i]
-  mod.mf[[i]] <- fit2stageGAMtoCatch(input=pslf,which.flag="Mixed flags (FIS)",which.species=sp,start.year=1980,end.year=2015,kk=9)
+  mod.mf[[i]] <- fit2stageGAMtoCatch(input=pslf,which.flag="Mixed flags (FIS)",which.species=sp,start.year=1990,end.year=2015,kk=9)
   print(sp)
 }
 
@@ -412,23 +410,23 @@ for(i in 1:9)
   {print('no model')
   }
   else{
-    aa <- predict.effdis.t2.data(cmod=mod.mf[[i]],which.gear="PS", effmod=emod.mf,grid.res=1,start.year=1980,end.year=2015,which.flag="Mixed flags")
+    aa <- predict.effdis.t2.data(cmod=mod.mf[[i]],which.gear="PS", effmod=emod.mf,grid.res=1,start.year=1990,end.year=2015,which.flag="Mixed flags (FIS)")
     rm(aa)
     gc(reset=T)
   }
 }
 
-## (NEI (ETRO))
+### (NEI (ETRO))
 
-emod.nei <- fitGAMtoEffort(input=pslf,which.flag="NEI ussr <- ps.t1[ps.t1$flag %in% c("U.S.S.R.","Russian Federation"),]
+#ussr <- ps.t1[ps.t1$flag %in% c("U.S.S.R.","Russian Federation"),]
 
-(ETRO)",which.effort='FISH.HOUR',start.year=1980,end.year=2015,kk=6)
+emod.nei <- fitGAMtoEffort(input=pslf,which.flag="NEI (ETRO)",which.effort='FISH.HOUR',start.year=1990,end.year=2015,kk=6)
 
 mod.nei <- as.list(1:9)
 for(i in 1:9)
 {
   sp <- us[i]
-  mod.nei[[i]] <- fit2stageGAMtoCatch(input=pslf,which.flag="NEI (ETRO)",which.species=sp,start.year=1980,end.year=2015,kk=6)
+  mod.nei[[i]] <- fit2stageGAMtoCatch(input=pslf,which.flag="NEI (ETRO)",which.species=sp,start.year=1990,end.year=2015,kk=6)
   print(sp)
 }
 
@@ -438,7 +436,7 @@ for(i in 1:9)
   {print('no model')
   }
   else{
-    aa <- predict.effdis.t2.data(cmod=mod.nei[[i]],which.gear="PS", effmod=emod.nei,grid.res=1,start.year=1980,end.year=2015,which.flag="NEI (ETRO)")
+    aa <- predict.effdis.t2.data(cmod=mod.nei[[i]],which.gear="PS", effmod=emod.nei,grid.res=1,start.year=1990,end.year=2015,which.flag="NEI (ETRO)")
     rm(aa)
     gc(reset=T)
   }
@@ -447,13 +445,13 @@ for(i in 1:9)
 
 ## Other
 
-emod.oth <- fitGAMtoEffort(input=pslf,which.flag="Other",which.effort='FISH.HOUR',start.year=1980,end.year=2015,kk=6)
+emod.oth <- fitGAMtoEffort(input=pslf,which.flag="Other",which.effort='FISH.HOUR',start.year=1990,end.year=2015,kk=6)
 
 mod.oth <- as.list(1:9)
 for(i in 1:9)
 {
   sp <- us[i]
-  mod.oth[[i]] <- fit2stageGAMtoCatch(input=pslf,which.flag="Other",which.species=sp,start.year=1980,end.year=2015,kk=6)
+  mod.oth[[i]] <- fit2stageGAMtoCatch(input=pslf,which.flag="Other",which.species=sp,start.year=1990,end.year=2015,kk=6)
   print(sp)
 }
 
@@ -463,7 +461,7 @@ for(i in 1:9)
   {print('no model')
   }
   else{
-    aa <- predict.effdis.t2.data(cmod=mod.oth[[i]],which.gear="PS", effmod=emod.oth,grid.res=1,start.year=1980,end.year=2015,which.flag="Other")
+    aa <- predict.effdis.t2.data(cmod=mod.oth[[i]],which.gear="PS", effmod=emod.oth,grid.res=1,start.year=1990,end.year=2015,which.flag="Other")
     rm(aa)
     gc(reset=T)
   }
@@ -487,7 +485,7 @@ for( i in 1: length(lf)){
 }
 
 effdis_estimates<-do.call("rbind",effdis_estimates)
-dim(effdis_estimates) # = 249925
+dim(effdis_estimates) # = 226113
 
 dimnames(effdis_estimates)[[2]] <- c("longitude","latitude","which.ocean","year","month","trend","flagname","geargrp","prob","prob.se.fit","measured_catch","measured_catch.se.fit",
                                      "eff","eff.se.fit","species","catch","cpue","observation")          
@@ -509,7 +507,7 @@ print(wf)
 mod1 <- effdis_estimates[effdis_estimates$flagname == wf & effdis_estimates$species == "bet",]
 par(mfrow=c(2,1),mar=c(2,2,2,2))
 #Effort
-effort <- aggt2data(input=pslf,which.effort="FISH.HOUR",which.flag=wf,start.year=1980, end.year=2015)
+effort <- aggt2data(input=pslf,which.effort="FISH.HOUR",which.flag=wf,start.year=1990, end.year=2015)
 plot(effort$trend,effort$eff1,pch=".",xlab="",ylab="")
 title(wf)
 points(mod1$trend,mod1$eff,col="red",pch="*")
@@ -521,7 +519,7 @@ plot(as.numeric(names(te)),te/1000000)
 lines(as.numeric(names(te)),tm/1000000)
 
 
-catch <- aggt2catchdata(input=pslf,which.effort="FISH.HOUR",which.flag=wf,start.year=1980, end.year=2015)
+catch <- aggt2catchdata(input=pslf,which.effort="FISH.HOUR",which.flag=wf,start.year=1990, end.year=2015)
 spp <- "bet"
 par(mfrow=c(1,1))
 plot(catch$trend[catch$species == spp],catch$raw_measured_catch[catch$species == spp],pch=".",
@@ -535,11 +533,11 @@ plot(mod2$trend[mod2$species == spp],mod2$catch[mod2$species == spp],col="green"
 
 xyplot(eff~trend|flagname,data=effdis_estimates[effdis_estimates$species == "bet",],pch=".")
 
-
 #Which species do we not have by flag ?
 
 n1 <-table(effdis_estimates$flagname,as.character(effdis_estimates$species))
 n1 <- ifelse(n1==0,F,T)
+n1
 
 #################################
 ### Get Task 1 data##############
@@ -549,6 +547,7 @@ n1 <- ifelse(n1==0,F,T)
 ps.t1 <- get.effdis.t1.data(which.dsn='effdis-tuna-cc1',which.gear = 'PS',which.region='AT',which.flag='All')
 str(ps.t1)
 for(i in c(2,5:15)){ps.t1[,i] <- as.character(ps.t1[,i])}
+ps.t1<- ps.t1[ps.t1$yearc > 1989,]
 
 # Datatype is either C (catch), L (Landings), DD (Discards), DM (?) and Landings
 
@@ -578,7 +577,7 @@ xyplot(qty_t~yearc|species,groups=fleet,data=ps.t1[ps.t1$flag=="Venezuela",],typ
 
 #Convert Task 1 to 'Other
 
-uf<-sort(unique(pslf$flagname))
+uf<-sort(unique(pslf$flagname[pslf$year > 1989]))
 uf2 <- uf
 
 uf1 <- as.character(sort(unique(ps.t1$flag)))
@@ -644,22 +643,6 @@ effdis_estimates$species <- as.character(effdis_estimates$species)
 
 # Create modeled effort file - we have this problem that effort is repeated in the long format.
 
-tapply(effdis_estimates$eff,list(effdis_estimates$flagname,effdis_estimates$species),sum)
-# 
-#                        alb        bet         skj         yft
-# Cape Verde               NA   16700.70   16700.696   16700.696
-# Curaçao                  NA   46466.10   46466.097   46466.097
-# EU.España         4647867.0 4647867.03 4647867.025 4647867.025
-# EU.France          680155.3  680155.32  680155.323  680155.323
-# Guatemala                NA   30574.79   30574.789          NA
-# Guinée Rep.              NA   16210.21   16210.209   16210.209
-# Japan                    NA         NA    7787.665    7787.665
-# Mixed flags (NIS)        NA 1207435.19 1207435.186 1207435.186
-# NEI (ETRO)         280678.7  280678.73  280678.728  280678.728
-# Other                    NA  611851.10  611851.098  611851.098
-# Panama                   NA   57413.79   57413.794   57413.794
-# U.S.A.                   NA         NA   33827.999   33827.999
-# Venezuela          633744.0  633744.01  633744.012  633744.012
 
 
 effdis_estimates.skj <- effdis_estimates[effdis_estimates$species == 'skj',] # Just take the skj since all countries catch them
@@ -798,9 +781,9 @@ ggsave(p,file="GlobalEffdisEstimates.png",dpi=500,w=10,h=6,unit="in",type="cairo
 
 z5$geargrp <- "PS"
 
-write.table(z5,file="effdis_ps.1980.2014.csv",sep=",",row.names=F)
+write.table(z5,file="effdis_ps.1990.2014.csv",sep=",",row.names=F)
 
-effdis_ps.1980.2015<-read.table("effdis_ps.1980.2014.csv",sep=",",header=T)
+effdis_ps.1990.2015<-read.table("effdis_ps.1990.2014.csv",sep=",",header=T)
 
 chan <- odbcConnect("effdis-tuna-cc1", case="postgresql", believeNRows=FALSE)
 sqlQuery(chan,'drop table effdis_ps_1980_2014')
