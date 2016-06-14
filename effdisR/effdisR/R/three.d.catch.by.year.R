@@ -4,8 +4,8 @@ function(tdata = task2.lf, which.gear = 'LL', which.year = 2005, gridx=5,gridy=5
   
     {
     
-#        tdata<-skj; which.gear <- 'PS'; which.year <- 2014; gridx <- 5; gridy <- 5; which.species = "skj"; catchunit <- 'kg'
-#        which.flag<- 'EU.France'
+        #tdata<-skj; which.gear <- 'PS'; which.year <- 2014; gridx <- 5; gridy <- 5; which.species = "skj"; catchunit <- 'kg'
+        #which.flag<- 'EU.France'
 # # #   
     if(which.flag == 'All'){
       tdata1 <- tdata[tdata$geargrpcode == which.gear & tdata$month < 13 & tdata$year == which.year & tdata$species == which.species & tdata$catchunit == catchunit,]
@@ -67,6 +67,11 @@ function(tdata = task2.lf, which.gear = 'LL', which.year = 2005, gridx=5,gridy=5
       #tacsat                        <- intervalTacsat(tacsat,level="vessel",fill.na=T)
       
       idx                           <- over(as(coords,"SpatialPoints"),as(grd,"SpatialGrid"))
+      
+     
+      
+      
+      
       tdata1$gridID                 <- idx
       
       
