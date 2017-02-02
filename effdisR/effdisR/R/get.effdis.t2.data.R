@@ -18,7 +18,7 @@ if(which.flag=='All') # If which.flag is 'All' extract all data
   query <- paste0("SELECT yearc AS year, trend, timeperiodid AS month, flagname, fleetcode,region, squaretypecode,quadid,
 geargrpcode,lon,lat,longitude,latitude, catchunit, dsettype, eff1, eff1type,
 alb,bft,bet,skj,yft,swo,bum,sai,whm,totsp9
-FROM t2ce_new
+FROM t2ce_2017
 WHERE region =","'",which.region,"'","AND timeperiodid < 13 AND geargrpcode=","'",which.gear,"'",
                   "AND dsettype=","'",which.dsettype,"'")
   }
@@ -28,7 +28,7 @@ query <- paste0("SELECT yearc AS year, trend, timeperiodid AS month, flagname, f
 geargrpcode,lon,lat,longitude,latitude, catchunit, dsettype, eff1, eff1type,
 alb,bft,bet,skj,yft,swo,bum,sai,whm,totsp9
 
-FROM t2ce_new
+FROM t2ce_2017
 WHERE region =","'",which.region,"'","AND timeperiodid < 13 AND geargrpcode=","'",which.gear,"'",
                 "AND flagname=","'",which.flag,"'","AND dsettype=","'",which.dsettype,"'")
 }
