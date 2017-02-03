@@ -20,7 +20,7 @@ geargrpcode,lon,lat,longitude,latitude, catchunit, dsettype, eff1, eff1type,
 alb,bft,bet,skj,yft,swo,bum,sai,whm,totsp9
 FROM t2ce_2017
 WHERE region =","'",which.region,"'","AND timeperiodid < 13 AND geargrpcode=","'",which.gear,"'",
-                  "AND dsettype=","'",which.dsettype,"'")
+                  "AND dsettypeid=","'",which.dsettype,"'")
   }
 
 else{
@@ -30,7 +30,7 @@ alb,bft,bet,skj,yft,swo,bum,sai,whm,totsp9
 
 FROM t2ce_2017
 WHERE region =","'",which.region,"'","AND timeperiodid < 13 AND geargrpcode=","'",which.gear,"'",
-                "AND flagname=","'",which.flag,"'","AND dsettype=","'",which.dsettype,"'")
+                "AND flagname=","'",which.flag,"'","AND dsettypeid=","'",which.dsettype,"'")
 }
 
   out <- sqlQuery(chan,query)
