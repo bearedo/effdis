@@ -17,14 +17,14 @@ function(which.dsn="effdis-tuna-cc1",which.gear='LL',which.region='AT',which.fla
 if(which.flag=='All') # If which.flag is 'All' extract all data
   {
   query <- paste0("SELECT *
-FROM t1det9sp_new
+FROM t1det_2017
 WHERE region =","'",which.region,"'","AND geargrp=","'",which.gear,"'")
   }
 
 else{
 query <- paste0("SELECT * 
 
-FROM t1det9sp_new
+FROM t1det_2017
 WHERE region =","'",which.region,"'","AND geargrp=","'",which.gear,"'",
                 "AND flag=","'",which.flag,"'")
 }
