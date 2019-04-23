@@ -5,7 +5,7 @@ function(input=lllf,which.flag="Japan",which.effort='NO.HOOKS',start.year=1950,e
   
    #input <- lllf; which.flag='Korea Rep.'; which.effort='NO.HOOKS'; start.year=1990; end.year=2015
   
-  input <- input[input$year >= start.year & input$year <= end.year & input$eff1type == which.effort,]
+  input <- input[input$year >= start.year & input$year <= end.year & input$eff1type %in% which.effort,]
   
   input <- input[input$species == 'bet',] # Doesn't matter which as the Xn data are all repeated in the long format
   
