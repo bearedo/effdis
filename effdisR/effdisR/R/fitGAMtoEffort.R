@@ -4,7 +4,7 @@ function(input = lllf, which.flag='Japan',which.effort='NO.HOOKS',start.year=195
   
 #input <- pslf; which.flag='Ghana'; which.effort='FISH.HOUR'; start.year=1980; end.year=2015
 
-input <- input[input$year >= start.year & input$year <= end.year & input$eff1type == which.effort,]
+input <- input[input$year >= start.year & input$year <= end.year & input$eff1type %in% which.effort,]
 
 #input[input$trend == 517 & input$longitude == -12.5 & input$latitude == -12.5 & input$flagname == "Japan",]
 #input[input$trend == 517 & input$longitude == -12.5 & input$latitude == -2.5 & input$flagname == "Korea Rep.",]
